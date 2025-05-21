@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Passwort-Rücksetzung anfordern</title>
+  </head>
+  <body>
+    <h2>Passwort-Rücksetzung anfordern</h2>
+    <p>Geben Sie in das Feld Ihren Benutzername oder Ihre Emailadresse ein und drücken Sie Enter</p>
+    <form>
+      Benutzername oder Email: <input type="text" name="login" />
+      <button>Absenden</button>
+    </form>
+    <br />
+    <div id="message"></div>
+
+    <script src="/axios/axios.min.js"></script>
+    <script>
+      'use strict';
+
+      // Zuweisungen ins DOM speichern
+      const form = document.querySelector('form');
+      const message = document.querySelector('#message');
+      const input = document.querySelector('input[name=login]');
+
+      // Eventlistener für Form onSubmit
+      form.addEventListener('submit', (event) => {
+        // Standardverhalten abbrechen
+        event.preventDefault();
+
+        // ev. Prüfungen
+        const login = input.value;
+        if (login.length > 200 || login.length < 4) {
+          return alert('Benutzername / Emailadresse muss 4 bis 200 Stellen lang sein');
+        }
+
+        // Daten ans Backend senden
+        // Axios request config object bauen
+        const config = {
+          method: 'post',
+          url: '/api/members/reset-password',
+          data: { login },
+        };
+
+        axios(config)
+          .then((response) => {
+            // Response auswerten
+            message.innerHTML = response.data;
+          })
+          .catch((error) => {
+            // Fehler-Response auswerten
+            message.innerHTML = error.response.data.message;
+          });
+      });
+    </script>
+  </body>
+</html>
