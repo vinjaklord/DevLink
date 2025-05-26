@@ -3,7 +3,7 @@ import Logo from "../../assets/react.svg";
 
 export default function AppNameAndLogo() {
   return (
-    <div className="font-poppins flex items-center gap-2">
+    <div className="font-poppins flex items-center gap-2 ">
       {/* Logo with Link */}
       <Link to="/">
         <div className="flex justify-center items-center">

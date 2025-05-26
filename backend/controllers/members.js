@@ -53,22 +53,22 @@ const signup = async (req, res, next) => {
 
     const data = matchedData(req);
 
-    // ist ein Bild vorhanden?
-    if (!req.file) {
-      throw new HttpError('Photo is missing', 422);
-    }
+    // // ist ein Bild vorhanden?
+    // if (!req.file) {
+    //   throw new HttpError('Photo is missing', 422);
+    // }
 
-    // Bild zu Cloudinary transferieren
-    const response = await sendFileToCloudinary(FOLDER_NAME, req.file.path);
+    // // Bild zu Cloudinary transferieren
+    // const response = await sendFileToCloudinary(FOLDER_NAME, req.file.path);
 
-    photo = {
-      cloudinaryPublicId: response.public_id,
-      url: response.secure_url,
-    };
+    // photo = {
+    //   cloudinaryPublicId: response.public_id,
+    //   url: response.secure_url,
+    // };
 
-    // Geodaten holen
-    const address = data.street + ', ' + data.zip + ' ' + data.city;
-    const geo = await getGeolocation(address);
+    // // Geodaten holen
+    // const address = data.street + ', ' + data.zip + ' ' + data.city;
+    // const geo = await getGeolocation(address);
 
     // Password generiert
     const password = getHash(data.password);
@@ -79,8 +79,8 @@ const signup = async (req, res, next) => {
     const createdMember = new Member({
       //Spread-Opertor
       ...data,
-      geo,
-      photo,
+      // geo,
+      // photo,
     });
 
     // Member speichern und Password speichern in einer Transaktion
@@ -343,7 +343,9 @@ const getDistances = async (req, res, next) => {
     // Array ausgeben
     res.json(calculatesMembers);
   } catch (error) {
-    return next(new HttpError(error, error.errorCode || 500, error.messageArray));
+    return next(
+      new HttpError(error, error.errorCode || 500, error.messageArray)
+    );
   }
 };
 
@@ -385,7 +387,9 @@ const removeFavorite = async (req, res, next) => {
     const { favoriteId } = req.params;
 
     // favoriteId in der Liste der Favoriten suchen. Wenn gefunden -> aus dem Array entfernen
-    const index = foundMember.favorites.findIndex((favorite) => favorite.toString() === favoriteId);
+    const index = foundMember.favorites.findIndex(
+      (favorite) => favorite.toString() === favoriteId
+    );
     if (index === -1) {
       return res.json(foundMember);
     }
@@ -398,7 +402,9 @@ const removeFavorite = async (req, res, next) => {
     // angemeldeten Member mit neuer Favoritenliste ausgeben
     res.json(savedMember);
   } catch (error) {
-    return next(new HttpError(error, error.errorCode || 500, error.messageArray));
+    return next(
+      new HttpError(error, error.errorCode || 500, error.messageArray)
+    );
   }
 };
 
@@ -425,7 +431,9 @@ const resetPassword = async (req, res, next) => {
     await newResettoken.save();
 
     // Email produzieren (Text mit Link) und raussenden an Email-Adresse
-    const link = `http://${req.hostname}:${process.env.port || 80}/set-new-password?t=${token}`;
+    const link = `http://${req.hostname}:${
+      process.env.port || 80
+    }/set-new-password?t=${token}`;
     const html = `
     <p>Lieber ${foundMember.firstName} ${foundMember.lastName}!</p>
     <p>Mittels nachfolgendem Link können Sie ein neues Passwort setzen!</p>
@@ -455,7 +463,9 @@ const resetPassword = async (req, res, next) => {
     // Erfolgsmeldung rausschicken
     res.send('Mail was sent successfully');
   } catch (error) {
-    return next(new HttpError(error, error.errorCode || 500, error.messageArray));
+    return next(
+      new HttpError(error, error.errorCode || 500, error.messageArray)
+    );
   }
 };
 
@@ -500,7 +510,10 @@ const setNewPassword = async (req, res, next) => {
     const newPassword = getHash(password);
 
     // Altes Passwort suchen, mit neuem überschreiben, speichern
-    await Password.findOneAndUpdate({ member: foundResettoken.member }, { password: newPassword });
+    await Password.findOneAndUpdate(
+      { member: foundResettoken.member },
+      { password: newPassword }
+    );
 
     // alle bestehenden Reset-Tokens dieses Members löschen
     await Resettoken.deleteMany({ member: foundResettoken.member });
@@ -508,7 +521,9 @@ const setNewPassword = async (req, res, next) => {
     // Erfolgsmeldung rausschicken
     res.send('New Password was set successfully');
   } catch (error) {
-    return next(new HttpError(error, error.errorCode || 500, error.messageArray));
+    return next(
+      new HttpError(error, error.errorCode || 500, error.messageArray)
+    );
   }
 };
 

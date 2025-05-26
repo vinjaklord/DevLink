@@ -10,30 +10,15 @@ const Schema = mongoose.Schema;
 
 const membersSchema = new Schema(
   {
-    nickname: { type: String, required: true, unique: true },
+    username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
-    street: { type: String, required: true },
-    city: { type: String, required: true },
-    zip: { type: String, required: true },
-    birthDay: { type: Number, required: true },
-    birthMonth: { type: Number, required: true },
-    birthYear: { type: Number, required: true },
-    statement: String,
-    paused: { type: Boolean, default: false },
     isAdmin: { type: Boolean, default: false },
-    photo: {
-      cloudinaryPublicId: { type: String, required: true },
-      url: { type: String, required: true },
-    },
-    geo: {
-      lat: { type: Number, default: 0 },
-      lon: { type: Number, default: 0 },
-    },
-    age: Number,
-    zodiac: String,
-    favorites: [{ type: mongoose.Types.ObjectId, required: true, ref: 'Member' }],
+    // photo: {
+    //   cloudinaryPublicId: { type: String, required: true },
+    //   url: { type: String, required: true },
+    // },
   },
   { timestamps: true }
 );
@@ -74,7 +59,10 @@ membersSchema.post('findOneAndDelete', async (deletedMember) => {
     await Resettoken.deleteMany({ member: deletedMember._id });
 
     await Visit.deleteMany({
-      $or: [{ visitor: deletedMember._id }, { targetMember: deletedMember._id }],
+      $or: [
+        { visitor: deletedMember._id },
+        { targetMember: deletedMember._id },
+      ],
     });
 
     await Heart.deleteMany({
