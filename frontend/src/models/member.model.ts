@@ -1,4 +1,5 @@
 export interface IMember {
+<<<<<<< HEAD
   id: string;
   username: string;
   email?: string;
@@ -21,4 +22,13 @@ export interface SignupCredentials {
   email: string;
   password: string;
   confirmPassword: string;
+=======
+    id: string;
+    username: string;
+    firstName: string;
+    lastName: string;
+    adress?: {
+        city: string;
+    };
+>>>>>>> 6d20355e57951d7fc0081343aee732ce15e82fa0
 }

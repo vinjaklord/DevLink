@@ -1,25 +1,25 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
-@import "tailwindcss";
-@import "tw-animate-css";
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
 button,
-[role="button"],
-[type="button"],
+[role='button'],
+[type='button'],
 a,
 .cursor-pointer,
-[role="menuitem"] {
+[role='menuitem'] {
   cursor: pointer !important;
 }
 body {
-  font-family: "Poppins", sans-serif;
+  font-family: 'Poppins', sans-serif;
   background: var(--background);
   color: var(--foreground);
 }
 
 .font-poppins {
-  font-family: "Poppins", sans-serif;
+  font-family: 'Poppins', sans-serif;
 }
 
 @theme inline {
