@@ -1,11 +1,17 @@
-import { useEffect } from "react";
-import { Routes, Route } from "react-router-dom"; // Remove BrowserRouter import
-import useStore from "./hooks/useStore";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./Components/ui/dialog";
-import Header from "./Components/Header/Header";
-import { Signup } from "./Components/SignUp/Signup";
-import "./App.css";
-import { Login } from "./Components/Login/Login";
+import { useEffect } from 'react';
+import { Routes, Route } from 'react-router-dom'; // Remove BrowserRouter import
+import useStore from './hooks/useStore';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from './Components/ui/dialog';
+import Header from './Components/Header/Header';
+import { Signup } from './Components/SignUp/Signup';
+import './App.css';
+import { Login } from './Components/Login/Login';
 
 function App() {
   const { loggedInMember, memberCheck } = useStore((state) => state);
@@ -18,6 +24,7 @@ function App() {
   // Define routes for logged-in users
   const routerLoggedIn = (
     <Routes>
+      {/* Add your routes here when ready */}
       {/* Add your routes here when ready */}
       {/* <Route path="/" element={<Dashboard />} /> */}
       {/* <Route path="/edit-profile" element={<MemberChangeProfile />} /> */}
