@@ -2,7 +2,6 @@ import mongoose from 'mongoose';
 
 import { getZodiac, getAge } from '../common/index.js';
 
-
 const Schema = mongoose.Schema;
 
 const membersSchema = new Schema(
@@ -23,10 +22,6 @@ const membersSchema = new Schema(
 const passwordsSchema = new Schema(
   {
     password: { type: String, required: true },
-<<<<<<< HEAD
-
-=======
->>>>>>> 6d20355e57951d7fc0081343aee732ce15e82fa0
     member: { type: mongoose.Types.ObjectId, required: true, ref: 'Member' },
   },
   { timestamps: true }
@@ -59,24 +54,6 @@ membersSchema.post('findOneAndDelete', async (deletedMember) => {
 
     await Resettoken.deleteMany({ member: deletedMember._id });
 
-<<<<<<< HEAD
-   
-=======
-    await Visit.deleteMany({
-      $or: [
-        { visitor: deletedMember._id },
-        { targetMember: deletedMember._id },
-      ],
-    });
-
-    await Heart.deleteMany({
-      $or: [{ sender: deletedMember._id }, { recipient: deletedMember._id }],
-    });
-
-    await Message.deleteMany({
-      $or: [{ sender: deletedMember._id }, { recipient: deletedMember._id }],
-    });
->>>>>>> 6d20355e57951d7fc0081343aee732ce15e82fa0
     // TODO: weitere Collections beachten wie z.B. hearts, visits, usw.
   }
 });

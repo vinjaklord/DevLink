@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { Button } from '../ui/button';
 import {
   Card,
@@ -16,16 +15,7 @@ import useForm from '../../hooks/useForm';
 import useStore from '../../hooks/useStore';
 import { Link } from 'react-router-dom';
 import { EyeIcon, EyeSlashIcon } from '@phosphor-icons/react';
-=======
-import { Button } from "../ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import useForm from "../hooks/useForm";
-import useStore from "../hooks/useStore";
->>>>>>> 6d20355e57951d7fc0081343aee732ce15e82fa0
+import { toast } from 'sonner';
 
 type UserData = {
   username: string;
@@ -36,9 +26,8 @@ type UserData = {
   email: string;
 };
 export function Signup() {
-  const { memberSignup, raiseAlert } = useStore((state) => state);
+  const { memberSignup } = useStore((state) => state);
   const [showPassword, setShowPassword] = useState(false);
-<<<<<<< HEAD
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
   const toggleConfirmPasswordVisibility = () =>
@@ -53,30 +42,11 @@ export function Signup() {
     firstName: '',
     lastName: '',
     email: '',
-=======
-  const navigate = useNavigate();
-
-  const { formState, handleFormChange } = useForm<UserData>({
-    username: "",
-    password: "",
-    confirmPassword: "",
-    firstName: "",
-    lastName: "",
-    email: "",
->>>>>>> 6d20355e57951d7fc0081343aee732ce15e82fa0
   });
 
   const handleSignup = async () => {
     if (formState.password !== formState.confirmPassword) {
-      return raiseAlert({
-<<<<<<< HEAD
-        severity: 'warning',
-        text: 'Passwords do not match.',
-=======
-        severity: "warning",
-        text: "Passwords do not match.",
->>>>>>> 6d20355e57951d7fc0081343aee732ce15e82fa0
-      });
+      toast.warning('Passwords do not match!');
     }
 
     const userData: UserData = {
@@ -88,30 +58,13 @@ export function Signup() {
       lastName: formState.lastName,
     };
 
-<<<<<<< HEAD
-    console.log('userData:', userData); // Debug the data
     const response = await memberSignup(userData);
 
     if (response) {
       navigate('/login');
-      console.log('success');
+      toast.success('Successfully signed in. Welcome!');
     } else {
-      raiseAlert({
-        severity: 'error',
-        text: 'There was an issue with the signup. Please check the fields.',
-=======
-    console.log("userData:", userData); // Debug the data
-    const response = await memberSignup(userData);
-
-    if (response) {
-      // navigate("/login");
-      console.log("success");
-    } else {
-      raiseAlert({
-        severity: "error",
-        text: "There was an issue with the signup. Please check the fields.",
->>>>>>> 6d20355e57951d7fc0081343aee732ce15e82fa0
-      });
+      toast.error('Error while signing in!');
     }
   };
 
@@ -120,16 +73,11 @@ export function Signup() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Sign Up</CardTitle>
-<<<<<<< HEAD
           <CardDescription>Welcome, Stranger!</CardDescription>
-=======
-          <CardDescription>Make changes to your account here. Click save when you're done.</CardDescription>
->>>>>>> 6d20355e57951d7fc0081343aee732ce15e82fa0
         </CardHeader>
         <CardContent className="space-y-2 ">
           <div className="space-y-1">
             <Label htmlFor="firstName">First Name</Label>
-<<<<<<< HEAD
             <Input
               id="firstName"
               name="firstName"
@@ -223,31 +171,6 @@ export function Signup() {
           </Link>
         </div>
 
-=======
-            <Input id="firstName" name="firstName" value={formState.firstName} onChange={handleFormChange} />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="lastName">Last Name</Label>
-            <Input id="lastName" name="lastName" value={formState.lastName} onChange={handleFormChange} />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="username">Username</Label>
-            <Input id="username" name="username" value={formState.username} onChange={handleFormChange} />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" name="email" value={formState.email} onChange={handleFormChange} />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="password">Password</Label>
-            <Input id="password" name="password" type="password" value={formState.password} onChange={handleFormChange} />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
-            <Input id="confirmPassword" name="confirmPassword" type="password" value={formState.confirmPassword} onChange={handleFormChange} />
-          </div>
-        </CardContent>
->>>>>>> 6d20355e57951d7fc0081343aee732ce15e82fa0
         <CardFooter className="flex justify-center">
           <Button onClick={handleSignup}>Sign Up</Button>
         </CardFooter>

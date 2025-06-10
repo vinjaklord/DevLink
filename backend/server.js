@@ -39,15 +39,9 @@ app.use(express.json());
 app.use(express.static('www'));
 app.use('/axios', express.static('node_modules/axios/dist'));
 
-<<<<<<< HEAD
 // app.get('/', (req, res) => {
 //   res.send('There are no Easter Eggs up here. Go away.');
 // });
-=======
-app.get('/', (req, res) => {
-  res.send('There are no Easter Eggs up here. Go away.');
-});
->>>>>>> 6d20355e57951d7fc0081343aee732ce15e82fa0
 
 // alle anderen Routen
 app.use('/', router);

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import type {
   IMember,
   LoginCredentials,
@@ -13,6 +12,7 @@ import type {
 import { updateInstance } from '../../utils/object.common-js.ts';
 import fetchAPI from '../../utils/index.ts';
 import { jwtDecode } from 'jwt-decode';
+import { toast } from 'sonner';
 
 // Interfaces /////////////////////////////////////////
 export interface MemberStore {
@@ -91,19 +91,20 @@ export const createMemberSlice = (set: any, get: any): MemberStore => ({
       if (response.status !== 200) {
         throw new Error('Login failed');
       }
-
+      toast.success('Signed in successfully. Welcome!');
       console.log('success signup');
 
       return true;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error during signup:', error);
 
       if (error.code === 'ECONNABORTED') {
-        //add alert window
+        toast.error('ECONNABORTED');
         console.log('ECONNABORTED');
       } else {
         //alert window
-        console.error(error, error.message);
+        // toast.error(error.message);
+        console.error(error.message);
       }
       return false;
     }
@@ -147,6 +148,7 @@ export const createMemberSlice = (set: any, get: any): MemberStore => ({
       return true;
     } catch (error: unknown) {
       // console.log('was ist error', error);
+      toast.error(error.message);
       console.error(error, error.response?.data?.message);
 
       return false;
@@ -206,52 +208,3 @@ export const createMemberSlice = (set: any, get: any): MemberStore => ({
     }
   },
 });
-=======
-import type { IMember } from '../../models/member.model.ts';
-import { updateInstance } from '@/utils/object.common-js.ts';
-import { fetchAPI } from '@/utils/index.ts';
-
-export interface MemberStore {
-    member: IMember;
-    loading: boolean;
-    setMember: (data: Partial<IMember>) => void;
-    resetMember: () => void; 
-    searchMembers: (q: string) => Promise<IMember[]>;
-}
-
-const defaultMember: IMember = {
-    id: '',
-    username: '',
-    firstName: '',
-    lastName: '',
-};
-
-export const createMemberSlice = (set: any, get: any): MemberStore => ({
-    member: defaultMember,
-    loading: false,
-
-    setMember: (data: Partial<IMember>) => {
-        set((state: MemberStore) => ({
-            member: updateInstance(state.member, data),
-        }));
-    },
-
-    resetMember: () => set({member: defaultMember}),
-
-    searchMembers: async (q: string) => {
-        try {
-        set({ loading: true });
-
-        const response = await fetchAPI({ method: "get", url: `/api/members/search?q=${q}`});
-
-        // Update state with fetched members and reset loading
-        set({ loading: false });
-        return response.data;
-        } catch (err) {
-        console.error("Error fetching members", err);
-        set({ loading: false });
-        }
-    },
-})
-
->>>>>>> 6d20355e57951d7fc0081343aee732ce15e82fa0
