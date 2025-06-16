@@ -228,7 +228,7 @@ const getAllMembers = async (req, res, next) => {
     // mit leerem Objekt bekommen wir alle Members
     const membersList = await Member.find({})
       // Liste aller Members in JSON-Format an Client senden
-      .res.json(membersList);
+    res.json(membersList);
   } catch (error) {
     return next(new HttpError(error, error.errorCode || 500));
   }

@@ -17,6 +17,7 @@ import { toast } from 'sonner';
 // Interfaces /////////////////////////////////////////
 export interface MemberStore {
   member: IMember;
+  members: IMember[];
   loading: boolean;
   loggedInMember: IMember | null;
   token: string | null;
@@ -51,6 +52,7 @@ const initialState = {
 export const createMemberSlice = (set: any, get: any): MemberStore => ({
   member: defaultMember,
   loading: false,
+  members: [],
   ...initialState,
 
   setMember: (data: Partial<IMember>) => {
@@ -67,11 +69,11 @@ export const createMemberSlice = (set: any, get: any): MemberStore => ({
 
       const response = await fetchAPI({
         method: 'get',
-        url: `/api/members/search?q=${q}`,
+        url: `/members/search?q=${q}`,
       });
 
       // Update state with fetched members and reset loading
-      set({ loading: false });
+      set({ members: response.data, loading: false });
       return response.data;
     } catch (err) {
       console.error('Error fetching members', err);
