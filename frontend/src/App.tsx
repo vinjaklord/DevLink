@@ -1,18 +1,12 @@
 import { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom'; // Remove BrowserRouter import
 import useStore from './hooks/useStore';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from './Components/ui/dialog';
 import Header from './Components/Header/Header';
 import { Signup } from './Components/SignUp/Signup';
 import { Login } from './Components/Login/Login';
 import './App.css';
 import { Toaster } from 'sonner';
+import Feed from './Components/Feed/Feed';
 
 function App() {
   const { loggedInMember, memberCheck } = useStore((state) => state);
@@ -26,7 +20,7 @@ function App() {
   const routerLoggedIn = (
     <Routes>
       {/* Add your routes here when ready */}
-      {/* <Route path="/" element={<Dashboard />} /> */}
+      <Route path="/" element={<Feed />} />
       {/* <Route path="/edit-profile" element={<MemberChangeProfile />} /> */}
       {/* <Route path="/news" element={<NewsPage />} /> */}
       {/* <Route path="/calendar" element={<TablePage />} /> */}
@@ -42,7 +36,7 @@ function App() {
       <Route path="/signup" element={<Signup />} />
       <Route path="/login" element={<Login />} />
       {/* Add other routes as needed */}
-      {/* <Route path="/" element={<Dashboard />} /> */}
+      <Route path="/" element={<Feed />} />
       {/* <Route path="/news" element={<NewsPage />} /> */}
       {/* <Route path="/calendar" element={<TablePage />} /> */}
       {/* <Route path="/calculator" element={<CalculatorPage />} /> */}
@@ -52,16 +46,14 @@ function App() {
   );
 
   // Select the correct set of routes based on loggedInMember status
-  // const routes = loggedInMember ? routerLoggedIn : routerNotLoggedIn;
+  const routes = loggedInMember ? routerLoggedIn : routerNotLoggedIn;
 
   // TEMPORARY ROUTES
-  const routes = routerNotLoggedIn;
 
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      {/* <CustomToast /> */}
-      <main className="container mx-auto px-6 pt-32 flex-grow ">{routes}</main>
+      <main className="container mx-auto px-6 pt-32 flex-grow">{routes}</main>
       <Toaster richColors position="bottom-left" />
     </div>
   );

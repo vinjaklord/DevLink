@@ -1,12 +1,15 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 
-import { createMemberSlice } from "./store-slices/memberStore.ts"; 
-import type { MemberStore } from "./store-slices/memberStore.ts";
+import { createMemberSlice } from './store-slices/memberStore.ts';
+import { createFriendsSlice } from './store-slices/friendsStore.ts';
+import type { MemberStore } from './store-slices/memberStore.ts';
+import type { FriendsStore } from './store-slices/friendsStore.ts';
 
+type StoreState = MemberStore & FriendsStore;
 
-// Makes the useStore cleanier and the code more readable
-const useStore = create<MemberStore>((set, get) => ({
+const useStore = create<StoreState>((set, get) => ({
   ...createMemberSlice(set, get),
+  ...createFriendsSlice(set, get),
 }));
 
 export default useStore;
