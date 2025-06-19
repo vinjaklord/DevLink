@@ -53,6 +53,8 @@ const signup = async (req, res, next) => {
 
     const data = matchedData(req);
 
+    const uploadResponse = await uploadImage(image.buffer, image.originalname);
+    
     // // ist ein Bild vorhanden?
     // if (!req.file) {
     //   throw new HttpError('Photo is missing', 422);
@@ -80,7 +82,10 @@ const signup = async (req, res, next) => {
       //Spread-Opertor
       ...data,
       // geo,
-      // photo,
+      photo: {
+        fileId: uploadResponse.fileId,
+        url: uploadResponse.url
+      },
     });
 
     // Member speichern und Password speichern in einer Transaktion
@@ -101,6 +106,8 @@ const signup = async (req, res, next) => {
 
     // Bestätigen der Transaction
     await session.commitTransaction();
+
+    session.endSession();
 
     // Daten des neuen Members an Client gesendet (ohne Passwort)
     res.json(newMember);

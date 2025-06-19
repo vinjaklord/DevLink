@@ -22,6 +22,7 @@ import {
 } from '../controllers/friends.js';
 
 import { upload, checkToken } from '../common/middlewares.js';
+import { addComment, createPost, getPostById } from '../controllers/posts.js';
 
 const router = new Router();
 
@@ -103,5 +104,23 @@ router.put(
   [check('senderId').isMongoId(), check('action').isIn(['accept', 'decline'])],
   manageFriendRequest
 );
+
+router.post(
+  '/posts/post',
+  checkToken,
+  upload.single('photo'),
+  body('caption').trim().escape().isLength({ min: 1, max: 300 }),
+  createPost
+);
+
+router.post(
+  "/posts/:id/comments",
+  checkToken,
+  upload.none(),
+  body("text").trim().escape().isLength({ min: 1, max: 500 }),
+  addComment
+);
+
+router.get('/posts/:id', getPostById);
 
 export default router;

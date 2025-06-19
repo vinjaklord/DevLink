@@ -15,10 +15,10 @@ const membersSchema = new Schema(
       { type: mongoose.Types.ObjectId, ref: 'Member', default: [] },
     ],
     friends: [{ type: mongoose.Types.ObjectId, ref: 'Member', default: [] }],
-    // photo: {
-    //   cloudinaryPublicId: { type: String, required: true },
-    //   url: { type: String, required: true },
-    // },
+    photo: {
+      fileId: { type: String, required: true },
+      url: { type: String, required: true },
+    },
   },
   { timestamps: true }
 );
