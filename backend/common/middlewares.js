@@ -14,8 +14,8 @@ dotenv.config();
 //     cb(null, './uploads');
 //   },
 //   filename: (req, file, cb) => {
-    // const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    // cb(null, file.fieldname + '-' + uniqueSuffix);
+// const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+// cb(null, file.fieldname + '-' + uniqueSuffix);
 //     const extArray = file.mimetype.split('/');
 //     const extension = extArray[extArray.length - 1];
 //     cb(null, file.fieldname + '-' + Date.now() + '.' + extension);
@@ -33,7 +33,8 @@ const fileFilter = (req, file, cb) => {
     file.mimetype === 'image/jpeg' ||
     file.mimetype === 'image/jpg' ||
     file.mimetype === 'image/png' ||
-    file.mimetype === 'image/gif'
+    file.mimetype === 'image/gif' ||
+    file.mimetype === 'image/svg'
   ) {
     return cb(null, true);
   }
