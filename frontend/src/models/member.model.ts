@@ -4,9 +4,14 @@ export interface IMember {
   email?: string;
   firstName: string;
   lastName: string;
+  photo?: Photo;
   adress?: {
     city: string;
   };
+}
+interface Photo {
+  url?: string;
+  photoId?: string;
 }
 
 export interface LoginCredentials {
@@ -19,6 +24,7 @@ export interface SignupCredentials {
   lastName: string;
   username: string;
   email: string;
+  photo?: Photo;
   password: string;
   confirmPassword: string;
 }

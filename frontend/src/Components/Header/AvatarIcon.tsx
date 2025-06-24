@@ -12,7 +12,7 @@ import {
 import { Link } from 'react-router-dom';
 
 export default function AvatarIcon() {
-  const { loggedInMember } = useStore((state) => state);
+  const { loggedInMember, memberLogout } = useStore((state) => state);
 
   return (
     <DropdownMenu>
@@ -47,6 +47,18 @@ export default function AvatarIcon() {
             <DropdownMenuGroup>
               <DropdownMenuItem>Profile</DropdownMenuItem>
               <DropdownMenuItem>Settings</DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <Link to="/login">
+                <DropdownMenuItem
+                  onClick={() => {
+                    memberLogout();
+                  }}
+                >
+                  Log Out
+                </DropdownMenuItem>
+              </Link>
             </DropdownMenuGroup>
           </>
         )}

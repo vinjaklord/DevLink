@@ -3,8 +3,8 @@ import axios from 'axios';
 const fetchAPI = (options = {}) => {
   const defaultConfig = {
     method: 'get',
-    timeout: 5000,
-    data: {},
+    timeout: 10000,
+    data: null,
     url: '/',
     baseURL: 'http://localhost:8000/',
   };

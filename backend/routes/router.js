@@ -33,7 +33,7 @@ router.get('/members/:id', getOneMember);
 
 router.post(
   '/members/signup',
-  // upload.single('photo'),
+  upload.single('photo'),
   body('firstName').trim().escape().isLength({ min: 2, max: 50 }),
   body('lastName').trim().escape().isLength({ min: 2, max: 50 }),
   body('username').trim().escape().isLength({ min: 4, max: 50 }),
@@ -114,10 +114,10 @@ router.post(
 );
 
 router.post(
-  "/posts/:id/comments",
+  '/posts/:id/comments',
   checkToken,
   upload.none(),
-  body("text").trim().escape().isLength({ min: 1, max: 500 }),
+  body('text').trim().escape().isLength({ min: 1, max: 500 }),
   addComment
 );
 

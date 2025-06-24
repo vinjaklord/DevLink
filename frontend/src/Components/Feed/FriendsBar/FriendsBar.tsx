@@ -23,14 +23,20 @@ export default function FriendsBar() {
       ) : (
         <div className="flex flex-col overflow-y-auto h-full">
           {friends.map((friend) => (
-            <div key={friend.id} className="py-2">
-              <button
-                key={friend.id}
-                className="w-full text-left px-3 py-2 text-sm font-poppins bg-transparent hover:bg-[#3a3b3c5f] transition-colors duration-150 rounded-sm"
-              >
+            <button
+              key={friend.id}
+              className="flex items-center gap-2 px-3 py-2 w-full text-left transition-colors duration-150 hover:bg-[#3a3b3c5f] rounded-sm"
+              onClick={() => console.log(`${friend.firstName}`)}
+            >
+              <img
+                src={friend.photo?.url}
+                alt={`${friend.firstName} ${friend.lastName}`}
+                className="w-9 h-9 rounded-full object-cover"
+              />
+              <span className="text-sm font-poppins">
                 {friend.firstName} {friend.lastName}
-              </button>
-            </div>
+              </span>
+            </button>
           ))}
         </div>
       )}

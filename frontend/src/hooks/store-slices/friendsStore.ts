@@ -1,15 +1,5 @@
-import { data } from 'react-router-dom';
-import type {
-  IMember,
-  LoginCredentials,
-  SignupCredentials,
-} from '../../models/member.model.ts';
-import type {
-  Alert,
-  DecodedToken,
-  ApiError,
-  ApiResponse,
-} from '@/models/helper.model.ts';
+import type { IMember } from '../../models/member.model.ts';
+import type { ApiResponse } from '@/models/helper.model.ts';
 import fetchAPI from '../../utils/index.ts';
 import { toast } from 'sonner';
 
@@ -25,14 +15,6 @@ export interface FriendsStore {
   //   members: IMember[];
   //   loading: boolean;
 }
-
-const defaultMember: IMember = {
-  id: '',
-  username: '',
-  email: '',
-  firstName: '',
-  lastName: '',
-};
 
 const initialState = {
   friends: [],

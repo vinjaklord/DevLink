@@ -16,6 +16,7 @@ import useStore from '../../hooks/useStore';
 import { Link } from 'react-router-dom';
 import { EyeIcon, EyeSlashIcon } from '@phosphor-icons/react';
 import { toast } from 'sonner';
+import ImageUploader from '../../constant/ImageUploader';
 
 type UserData = {
   username: string;
@@ -24,7 +25,9 @@ type UserData = {
   firstName: string;
   lastName: string;
   email: string;
+  photo: unknown;
 };
+
 export function Signup() {
   const { memberSignup } = useStore((state) => state);
   const [showPassword, setShowPassword] = useState(false);
@@ -42,29 +45,36 @@ export function Signup() {
     firstName: '',
     lastName: '',
     email: '',
+    photo: null,
   });
 
+  // Signup.tsx
   const handleSignup = async () => {
     if (formState.password !== formState.confirmPassword) {
       toast.warning('Passwords do not match!');
+      return;
+    }
+    if (!formState.photo) {
+      toast.warning('Please select a photo!');
+      return;
     }
 
-    const userData: UserData = {
-      username: formState.username,
-      password: formState.password,
-      confirmPassword: formState.confirmPassword, // Include if backend expects it
-      email: formState.email,
-      firstName: formState.firstName,
-      lastName: formState.lastName,
-    };
+    const formData = new FormData();
+    formData.append('username', formState.username);
+    formData.append('password', formState.password);
+    formData.append('confirmPassword', formState.confirmPassword);
+    formData.append('email', formState.email);
+    formData.append('firstName', formState.firstName);
+    formData.append('lastName', formState.lastName);
+    formData.append('photo', formState.photo); // Send File object
 
-    const response = await memberSignup(userData);
+    const response = await memberSignup(formData);
 
     if (response) {
       navigate('/login');
-      toast.success('Successfully signed in. Welcome!');
+      toast.success('Successfully signed up. Welcome!');
     } else {
-      toast.error('Error while signing in!');
+      toast.error('Error while signing up!');
     }
   };
 
@@ -163,6 +173,13 @@ export function Signup() {
                 <EyeIcon className="h-5 w-5 text-gray-500" />
               )}
             </Button>
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="photo">Photo</Label>
+            <ImageUploader
+              handleFormChange={handleFormChange}
+              photo={formState.photo}
+            />
           </div>
         </CardContent>
         <div className="text-center text-sm text-gray-600 ">

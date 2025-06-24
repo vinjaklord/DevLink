@@ -1,9 +1,7 @@
 import { validationResult, matchedData } from 'express-validator';
 import mongoose from 'mongoose';
 import HttpError from '../models/http-error.js';
-import { Member } from '../models/members.js';
-
-// once the friend request is accepted or rejected delete the db entry
+import { Friend, Member } from '../models/members.js';
 
 const addFriend = async (req, res, next) => {
   try {
@@ -14,7 +12,7 @@ const addFriend = async (req, res, next) => {
     }
 
     const data = matchedData(req);
-    const { sender, recipient } = data; // as ID's
+    const { sender, recipient } = data; // as IDs
 
     const senderMember = await Member.findById(sender);
     const recipientMember = await Member.findById(recipient);
@@ -22,21 +20,37 @@ const addFriend = async (req, res, next) => {
       throw new HttpError('Cannot find member by id', 404);
     }
 
+    let recipientFriend = await Friend.findOne({ member: recipient });
+    if (!recipientFriend) {
+      recipientFriend = new Friend({ member: recipient });
+      await recipientFriend.save();
+      console.log('Created new Friend document for:', recipient);
+    } else {
+      console.log(
+        'Found Friend document for:',
+        recipient,
+        'with requests:',
+        recipientFriend.pendingFriendRequests
+      );
+    }
+
     if (
-      recipientMember.pendingFriendRequests.some(
-        (id) => id.toString() === sender
+      recipientFriend.pendingFriendRequests.some(
+        (id) => id.toString() === sender.toString()
       )
     ) {
       throw new HttpError('Friend request already sent', 409);
     }
 
-    const newFriendRequest = await Member.findByIdAndUpdate(
+    recipientFriend.pendingFriendRequests.push(sender);
+    await recipientFriend.save();
+    console.log('Added friend request:', {
       recipient,
-      { $push: { pendingFriendRequests: sender } },
-      { new: true }
-    );
+      sender,
+      pendingFriendRequests: recipientFriend.pendingFriendRequests,
+    });
 
-    res.json(newFriendRequest);
+    res.json(recipientFriend);
   } catch (error) {
     return next(new HttpError(error, 422));
   }
@@ -46,13 +60,23 @@ const getPendingFriendRequests = async (req, res, next) => {
   try {
     if (!req.verifiedMember) throw new HttpError('Unauthorized', 401);
 
-    const foundMember = await Member.findById(req.verifiedMember._id)
-      .select('pendingFriendRequests')
-      .populate('pendingFriendRequests', 'username firstName');
+    const foundMember = await Member.findById(req.verifiedMember._id);
     if (!foundMember) {
       throw new HttpError('logged in member not found', 404);
     }
-    res.json(foundMember.pendingFriendRequests);
+
+    const friendDoc = await Friend.findOne({
+      member: req.verifiedMember._id,
+    }).populate('pendingFriendRequests', 'username firstName');
+    if (!friendDoc) {
+      return res.json([]);
+    }
+    console.log(
+      'Pending requests for:',
+      req.verifiedMember._id,
+      friendDoc.pendingFriendRequests
+    );
+    res.json(friendDoc.pendingFriendRequests);
   } catch (error) {
     return next(new HttpError(error, error.errorCode || 500));
   }
@@ -61,17 +85,21 @@ const getPendingFriendRequests = async (req, res, next) => {
 const getAllFriends = async (req, res, next) => {
   try {
     if (!req.verifiedMember) throw new HttpError('Unauthorized', 401);
-    const foundMember = await Member.findById(req.verifiedMember._id)
-      .select('friends')
-      .populate('friends', 'username firstName lastName email');
-    if (!foundMember) {
-      throw new HttpError('logged in member not found', 404);
+
+    const friendDoc = await Friend.findOne({
+      member: req.verifiedMember._id,
+    }).populate('friends', 'username firstName lastName photo email');
+    if (!friendDoc) {
+      return res.json([]);
     }
-    res.json(foundMember.friends);
-  } catch (error) {}
+    res.json(friendDoc.friends);
+  } catch (error) {
+    return next(new HttpError(error, error.errorCode || 500));
+  }
 };
 
 const manageFriendRequest = async (req, res, next) => {
+  let session;
   try {
     const { senderId } = req.params;
     if (!req.verifiedMember) throw new HttpError('Unauthorized', 401);
@@ -90,48 +118,109 @@ const manageFriendRequest = async (req, res, next) => {
     if (!senderMember || !recipientMember) {
       throw new HttpError('Cannot find member by id', 404);
     }
-    if (!recipientMember.pendingFriendRequests.includes(senderId)) {
+
+    let recipientFriend = await Friend.findOne({
+      member: req.verifiedMember._id,
+    });
+    if (!recipientFriend) {
+      recipientFriend = new Friend({ member: req.verifiedMember._id });
+      await recipientFriend.save();
+      console.log(
+        'Created new Friend document for recipient:',
+        req.verifiedMember._id
+      );
+    } else {
+      console.log(
+        'Found Friend document for recipient:',
+        req.verifiedMember._id,
+        'with requests:',
+        recipientFriend.pendingFriendRequests
+      );
+    }
+
+    console.log(
+      'Pending requests for recipient:',
+      recipientFriend.pendingFriendRequests.map((id) => id.toString())
+    );
+    console.log('Sender ID:', senderId);
+
+    if (
+      !recipientFriend.pendingFriendRequests.some(
+        (id) => id.toString() === senderId.toString()
+      )
+    ) {
       throw new HttpError('Friend request not found!', 404);
     }
-    const recipientId = req.verifiedMember._id;
+
+    // Check if already friends to prevent multiple accepts
+    if (
+      action === 'accept' &&
+      recipientFriend.friends.some(
+        (id) => id.toString() === senderId.toString()
+      )
+    ) {
+      throw new HttpError('Already friends!', 409);
+    }
+
+    session = await mongoose.startSession();
+    session.startTransaction();
 
     if (action === 'decline') {
-      await Member.findOneAndUpdate(
-        { _id: req.verifiedMember._id },
-        { $pull: { pendingFriendRequests: senderId } }
+      recipientFriend.pendingFriendRequests.pull(senderId);
+      await recipientFriend.save({ session });
+      await session.commitTransaction();
+      console.log(
+        'Declined request, updated requests:',
+        recipientFriend.pendingFriendRequests
       );
-      return res.json({ message: 'Friend request declined' });
     } else if (action === 'accept') {
-      const session = await mongoose.startSession();
-      session.startTransaction();
+      recipientFriend.pendingFriendRequests.pull(senderId);
+      recipientFriend.friends.push(senderId);
+      await recipientFriend.save({ session });
 
-      await Member.findOneAndUpdate(
-        { _id: req.verifiedMember._id },
-        {
-          $pull: { pendingFriendRequests: senderId },
-          $push: { friends: senderId },
-        },
-        { session }
+      // Update sender's Friend document with recipientId
+      let senderFriend = await Friend.findOne({ member: senderId }).session(
+        session
       );
-
-      await Member.findOneAndUpdate(
-        { _id: senderId },
-        { $push: { friends: recipientId } },
-        { session }
-      );
+      if (!senderFriend) {
+        senderFriend = new Friend({ member: senderId });
+        await senderFriend.save({ session });
+      }
+      if (
+        !senderFriend.friends.some(
+          (id) => id.toString() === req.verifiedMember._id.toString()
+        )
+      ) {
+        senderFriend.friends.push(req.verifiedMember._id);
+        await senderFriend.save({ session });
+      }
 
       await session.commitTransaction();
-      await session.endSession();
-      res.json({ message: 'Friend request accepted!' });
+      console.log(
+        'Accepted request, recipient friends:',
+        recipientFriend.friends
+      );
+      console.log('Accepted request, sender friends:', senderFriend.friends);
     } else {
       throw new HttpError('You must accept or decline', 422);
     }
+
+    res.json({
+      message:
+        action === 'decline'
+          ? 'Friend request declined'
+          : 'Friend request accepted!',
+    });
   } catch (error) {
     if (session) {
       await session.abortTransaction();
       await session.endSession();
     }
     next(new HttpError(error, error.errorCode || 500));
+  } finally {
+    if (session) {
+      await session.endSession();
+    }
   }
 };
 

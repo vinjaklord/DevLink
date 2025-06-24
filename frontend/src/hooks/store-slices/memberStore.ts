@@ -81,33 +81,25 @@ export const createMemberSlice = (set: any, get: any): MemberStore => ({
     }
   },
 
-  memberSignup: async (data: SignupCredentials): Promise<boolean> => {
+  memberSignup: async (
+    data: SignupCredentials | FormData
+  ): Promise<boolean> => {
     try {
-      const response: ApiResponse<string> = await fetchAPI({
+      const response = await fetchAPI({
         method: 'post',
         url: 'members/signup',
         data,
       });
-
-      // TODO: Statuscode 200 prüfen
       if (response.status !== 200) {
-        throw new Error('Login failed');
+        throw new Error(
+          `Signup failed: ${response.data?.message || 'Unknown error'}`
+        );
       }
       toast.success('Signed in successfully. Welcome!');
-      console.log('success signup');
-
       return true;
-    } catch (error: unknown) {
-      console.error('Error during signup:', error);
-
-      if (error.code === 'ECONNABORTED') {
-        toast.error('ECONNABORTED');
-        console.log('ECONNABORTED');
-      } else {
-        //alert window
-        // toast.error(error.message);
-        console.error(error.message);
-      }
+    } catch (error: any) {
+      console.error('Signup error:', error);
+      toast.error(error.response?.data?.message || 'Signup failed');
       return false;
     }
   },

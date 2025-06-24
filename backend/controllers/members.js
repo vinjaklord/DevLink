@@ -4,6 +4,7 @@ import { validationResult, matchedData } from 'express-validator';
 import mongoose from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 import nodemailer from 'nodemailer';
+import { uploadImage, deleteFileInImageKit } from '../utils/imageKit.js';
 
 // Import der Models
 import { Member, Password, Resettoken } from '../models/members.js';
@@ -13,13 +14,10 @@ import HttpError from '../models/http-error.js';
 import { handleValidationErrors } from '../common/index.js';
 
 import {
-  sendFileToCloudinary,
-  getGeolocation,
   getHash,
   deleteFile,
   checkHash,
   getToken,
-  deleteFileInCloudinary,
   getGeoDistance,
 } from '../common/index.js';
 
@@ -47,45 +45,27 @@ const signup = async (req, res, next) => {
     const result = validationResult(req);
 
     if (result.errors.length > 0) {
-      // TODO: temporäres Foto löschen
       throw new HttpError(JSON.stringify(result.errors), 422);
     }
 
     const data = matchedData(req);
-
-    const uploadResponse = await uploadImage(image.buffer, image.originalname);
-    
-    // // ist ein Bild vorhanden?
-    // if (!req.file) {
-    //   throw new HttpError('Photo is missing', 422);
-    // }
-
-    // // Bild zu Cloudinary transferieren
-    // const response = await sendFileToCloudinary(FOLDER_NAME, req.file.path);
-
-    // photo = {
-    //   cloudinaryPublicId: response.public_id,
-    //   url: response.secure_url,
-    // };
-
-    // // Geodaten holen
-    // const address = data.street + ', ' + data.zip + ' ' + data.city;
-    // const geo = await getGeolocation(address);
 
     // Password generiert
     const password = getHash(data.password);
 
     let newMember;
 
-    // neuen Member erschaffen
+    // neuen Member erschaffen (photo is optional, defaults to model pre-save hook if not provided)
     const createdMember = new Member({
-      //Spread-Opertor
       ...data,
-      // geo,
-      photo: {
-        fileId: uploadResponse.fileId,
-        url: uploadResponse.url
-      },
+      photo: req.file
+        ? {
+            fileId: (await uploadImage(req.file.buffer, req.file.originalname))
+              .fileId,
+            url: (await uploadImage(req.file.buffer, req.file.originalname))
+              .url,
+          }
+        : {},
     });
 
     // Member speichern und Password speichern in einer Transaktion
@@ -97,26 +77,21 @@ const signup = async (req, res, next) => {
 
     const createdPassword = new Password({
       password,
-      // Member-ID auslesen
       member: newMember._id,
     });
 
-    // Passwort speichern
     await createdPassword.save({ session });
 
-    // Bestätigen der Transaction
     await session.commitTransaction();
 
     session.endSession();
 
-    // Daten des neuen Members an Client gesendet (ohne Passwort)
     res.json(newMember);
   } catch (error) {
-    // TODO: temporäres Foto löschen
     if (photo) {
-      deleteFile(req.file.path);
+      deleteFile(photo);
     }
-    return next(new HttpError(error, 422));
+    return next(new HttpError(error.message || error, 422));
   }
 };
 
@@ -233,8 +208,8 @@ const getAllMembers = async (req, res, next) => {
   console.log(req.verifiedMember);
   try {
     // mit leerem Objekt bekommen wir alle Members
-    const membersList = await Member.find({})
-      // Liste aller Members in JSON-Format an Client senden
+    const membersList = await Member.find({});
+    // Liste aller Members in JSON-Format an Client senden
     res.json(membersList);
   } catch (error) {
     return next(new HttpError(error, error.errorCode || 500));
@@ -305,25 +280,23 @@ const updateMember = async (req, res, next) => {
 
     // wenn ein Bild kommt:
     if (req.file) {
-      // Neues Bild in Cloudinary speichern
-      const response = await sendFileToCloudinary(FOLDER_NAME, req.file.path);
+      // Neues Bild in ImageKit speichern
+      const uploadResponse = await uploadImage(
+        req.file.buffer,
+        req.file.originalname
+      );
 
-      // Cloudinary Bild löschen
-      await deleteFileInCloudinary(foundMember.photo.cloudinaryPublicId);
+      // ImageKit Bild löschen (using fileId instead of cloudinaryPublicId)
+      if (foundMember.photo && foundMember.photo.fileId) {
+        await deleteFileInImageKit(foundMember.photo.fileId); // Replace with your ImageKit delete function
+      }
 
       const photo = {
-        cloudinaryPublicId: response.public_id,
-        url: response.secure_url,
+        fileId: uploadResponse.fileId,
+        url: uploadResponse.url,
       };
 
       foundMember.photo = photo;
-    }
-
-    // nur wenn Zip, Street oder City kommt, dann Geodaten neu holen
-    if (data.zip || data.street || data.city) {
-      const address = data.street + ', ' + data.zip + ' ' + data.city;
-      const geo = await getGeolocation(address);
-      foundMember.geo = geo;
     }
 
     // Member speichern
