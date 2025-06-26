@@ -7,10 +7,12 @@ import { Login } from './Components/Login/Login';
 import './App.css';
 import { Toaster } from 'sonner';
 import Feed from './Components/Feed/Feed';
-import { Post } from './Components/Feed/MainFeed/Post';
+import AddPost from './Components/AddPost/AddPost';
 
 function App() {
-  const { loggedInMember, memberCheck } = useStore((state) => state);
+  const { loggedInMember, memberCheck, showAddPost, setShowAddPost } = useStore(
+    (state) => state
+  );
 
   // Check if the user is logged in on every page load
   useEffect(() => {
@@ -19,17 +21,14 @@ function App() {
 
   // Define routes for logged-in users
   const routerLoggedIn = (
-    <Routes>
-      {/* Add your routes here when ready */}
-      <Route path="/" element={<Feed />} /> 
-      <Route path="/posts/:id" element={<Post />} /> 
-      {/* <Route path="/edit-profile" element={<MemberChangeProfile />} /> */}
-      {/* <Route path="/news" element={<NewsPage />} /> */}
-      {/* <Route path="/calendar" element={<TablePage />} /> */}
-      {/* <Route path="/calculator" element={<CalculatorPage />} /> */}
-      {/* <Route path="/calculator/position-size" element={<PositionSizePage />} /> */}
-      {/* <Route path="/calculator/currency-converter" element={<CurrencyConverterPage />} /> */}
-    </Routes>
+    <>
+      <Routes>
+        {/* Add your routes here when ready */}
+        <Route path="/" element={<Feed />} />
+        {/* <Route path="/post" element={<Post />} /> */}
+      </Routes>
+      <AddPost isOpen={showAddPost} onClose={() => setShowAddPost(false)} />
+    </>
   );
 
   // Define routes for users who are not logged in

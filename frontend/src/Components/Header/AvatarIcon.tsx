@@ -15,7 +15,7 @@ export default function AvatarIcon() {
   const { loggedInMember, memberLogout } = useStore((state) => state);
 
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Avatar className="">
           <AvatarImage

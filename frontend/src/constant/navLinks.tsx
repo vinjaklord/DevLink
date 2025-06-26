@@ -5,15 +5,6 @@ import {
 } from '@phosphor-icons/react';
 
 export const NAV_LINKS = Object.freeze([
-  // {
-  //   label: 'Shifts',
-  //   to: '/shifts',
-  //   icon: <CalendarMonthIcon className="navIcon"/>,
-  //   subLinks: [
-  //     { label: 'My Shifts', to: '/shifts/my-shifts' },
-  //     { label: 'All Shifts', to: '/shifts/all-shifts' },
-  //   ],
-  // },
   {
     label: 'Home',
     to: '/',
@@ -23,6 +14,7 @@ export const NAV_LINKS = Object.freeze([
     label: 'Post',
     to: '/post',
     icon: <CameraPlusIcon size={32} weight="thin" />,
+    onClick: 'openAddPost',
   },
   {
     label: 'Messages',
