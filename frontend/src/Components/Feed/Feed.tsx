@@ -5,12 +5,11 @@ import { PostFeed } from './MainFeed/PostsFeed';
 const LeftSidebar: FC = () => <div className="bg-card p-4">Left Sidebar</div>;
 // const MainFeed: FC = () => <div className="bg-card p-4">Main Feed</div>;
 
-
 export default function Feed() {
-  const [isWideEnough, setIsWideEnough] = useState(window.innerWidth >= 1024);
+  const [isWideEnough, setIsWideEnough] = useState(window.innerWidth >= 800);
 
   useEffect(() => {
-    const handleResize = () => setIsWideEnough(window.innerWidth >= 1024);
+    const handleResize = () => setIsWideEnough(window.innerWidth >= 800);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);

@@ -8,8 +8,8 @@ export interface PostsStore {
   error: string | null;
   allPosts: Post[];
   showAddPost: boolean;
-  setShowAddPost: (value: boolean) => void;
 
+  setShowAddPost: (value: boolean) => void;
   fetchPostById: (id: string) => Promise<void>;
   fetchAllPosts: () => Promise<void>;
   uploadPost: (data: Post) => Promise<boolean>;
@@ -49,16 +49,19 @@ const createPostsSlice = (set: any, get: any): PostsStore => ({
 
   uploadPost: async (data: Post): Promise<boolean> => {
     try {
+      const token = localStorage.getItem('lh_token');
+
       const response = await fetchAPI({
         method: 'post',
         url: 'posts/post',
         data,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
-      if (response.status !== 200) {
-        throw new Error('Upload Failed!');
-      }
       toast.success('Post added successfully!');
+
       return true;
     } catch (error) {
       console.error('Upload error:', error);
