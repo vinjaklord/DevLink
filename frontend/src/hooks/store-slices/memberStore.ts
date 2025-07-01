@@ -2,14 +2,13 @@ import type {
   IMember,
   LoginCredentials,
   SignupCredentials,
+  EditCredentials,
 } from '../../models/member.model.ts';
 import type {
   Alert,
   DecodedToken,
-  ApiError,
   ApiResponse,
 } from '@/models/helper.model.ts';
-import { updateInstance } from '../../utils/object.common-js.ts';
 import fetchAPI from '../../utils/index.ts';
 import { jwtDecode } from 'jwt-decode';
 import { toast } from 'sonner';
@@ -19,18 +18,20 @@ export interface MemberStore {
   member: IMember;
   members: IMember[];
   loading: boolean;
+  isUpdatingProfile: boolean;
   loggedInMember: IMember | null;
   token: string | null;
   decodedToken: DecodedToken | null;
   alert: Alert | null;
-  dialog: any | null; // Replace 'any' with a specific type if possible
-  // setMember: (data: Partial<IMember>) => void;
+  dialog: any | null;
   resetMember: () => void;
   searchMembers: (q: string) => Promise<IMember[]>;
   memberSignup: (data: SignupCredentials) => Promise<boolean>;
   memberLogout: () => void;
   memberLogin: (data: LoginCredentials) => Promise<boolean>;
   memberCheck: () => void;
+  memberRefreshMe: () => void;
+  editProfile: (data: EditCredentials) => Promise<boolean>;
 }
 
 const defaultMember: IMember = {
@@ -39,27 +40,23 @@ const defaultMember: IMember = {
   email: '',
   firstName: '',
   lastName: '',
+  createdAt: '',
 };
 
 const initialState = {
   loggedInMember: null,
   token: null,
   decodedToken: null,
+  isUpdatingProfile: false,
   alert: null,
   dialog: null,
+  loading: false,
 };
 
 export const createMemberSlice = (set: any, get: any): MemberStore => ({
   member: defaultMember,
-  loading: false,
   members: [],
   ...initialState,
-
-  // setMember: (data: Partial<IMember>) => {
-  //   set((state: MemberStore) => ({
-  //     member: updateInstance(state.member, data),
-  //   }));
-  // },
 
   resetMember: () => set({ member: defaultMember }),
 
@@ -199,6 +196,53 @@ export const createMemberSlice = (set: any, get: any): MemberStore => ({
       set({ token, decodedToken, loggedInMember });
     } catch (error) {
       console.log(error);
+    }
+  },
+  memberRefreshMe: async () => {
+    // LoggedInMember neu holen und in Session Store neu schreiben
+    // Memberdaten von API neu holen
+    // damit Store updaten
+    const response = await fetchAPI({
+      url: '/members/' + get().loggedInMember._id,
+      token: get().token,
+    });
+    const loggedInMember = response.data;
+    set({ loggedInMember });
+
+    // member-Daten in localStorage ändern
+    localStorage.setItem('lh_member', JSON.stringify(loggedInMember));
+  },
+
+  editProfile: async (data: EditCredentials) => {
+    try {
+      set({ isUpdatingProfile: true });
+      const token = localStorage.getItem('lh_token');
+      if (!token) throw new Error('No token found');
+
+      const memberId = get().loggedInMember?._id || get().loggedInMember?.id;
+      if (!memberId) throw new Error('No logged in member found');
+
+      const response = await fetchAPI({
+        method: 'patch',
+        url: `members/${memberId}`,
+        data, // FormData object
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data', // Important for FormData
+        },
+      });
+
+      await get().memberRefreshMe(); // Refresh the member data after successful update
+      toast.success('Profile updated successfully!');
+      return true;
+    } catch (error: any) {
+      console.error('error in updating profile', error);
+      toast.error(
+        error.response?.data?.message || error.message || 'Update failed'
+      );
+      return false;
+    } finally {
+      set({ isUpdatingProfile: false });
     }
   },
 });

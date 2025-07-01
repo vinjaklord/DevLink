@@ -15,7 +15,7 @@ export default function Feed() {
   }, []);
 
   return (
-    <div className="flex flex-col md:flex-row gap-1 p-1 min-h-screen max-w-[75rem] mx-auto bg-[--background] text-[--foreground]">
+    <div className="flex flex-col md:flex-row gap-1 p-1 pt-14 min-h-screen max-w-[75rem] mx-auto bg-[--background] text-[--foreground]">
       {isWideEnough && (
         <div className="flex-[0_0_16rem] bg-[--sidebar]">
           <LeftSidebar />

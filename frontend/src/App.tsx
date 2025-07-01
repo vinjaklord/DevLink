@@ -8,6 +8,7 @@ import './App.css';
 import { Toaster } from 'sonner';
 import Feed from './Components/Feed/Feed';
 import AddPost from './Components/AddPost/AddPost';
+import EditProfile from './Components/Profile/EditProfile';
 
 function App() {
   const { loggedInMember, memberCheck, showAddPost, setShowAddPost } = useStore(
@@ -25,6 +26,7 @@ function App() {
       <Routes>
         {/* Add your routes here when ready */}
         <Route path="/" element={<Feed />} />
+        <Route path="/edit-profile" element={<EditProfile />} />
         {/* <Route path="/post" element={<Post />} /> */}
       </Routes>
       <AddPost isOpen={showAddPost} onClose={() => setShowAddPost(false)} />
@@ -37,7 +39,7 @@ function App() {
       <Route path="/signup" element={<Signup />} />
       <Route path="/login" element={<Login />} />
       {/* Add other routes as needed */}
-      <Route path="/" element={<Feed />} />
+      {/* <Route path="/" element={<Feed />} /> */}
       {/* <Route path="/news" element={<NewsPage />} /> */}
       {/* <Route path="/calendar" element={<TablePage />} /> */}
       {/* <Route path="/calculator" element={<CalculatorPage />} /> */}
@@ -54,7 +56,7 @@ function App() {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <main className="container mx-auto px-6 pt-32 flex-grow">{routes}</main>
+      <main className="container mx-auto px-6 pt-6 flex-grow">{routes}</main>
       <Toaster richColors position="bottom-left" />
     </div>
   );

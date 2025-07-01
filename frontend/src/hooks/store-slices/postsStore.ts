@@ -59,6 +59,11 @@ const createPostsSlice = (set: any, get: any): PostsStore => ({
           Authorization: `Bearer ${token}`,
         },
       });
+      const newPost = response.data;
+
+      set((state) => ({
+        allPosts: [...state.allPosts, newPost],
+      }));
 
       toast.success('Post added successfully!');
 

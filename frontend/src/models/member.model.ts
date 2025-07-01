@@ -8,6 +8,7 @@ export interface IMember {
   adress?: {
     city: string;
   };
+  createdAt: string;
 }
 interface Photo {
   url?: string;
@@ -27,4 +28,13 @@ export interface SignupCredentials {
   photo?: Photo;
   password: string;
   confirmPassword: string;
+}
+export interface EditCredentials {
+  firstName: string;
+  lastName: string;
+  username?: string;
+  email?: string;
+  photo?: Photo;
+  password?: string;
+  confirmPassword?: string;
 }

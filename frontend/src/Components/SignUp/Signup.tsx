@@ -18,7 +18,7 @@ import { EyeIcon, EyeSlashIcon } from '@phosphor-icons/react';
 import { toast } from 'sonner';
 import ImageUploader from '../../constant/ImageUploader';
 
-type UserData = {
+export type UserData = {
   username: string;
   password: string;
   confirmPassword: string;

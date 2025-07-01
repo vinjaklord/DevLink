@@ -25,7 +25,9 @@ export default function AddPost({
   isOpen: boolean;
   onClose: () => void;
 }) {
-  const { uploadPost, setShowAddPost } = useStore((state) => state);
+  const { uploadPost, setShowAddPost, memberRefreshMe } = useStore(
+    (state) => state
+  );
   const { formState, handleFormChange } = useForm<PostData>({
     caption: '',
     photo: null,
@@ -76,6 +78,7 @@ export default function AddPost({
           <Button
             onClick={() => {
               handlePosting();
+              memberRefreshMe();
             }}
           >
             Post!
