@@ -81,7 +81,7 @@ export const createMemberSlice = (set: any, get: any): MemberStore => ({
     }
   },
 
-memberSignup: async (
+  memberSignup: async (
     data: SignupCredentials | FormData
   ): Promise<boolean> => {
     try {
@@ -134,7 +134,7 @@ memberSignup: async (
         token,
       });
       const loggedInMember: IMember = memberResponse.data;
-      set({ loggedInMember });
+      set({ loggedInMember: memberResponse.data });
 
       // loggedInMember in localStorage speichern
       localStorage.setItem('lh_member', JSON.stringify(loggedInMember));

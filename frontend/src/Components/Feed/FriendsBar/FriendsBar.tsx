@@ -2,7 +2,9 @@ import useStore from '@/hooks/useStore';
 import { useEffect } from 'react';
 
 export default function FriendsBar() {
-  const { friends, friendsLoading, friendsError, fetchFriends } = useStore();
+  const { friends, friendsLoading, friendsError, fetchFriends } = useStore(
+    (state) => state
+  );
 
   useEffect(() => {
     fetchFriends();

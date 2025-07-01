@@ -4,7 +4,7 @@ import SearchBar from './SearchBar';
 import AppNameAndLogo from './AppNameAndLogo';
 import AvatarIcon from './AvatarIcon';
 import useStore from '@/hooks/useStore';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import {
   HouseIcon,
   CameraPlusIcon,

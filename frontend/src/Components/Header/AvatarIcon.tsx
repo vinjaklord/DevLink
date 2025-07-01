@@ -19,10 +19,11 @@ export default function AvatarIcon() {
       <DropdownMenuTrigger asChild>
         <Avatar className="">
           <AvatarImage
-            src="https://icons.veryicon.com/png/o/internet--web/prejudice/user-128.png"
+            className="w-9 h-9 rounded-full object-cover"
+            src={loggedInMember?.photo?.url}
             alt="@shadcn"
           />
-          <AvatarFallback>CN</AvatarFallback>
+          <AvatarFallback>{`${loggedInMember?.firstName[0]} ${loggedInMember?.lastName[0]}`}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-50 mr-14">
