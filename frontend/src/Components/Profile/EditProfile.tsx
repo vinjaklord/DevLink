@@ -1,4 +1,5 @@
 import useStore from '@/hooks/useStore';
+import { useState } from 'react';
 import useForm from '@/hooks/useForm';
 import { Camera, Mail, User } from 'lucide-react';
 import { toast } from 'sonner';
@@ -6,6 +7,8 @@ import type { UserData } from '../SignUp/Signup';
 
 const EditProfile = () => {
   const { loggedInMember, isUpdatingProfile, editProfile } = useStore();
+
+  const [isEditing, setIsEditing] = useState(false);
 
   const { formState, handleFormChange, previewImage } = useForm<UserData>({
     username: '',
@@ -99,11 +102,43 @@ const EditProfile = () => {
             <div className="space-y-1.5">
               <div className="text-sm text-zinc-400 flex items-center gap-2">
                 <User className="w-4 h-4" />
-                Full Name
+                First Name
               </div>
-              <p className="px-4 py-2.5 bg-base-200 rounded-lg border">
-                {loggedInMember?.firstName} {loggedInMember?.lastName}
-              </p>
+              {isEditing ? (
+                <input
+                  type="text"
+                  name="firstName"
+                  value={formState.firstName}
+                  onChange={handleFormChange}
+                  className="px-4 py-2.5 bg-base-200 rounded-lg border w-full"
+                  placeholder="First Name"
+                />
+              ) : (
+                <p className="px-4 py-2.5 bg-base-200 rounded-lg border">
+                  {loggedInMember?.firstName}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="text-sm text-zinc-400 flex items-center gap-2">
+                <User className="w-4 h-4" />
+                Last Name
+              </div>
+              {isEditing ? (
+                <input
+                  type="text"
+                  name="lastName"
+                  value={formState.lastName}
+                  onChange={handleFormChange}
+                  className="px-4 py-2.5 bg-base-200 rounded-lg border w-full"
+                  placeholder="First Name"
+                />
+              ) : (
+                <p className="px-4 py-2.5 bg-base-200 rounded-lg border">
+                  {loggedInMember?.lastName}
+                </p>
+              )}
             </div>
 
             <div className="space-y-1.5">
@@ -138,6 +173,32 @@ const EditProfile = () => {
             Save Changes
           </button>
         </div>
+      </div>
+      <div className="flex justify-around gap-4 mt-6">
+        {!isEditing ? (
+          <button
+            onClick={() => setIsEditing(true)}
+            className="bg-primary text-white py-2 px-4 rounded-lg hover:bg-primary/90"
+          >
+            Edit Profile
+          </button>
+        ) : (
+          <>
+            <button
+              onClick={() => setIsEditing(false)}
+              className="bg-zinc-500 text-white py-2 px-4 rounded-lg hover:bg-zinc-600"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleEditProfile}
+              disabled={isUpdatingProfile}
+              className="bg-primary text-white py-2 px-4 rounded-lg hover:bg-primary/90 disabled:opacity-50"
+            >
+              Save Changes
+            </button>
+          </>
+        )}
       </div>
     </div>
   );

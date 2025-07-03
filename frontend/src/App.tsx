@@ -10,6 +10,7 @@ import Feed from './Components/Feed/Feed';
 import AddPost from './Components/AddPost/AddPost';
 import EditProfile from './Components/Profile/EditProfile';
 import { Post } from './Components/Feed/MainFeed/Post';
+import Profile from './Components/Profile/Profile';
 
 function App() {
   const { loggedInMember, memberCheck, showAddPost, setShowAddPost } = useStore(
@@ -29,6 +30,8 @@ function App() {
         <Route path="/" element={<Feed />} />
         <Route path="/edit-profile" element={<EditProfile />} />
         <Route path="/posts/:id" element={<Post />} />
+        <Route path="/profile" element={<Profile />} />
+        {/* <Route path="/post" element={<Post />} /> */}
       </Routes>
       <AddPost isOpen={showAddPost} onClose={() => setShowAddPost(false)} />
     </>
