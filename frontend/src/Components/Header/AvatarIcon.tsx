@@ -46,7 +46,7 @@ export default function AvatarIcon() {
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <Link to="/edit-profile">
+              <Link to="/profile">
                 <DropdownMenuItem>Profile</DropdownMenuItem>
               </Link>
               <DropdownMenuItem>Settings</DropdownMenuItem>

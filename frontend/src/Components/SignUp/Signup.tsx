@@ -79,7 +79,7 @@ export function Signup() {
   };
 
   return (
-    <div className="flex justify-center items-center ">
+    <div className="flex justify-center items-center py-20 ">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Sign Up</CardTitle>
