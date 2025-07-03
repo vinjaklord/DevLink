@@ -9,6 +9,7 @@ import { Toaster } from 'sonner';
 import Feed from './Components/Feed/Feed';
 import AddPost from './Components/AddPost/AddPost';
 import EditProfile from './Components/Profile/EditProfile';
+import { Post } from './Components/Feed/MainFeed/Post';
 
 function App() {
   const { loggedInMember, memberCheck, showAddPost, setShowAddPost } = useStore(
@@ -27,7 +28,7 @@ function App() {
         {/* Add your routes here when ready */}
         <Route path="/" element={<Feed />} />
         <Route path="/edit-profile" element={<EditProfile />} />
-        {/* <Route path="/post" element={<Post />} /> */}
+        <Route path="/posts/:id" element={<Post />} />
       </Routes>
       <AddPost isOpen={showAddPost} onClose={() => setShowAddPost(false)} />
     </>

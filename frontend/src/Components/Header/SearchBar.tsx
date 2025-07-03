@@ -4,6 +4,7 @@ import { IoSearch } from 'react-icons/io5';
 import useStore from '../../hooks/useStore.ts';
 import type { IMember } from '@/models/member.model.ts';
 import { useOutsideClick } from '@/hooks/useOutsideClick.ts';
+import { Link } from 'react-router-dom';
 
 export default function SearchBar() {
   const bgColor = 'bg-transparent';
@@ -57,8 +58,11 @@ export default function SearchBar() {
           {members.length > 0 && (
             <ul className="absolute overflow-auto bg-popover text-popover-foreground shadow rounded-sm max-h-48 w-full">
               {members.map((member: IMember) => (
-                <li key={member.id} className="p-2 hover:bg-gray-100">
+                <li key={member._id} className="p-2 hover:bg-gray-100">
+                  <Link 
+                  to={`/members/${member._id}`}>
                   {member.username}
+                  </Link>
                 </li>
               ))}
             </ul>

@@ -12,6 +12,8 @@ import type {
 import fetchAPI from '../../utils/index.ts';
 import { jwtDecode } from 'jwt-decode';
 import { toast } from 'sonner';
+import type { StateCreator } from 'zustand';
+import type { StoreState } from '../useStore.ts';
 
 // Interfaces /////////////////////////////////////////
 export interface MemberStore {
@@ -36,7 +38,7 @@ export interface MemberStore {
 }
 
 const defaultMember: IMember = {
-  id: '',
+  _id: '',
   username: '',
   email: '',
   firstName: '',
@@ -54,7 +56,7 @@ const initialState = {
   loading: false,
 };
 
-export const createMemberSlice = (set: any, get: any): MemberStore => ({
+export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = (set, get): MemberStore => ({
   member: defaultMember,
   members: [],
   ...initialState,
@@ -214,17 +216,19 @@ export const createMemberSlice = (set: any, get: any): MemberStore => ({
   },
 
   memberRefreshMe: async () => {
-    // LoggedInMember neu holen und in Session Store neu schreiben
-    // Memberdaten von API neu holen
-    // damit Store updaten
+    let loggedInMember = get().loggedInMember;
+    if(!loggedInMember) {
+      console.warn('LoggedInMember not Found');
+      return;
+    }
+
     const response = await fetchAPI({
-      url: '/members/' + get().loggedInMember._id,
+      url: '/members/' + loggedInMember._id,
       token: get().token,
     });
-    const loggedInMember = response.data;
+    loggedInMember = response.data;
     set({ loggedInMember });
 
-    // member-Daten in localStorage ändern
     localStorage.setItem('lh_member', JSON.stringify(loggedInMember));
   },
 
@@ -234,7 +238,7 @@ export const createMemberSlice = (set: any, get: any): MemberStore => ({
       const token = localStorage.getItem('lh_token');
       if (!token) throw new Error('No token found');
 
-      const memberId = get().loggedInMember?._id || get().loggedInMember?.id;
+      const memberId = get().loggedInMember?._id;
       if (!memberId) throw new Error('No logged in member found');
 
       const response = await fetchAPI({
@@ -243,7 +247,7 @@ export const createMemberSlice = (set: any, get: any): MemberStore => ({
         data, // FormData object
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data', // Important for FormData
+          'Content-Type': 'multipart/form-data', 
         },
       });
 

@@ -2,6 +2,8 @@ import type { IMember } from '../../models/member.model.ts';
 import type { ApiResponse } from '@/models/helper.model.ts';
 import fetchAPI from '../../utils/index.ts';
 import { toast } from 'sonner';
+import type { StateCreator } from 'zustand';
+import type { StoreState } from '../useStore.ts';
 
 export interface FriendsStore {
   friends: IMember[];
@@ -22,7 +24,7 @@ const initialState = {
   friendsError: null,
 };
 
-export const createFriendsSlice = (set: any, get: any): FriendsStore => ({
+export const createFriendsSlice: StateCreator<StoreState, [], [], FriendsStore> = (set, get): FriendsStore => ({
   ...initialState,
 
   fetchFriends: async () => {
@@ -34,7 +36,7 @@ export const createFriendsSlice = (set: any, get: any): FriendsStore => ({
         set({ friendsError: 'Not logged in!' });
       }
 
-      const response: ApiResponse<string> = await fetchAPI({
+      const response: ApiResponse<IMember[]> = await fetchAPI({
         url: 'friends/all-friends',
         headers: { Authorization: `Bearer ${token}` },
       });

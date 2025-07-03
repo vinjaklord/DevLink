@@ -1,4 +1,5 @@
 import useStore from '@/hooks/useStore';
+import type { IMember } from '@/models/member.model';
 import { useEffect } from 'react';
 
 export default function FriendsBar() {
@@ -26,7 +27,7 @@ export default function FriendsBar() {
         <div className="flex flex-col overflow-y-auto h-full">
           {friends.map((friend) => (
             <button
-              key={friend.id}
+              key={friend._id}
               className="flex items-center gap-2 px-3 py-2 w-full text-left transition-colors duration-150 hover:bg-[#3a3b3c5f] rounded-sm"
               onClick={() => console.log(`${friend.firstName}`)}
             >
@@ -37,6 +38,9 @@ export default function FriendsBar() {
               />
               <span className="text-sm font-poppins">
                 {friend.firstName} {friend.lastName}
+              </span>
+              <span className="text-sm font-poppins">
+                {friend._id}
               </span>
             </button>
           ))}

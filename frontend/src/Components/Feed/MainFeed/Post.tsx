@@ -20,7 +20,7 @@ const Post = () => {
 
             <h2 className="text-xl mb-2">{currentPost.caption}</h2>
             <p className="text-sm mb-4">
-                {currentPost.comments.length} Comments
+                {currentPost.comments?.length || 0} Comments
             </p>
         </div>
     )

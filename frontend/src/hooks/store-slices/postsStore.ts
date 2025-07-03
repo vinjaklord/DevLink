@@ -1,18 +1,21 @@
-import type { Post } from '@/models/posts.model';
+import type { IPost } from '@/models/posts.model';
 import fetchAPI from '@/utils';
 import { toast } from 'sonner';
+import type { StateCreator } from 'zustand';
+import type { StoreState } from '../useStore';
+ 
 
 export interface PostsStore {
-  currentPost: Post | null;
+  currentPost: IPost | null;
   loading: boolean;
   error: string | null;
-  allPosts: Post[];
+  allPosts: IPost[];
   showAddPost: boolean;
 
   setShowAddPost: (value: boolean) => void;
   fetchPostById: (id: string) => Promise<void>;
   fetchAllPosts: () => Promise<void>;
-  uploadPost: (data: Post) => Promise<boolean>;
+  uploadPost: (data: IPost) => Promise<boolean>;
 }
 
 const initialState = {
@@ -22,7 +25,7 @@ const initialState = {
   allPosts: [],
 };
 
-const createPostsSlice = (set: any, get: any): PostsStore => ({
+const createPostsSlice: StateCreator<StoreState, [], [], PostsStore> = (set, get): PostsStore => ({
   showAddPost: false,
   setShowAddPost: (value) => set({ showAddPost: value }),
   ...initialState,
@@ -47,7 +50,7 @@ const createPostsSlice = (set: any, get: any): PostsStore => ({
     }
   },
 
-  uploadPost: async (data: Post): Promise<boolean> => {
+  uploadPost: async (data: IPost): Promise<boolean> => {
     try {
       const token = localStorage.getItem('lh_token');
 
@@ -68,7 +71,7 @@ const createPostsSlice = (set: any, get: any): PostsStore => ({
       toast.success('Post added successfully!');
 
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Upload error:', error);
       toast.error(error.response?.data?.message || 'Upload failed');
       return false;

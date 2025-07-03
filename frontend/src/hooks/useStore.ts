@@ -6,12 +6,12 @@ import type { MemberStore } from './store-slices/memberStore.ts';
 import type { FriendsStore } from './store-slices/friendsStore.ts';
 import { createPostsSlice, type PostsStore } from './store-slices/postsStore.ts';
 
-type StoreState = MemberStore & FriendsStore & PostsStore;
+export type StoreState = MemberStore & FriendsStore & PostsStore;
 
-const useStore = create<StoreState>((set, get) => ({
-  ...createMemberSlice(set, get),
-  ...createFriendsSlice(set, get),
-  ...createPostsSlice(set,get),
+const useStore = create<StoreState>((...args) => ({
+  ...createMemberSlice(...args),
+  ...createFriendsSlice(...args),
+  ...createPostsSlice(...args),
 }));
 
 export default useStore;

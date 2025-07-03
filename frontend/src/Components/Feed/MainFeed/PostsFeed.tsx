@@ -24,7 +24,7 @@ const PostFeed = () => {
           <img src={post.imageUrl} alt="Post" className="w-full h-auto mb-4" />
           <h2 className="text-lg mb-2">{post.caption}</h2>
 
-          <p className="mb-1">{post.comments.length} Comments</p>
+          <p className="mb-1">{post.comments?.length || 0} Comments</p>
 
           <Link
             to={`/posts/${post._id}`}
