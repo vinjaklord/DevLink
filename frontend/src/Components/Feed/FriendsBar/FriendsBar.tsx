@@ -29,7 +29,6 @@ export default function FriendsBar() {
             <button
               key={friend._id}
               className="flex items-center gap-2 px-3 py-2 w-full text-left transition-colors duration-150 hover:bg-[#3a3b3c5f] rounded-sm"
-              onClick={() => console.log(`${friend.firstName}`)}
             >
               <img
                 src={friend.photo?.url}
@@ -38,9 +37,6 @@ export default function FriendsBar() {
               />
               <span className="text-sm font-poppins">
                 {friend.firstName} {friend.lastName}
-              </span>
-              <span className="text-sm font-poppins">
-                {friend._id}
               </span>
             </button>
           ))}

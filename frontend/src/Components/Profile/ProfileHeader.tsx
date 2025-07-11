@@ -19,6 +19,9 @@ export default function ProfileHeader() {
       <h1 className="mt-4 text-2xl font-semibold">
         {loggedInMember?.firstName} {loggedInMember?.lastName}
       </h1>
+      <p className="text-muted-foreground text-sm">
+        {`@${loggedInMember?.username}`}
+      </p>
       <p className="text-muted-foreground text-sm">{loggedInMember?.email}</p>
 
       {/* Edit Button Below Name/Email */}

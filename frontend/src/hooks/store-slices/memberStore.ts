@@ -28,7 +28,7 @@ export interface MemberStore {
   dialog: any | null;
   resetMember: () => void;
   searchMembers: (q: string) => Promise<IMember[]>;
-  getMemberById: (id:string) => Promise<IMember>;
+  getMemberById: (id: string) => Promise<IMember>;
   memberSignup: (data: SignupCredentials) => Promise<boolean>;
   memberLogout: () => void;
   memberLogin: (data: LoginCredentials) => Promise<boolean>;
@@ -56,7 +56,12 @@ const initialState = {
   loading: false,
 };
 
-export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = (set, get): MemberStore => ({
+export const createMemberSlice: StateCreator<
+  StoreState,
+  [],
+  [],
+  MemberStore
+> = (set, get): MemberStore => ({
   member: defaultMember,
   members: [],
   ...initialState,
@@ -85,9 +90,9 @@ export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = 
     try {
       set({ loading: true });
 
-      const response = await fetchAPI(`/members/${id}`)
+      const response = await fetchAPI(`/members/${id}`);
       set({ member: response.data, loading: false });
-      return response.data
+      return response.data;
     } catch (error: any) {
       console.error('Error fetching single member', error);
       set({ loading: false });
@@ -217,7 +222,7 @@ export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = 
 
   memberRefreshMe: async () => {
     let loggedInMember = get().loggedInMember;
-    if(!loggedInMember) {
+    if (!loggedInMember) {
       console.warn('LoggedInMember not Found');
       return;
     }
@@ -247,7 +252,7 @@ export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = 
         data, // FormData object
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data', 
+          'Content-Type': 'multipart/form-data',
         },
       });
 

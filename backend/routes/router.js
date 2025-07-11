@@ -27,7 +27,10 @@ import {
   createPost,
   getAllPosts,
   getPostById,
+  toggleLike,
+  getMyPosts,
 } from '../controllers/posts.js';
+import { getUsersForSidebar } from '../controllers/messages.js';
 
 const router = new Router();
 
@@ -126,8 +129,11 @@ router.post(
   body('text').trim().escape().isLength({ min: 1, max: 500 }),
   addComment
 );
-
-router.get('/posts/:id', getPostById);
+router.put('/posts/:id/likes', checkToken, toggleLike);
+router.get('/posts/myPosts', checkToken, getMyPosts);
 router.get('/posts', getAllPosts);
+router.get('/posts/:id', getPostById);
+
+router.get('/messages/users', checkToken, getUsersForSidebar);
 
 export default router;

@@ -48,27 +48,27 @@ const createPost = async (req, res, next) => {
 const toggleLike = async (req, res, next) => {
   try {
     const postId = req.params.id;
-    const userId = req.verifiedMember;
-
-    const user = await Member.findById(userId);
+    const userId = req.verifiedMember._id;
 
     const post = await Post.findById(postId);
     if (!post) {
       throw new HttpError('Post is not found', 404);
     }
 
-    const alreadyLiked = post.likes.includes(user);
+    const alreadyLiked = post.likes.includes(userId);
 
     if (alreadyLiked) {
-      post.likes.pull(user);
+      post.likes.pull(userId);
     } else {
-      post.likes.push(user);
+      post.likes.push(userId);
     }
 
     await post.save();
-    res
-      .status(200)
-      .json({ liked: !alreadyLiked, likeCount: post.likes.length });
+    res.status(200).json({
+      liked: !alreadyLiked,
+      likes: post.likes,
+      likeCount: post.likes.length,
+    });
   } catch (error) {
     return next(new HttpError(error, error.errorCode || 500));
   }
@@ -128,13 +128,36 @@ const getPostById = async (req, res, next) => {
 };
 
 const getAllPosts = async (req, res, next) => {
-  console.log(req.verifiedMember);
   try {
-    const postsList = await Post.find({});
+    const postsList = await Post.find({})
+      .populate('author', 'username firstName lastName photo')
+      .populate('comments.author', 'username firstName lastName photo');
     res.json(postsList);
   } catch (error) {
     return next(new HttpError(error, error.errorCode || 500));
   }
 };
 
-export { createPost, toggleLike, addComment, getPostById, getAllPosts };
+const getMyPosts = async (req, res, next) => {
+  const memberId = req.verifiedMember;
+
+  try {
+    const postsList = await Post.find({ author: memberId }).populate(
+      'author',
+      'username firstName lastName photo'
+    );
+
+    res.json(postsList);
+  } catch (error) {
+    return next(new HttpError(error, error.errorCode || 500));
+  }
+};
+
+export {
+  createPost,
+  toggleLike,
+  addComment,
+  getPostById,
+  getAllPosts,
+  getMyPosts,
+};

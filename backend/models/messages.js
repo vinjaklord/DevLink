@@ -10,7 +10,7 @@ const messagesSchema = new Schema(
     sender: { type: mongoose.Types.ObjectId, required: true, ref: 'Member' },
     recipient: { type: mongoose.Types.ObjectId, required: true, ref: 'Member' },
     text: { type: String, required: true },
-    read: { type: Boolean, required: true, default: false },
+    image: { type: String },
   },
   { timestamps: true }
 );
