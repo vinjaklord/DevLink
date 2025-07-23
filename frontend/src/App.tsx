@@ -12,6 +12,7 @@ import EditProfile from './Components/Profile/EditProfile';
 import { Post } from './Components/Feed/MainFeed/Post';
 import Profile from './Components/Profile/Profile';
 import MessagePage from './Components/MessagePage/MessagePage';
+import MemberProfile from './Components/Profile/MemberProfile';
 
 function App() {
   const { loggedInMember, memberCheck, showAddPost, setShowAddPost } = useStore(
@@ -31,6 +32,7 @@ function App() {
         <Route path="/" element={<Feed />} />
         <Route path="/edit-profile" element={<EditProfile />} />
         <Route path="/posts/:id" element={<Post />} />
+        <Route path="/members/:username" element={<MemberProfile />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/messages" element={<MessagePage />} />
         {/* <Route path="/post" element={<Post />} /> */}

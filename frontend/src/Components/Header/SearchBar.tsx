@@ -14,7 +14,7 @@ export default function SearchBar() {
 
   const { searchMembers, members, loading } = useStore((state) => state);
 
-  useOutsideClick(containerRef, () => setshowDropdown(false))
+  useOutsideClick(containerRef, () => setshowDropdown(false));
 
   useEffect(() => {
     const debounce = setTimeout(() => {
@@ -27,10 +27,13 @@ export default function SearchBar() {
     }, 300);
 
     return () => clearTimeout(debounce);
-  }, [query, searchMembers])
+  }, [query, searchMembers]);
 
   return (
-    <div ref={containerRef} className="relative flex-1 min-w-[150px] max-w-[270px]">
+    <div
+      ref={containerRef}
+      className="relative flex-1 min-w-[150px] max-w-[270px]"
+    >
       <IoSearch className="absolute text-2xl left-3 top-2 text-gray-400 " />
       <Input
         className={`${bgColor} rounded-3xl h-10 pl-11 shadow-none w-full`}
@@ -40,13 +43,16 @@ export default function SearchBar() {
         onFocus={() => {
           if (query.trim() && members.length > 0) {
             setshowDropdown(true);
-          }}}
+          }
+        }}
       />
 
       {showDropdown && (
         <div className="absolute mt-2 w-full z-10">
           {loading && (
-            <div className={`text-sm text-popover-foreground bg-popover shadow rounded p-2`}>
+            <div
+              className={`text-sm text-popover-foreground bg-popover shadow rounded p-2`}
+            >
               Loading...
             </div>
           )}
@@ -59,9 +65,8 @@ export default function SearchBar() {
             <ul className="absolute overflow-auto bg-popover text-popover-foreground shadow rounded-sm max-h-48 w-full">
               {members.map((member: IMember) => (
                 <li key={member._id} className="p-2 hover:bg-gray-100">
-                  <Link 
-                  to={`/members/${member._id}`}>
-                  {member.username}
+                  <Link to={`/members/${member.username}`}>
+                    {member.username}
                   </Link>
                 </li>
               ))}

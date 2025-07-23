@@ -10,11 +10,13 @@ export interface PostsStore {
   error: string | null;
   allPosts: IPost[];
   myPosts: IPost[];
+  memberPosts: IPost[];
   showAddPost: boolean;
 
   setShowAddPost: (value: boolean) => void;
   fetchPostById: (id: string) => Promise<void>;
   fetchMyPosts: () => Promise<void>;
+  fetchMemberPosts: (username: string) => Promise<void>;
   fetchAllPosts: () => Promise<void>;
   uploadPost: (data: IPost) => Promise<boolean>;
   toggleLike: (postId: string) => Promise<void>;
@@ -27,6 +29,7 @@ const initialState = {
   error: null,
   allPosts: [],
   myPosts: [],
+  memberPosts: [],
 };
 
 const createPostsSlice: StateCreator<StoreState, [], [], PostsStore> = (
@@ -72,6 +75,21 @@ const createPostsSlice: StateCreator<StoreState, [], [], PostsStore> = (
       });
 
       set({ myPosts: response.data, loading: false });
+    } catch (error: any) {
+      set({ error: error.message, loading: false });
+      toast.error(error.response?.data?.message || 'Failed to fetch posts');
+    }
+  },
+
+  fetchMemberPosts: async (username: string) => {
+    try {
+      set({ loading: true });
+
+      const response = await fetchAPI({
+        url: `/posts/memberPosts/${username}`,
+      });
+
+      set({ memberPosts: response.data, loading: false });
     } catch (error: any) {
       set({ error: error.message, loading: false });
       toast.error(error.response?.data?.message || 'Failed to fetch posts');

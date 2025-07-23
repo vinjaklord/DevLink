@@ -18,6 +18,7 @@ import type { StoreState } from '../useStore.ts';
 // Interfaces /////////////////////////////////////////
 export interface MemberStore {
   member: IMember;
+  user: IMember;
   members: IMember[];
   loading: boolean;
   isUpdatingProfile: boolean;
@@ -29,6 +30,7 @@ export interface MemberStore {
   resetMember: () => void;
   searchMembers: (q: string) => Promise<IMember[]>;
   getMemberById: (id: string) => Promise<IMember>;
+  getMemberByUsername: (username: string) => Promise<IMember>;
   memberSignup: (data: SignupCredentials) => Promise<boolean>;
   memberLogout: () => void;
   memberLogin: (data: LoginCredentials) => Promise<boolean>;
@@ -64,6 +66,7 @@ export const createMemberSlice: StateCreator<
 > = (set, get): MemberStore => ({
   member: defaultMember,
   members: [],
+  user: defaultMember,
   ...initialState,
 
   resetMember: () => set({ member: defaultMember }),
@@ -92,6 +95,18 @@ export const createMemberSlice: StateCreator<
 
       const response = await fetchAPI(`/members/${id}`);
       set({ member: response.data, loading: false });
+      return response.data;
+    } catch (error: any) {
+      console.error('Error fetching single member', error);
+      set({ loading: false });
+    }
+  },
+  getMemberByUsername: async (username: string) => {
+    try {
+      set({ loading: true });
+
+      const response = await fetchAPI({ url: `/members/username/${username}` });
+      set({ user: response.data, loading: false });
       return response.data;
     } catch (error: any) {
       console.error('Error fetching single member', error);

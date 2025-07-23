@@ -231,6 +231,22 @@ const getOneMember = async (req, res, next) => {
     return next(new HttpError(error, error.errorCode || 500));
   }
 };
+
+const getMemberByUsername = async (req, res, next) => {
+  try {
+    const username = req.params.username;
+    const member = await Member.findOne({ username });
+
+    if (!member) {
+      throw new HttpError('Cannot find member', 404);
+    }
+
+    // Members als Objekt in JSON-Format an Client senden
+    res.json(member);
+  } catch (error) {
+    return next(new HttpError(error, error.errorCode || 500));
+  }
+};
 const filterMember = async (req, res, next) => {
   const { q } = req.query;
   // if(!q) {
@@ -300,41 +316,6 @@ const updateMember = async (req, res, next) => {
     res.json(updatedMember);
   } catch (error) {
     return next(new HttpError(error, error.errorCode || 500));
-  }
-};
-
-const getDistances = async (req, res, next) => {
-  try {
-    // gewünschten Member suchen, wenn nicht vorhanden -> Abbruch mit Fehler
-    // gibt es den Member überhaupt? Wenn nein, Abbruch
-    const { id } = req.params;
-    const foundMember = await Member.findById(id);
-
-    if (!foundMember) {
-      throw new HttpError('Member cannot be found', 404);
-    }
-
-    const otherMembers = await Member.find({ _id: { $ne: id } });
-
-    // alle Member außer mir suchen -> Array
-    // Array durchlaufen und für jeden anderen Member die Entfernung kalkulieren
-    const calculatesMembers = otherMembers.map((member) => {
-      return {
-        ...member.toObject(),
-        distance: getGeoDistance(
-          foundMember.geo.lat,
-          foundMember.geo.lon,
-          member.geo.lat,
-          member.geo.lon
-        ),
-      };
-    });
-    // Array ausgeben
-    res.json(calculatesMembers);
-  } catch (error) {
-    return next(
-      new HttpError(error, error.errorCode || 500, error.messageArray)
-    );
   }
 };
 
@@ -462,10 +443,10 @@ export {
   login,
   getAllMembers,
   getOneMember,
+  getMemberByUsername,
   changePassword,
   deleteMember,
   updateMember,
-  getDistances,
   resetPassword,
   setNewPassword,
   filterMember,

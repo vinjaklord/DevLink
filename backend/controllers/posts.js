@@ -153,6 +153,23 @@ const getMyPosts = async (req, res, next) => {
   }
 };
 
+const getMemberPosts = async (req, res, next) => {
+  const username = req.params.username;
+
+  try {
+    const member = await Member.findOne({ username });
+
+    const postsList = await Post.find({ author: member._id }).populate(
+      'author',
+      'username firstName lastName photo'
+    );
+
+    res.json(postsList);
+  } catch (error) {
+    return next(new HttpError(error, error.errorCode || 500));
+  }
+};
+
 export {
   createPost,
   toggleLike,
@@ -160,4 +177,5 @@ export {
   getPostById,
   getAllPosts,
   getMyPosts,
+  getMemberPosts,
 };

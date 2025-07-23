@@ -60,9 +60,14 @@ const PostFeed = () => {
               alt="Author"
               className="w-8 h-8 rounded-full mr-2 object-cover"
             />
-            <span className="font-semibold text-foreground text-sm">
-              {post.author?.username || 'Unknown'}
-            </span>
+            <button>
+              <Link
+                to={`/members/${post.author?.username}`}
+                className="font-semibold text-foreground text-sm"
+              >
+                {post.author?.username || 'Unknown'}
+              </Link>
+            </button>
           </div>
 
           {/* Image */}
@@ -103,9 +108,14 @@ const PostFeed = () => {
           {/* Caption */}
           <div className="px-3 py-2">
             <p className="text-foreground text-sm text-left flex items-start pb-2.5">
-              <span className="font-bold mr-2">
-                {post.author?.username || 'Unknown'}
-              </span>
+              <button>
+                <Link
+                  to={`/members/${post.author?.username}`}
+                  className="font-bold mr-2"
+                >
+                  {post.author?.username || 'Unknown'}
+                </Link>
+              </button>
               <span className="flex-1">{post.caption}</span>
             </p>
           </div>
@@ -118,9 +128,14 @@ const PostFeed = () => {
                   key={index}
                   className="text-sm text-muted-foreground mb-2 flex items-start text-left "
                 >
-                  <span className="font-bold mr-2">
-                    {comment.author?.username || 'Unknown'}
-                  </span>
+                  <button>
+                    <Link
+                      to={`/members/${comment.author?.username}`}
+                      className="font-bold mr-2"
+                    >
+                      {comment.author?.username || 'Unknown'}
+                    </Link>
+                  </button>
                   <span className="flex-1">{comment.text}</span>
                 </div>
               ))

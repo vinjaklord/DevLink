@@ -13,6 +13,7 @@ export interface MessagesStore {
   isMessagesLoading: boolean;
   getUsers: () => Promise<void>;
   setSelectedUser: (userId: string | null) => void;
+  getMessages: (userId: string | null) => void;
 }
 
 const initialState = {
@@ -50,4 +51,16 @@ export const createMessageSlice: StateCreator<
     }
   },
   setSelectedUser: (userId) => set({ selectedUser: userId }),
+
+  getMessages: async (userId) => {
+    set({ isMessagesLoading: true });
+    try {
+      const response = await fetchAPI({ url: `messages/${userId}` });
+      set({ messages: response.data });
+    } catch (error) {
+      toast.error(error.response.data.message);
+    } finally {
+      set({ isMessagesLoading: false });
+    }
+  },
 });

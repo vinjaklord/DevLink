@@ -12,6 +12,7 @@ import {
   resetPassword,
   setNewPassword,
   filterMember,
+  getMemberByUsername,
 } from '../controllers/members.js';
 
 import {
@@ -29,8 +30,9 @@ import {
   getPostById,
   toggleLike,
   getMyPosts,
+  getMemberPosts,
 } from '../controllers/posts.js';
-import { getUsersForSidebar } from '../controllers/messages.js';
+import { getMessages, getUsersForSidebar } from '../controllers/messages.js';
 
 const router = new Router();
 
@@ -38,6 +40,7 @@ const router = new Router();
 router.get('/members', getAllMembers);
 router.get('/members/search', filterMember);
 router.get('/members/:id', getOneMember);
+router.get('/members/username/:username', getMemberByUsername);
 
 router.post(
   '/members/signup',
@@ -131,9 +134,11 @@ router.post(
 );
 router.put('/posts/:id/likes', checkToken, toggleLike);
 router.get('/posts/myPosts', checkToken, getMyPosts);
+router.get('/posts/memberPosts/:username', getMemberPosts);
 router.get('/posts', getAllPosts);
 router.get('/posts/:id', getPostById);
 
 router.get('/messages/users', checkToken, getUsersForSidebar);
+router.get('/messages/:userId', checkToken, getMessages);
 
 export default router;
