@@ -21,8 +21,6 @@ const createPost = async (req, res, next) => {
 
     const author = await Member.findById(authorId);
 
-    console.log(authorId);
-
     if (!image) {
       throw new HttpError('Image is required', 400);
     }

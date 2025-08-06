@@ -32,7 +32,11 @@ import {
   getMyPosts,
   getMemberPosts,
 } from '../controllers/posts.js';
-import { getMessages, getUsersForSidebar } from '../controllers/messages.js';
+import {
+  getMessages,
+  getUsersForSidebar,
+  sendMessage,
+} from '../controllers/messages.js';
 
 const router = new Router();
 
@@ -140,5 +144,13 @@ router.get('/posts/:id', getPostById);
 
 router.get('/messages/users', checkToken, getUsersForSidebar);
 router.get('/messages/:userId', checkToken, getMessages);
+
+router.post(
+  '/messages/send/:id',
+  checkToken,
+  upload.single('image'),
+  body('text').trim().escape().isLength({ min: 1, max: 10000 }),
+  sendMessage
+);
 
 export default router;

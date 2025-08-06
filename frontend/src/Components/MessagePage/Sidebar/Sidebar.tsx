@@ -4,12 +4,17 @@ import SidebarSkeleton from './SidebarLoading';
 import { Users } from 'lucide-react';
 
 const Sidebar = () => {
-  const { getUsers, users, selectedUser, setSelectedUser, isUsersLoading } =
-    useStore();
+  const {
+    friends,
+    fetchFriends,
+    selectedUser,
+    setSelectedUser,
+    isUsersLoading,
+  } = useStore();
 
   useEffect(() => {
-    getUsers();
-  }, [getUsers]);
+    fetchFriends();
+  }, [fetchFriends]);
 
   if (isUsersLoading) return <SidebarSkeleton />;
 
@@ -23,7 +28,7 @@ const Sidebar = () => {
       </div>
 
       <div className="overflow-y-auto w-full py-3">
-        {users.map((user) => (
+        {friends.map((user) => (
           <button
             key={user._id}
             onClick={() => setSelectedUser(user)}
@@ -52,7 +57,7 @@ const Sidebar = () => {
           </button>
         ))}
 
-        {users.length === 0 && (
+        {friends.length === 0 && (
           <div className="text-center text-zinc-500 py-4">No online users</div>
         )}
       </div>

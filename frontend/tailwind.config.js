@@ -3,4 +3,7 @@ export const content = ['./src/**/*.{js,jsx,ts,tsx}'];
 export const theme = {
   extend: {},
 };
-export const plugins = [];
+export const plugins = [require('daisyui')];
+export const daisyui = {
+  themes: ['light', 'dark'], // or your custom themes
+};

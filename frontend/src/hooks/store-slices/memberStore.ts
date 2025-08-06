@@ -14,7 +14,9 @@ import { jwtDecode } from 'jwt-decode';
 import { toast } from 'sonner';
 import type { StateCreator } from 'zustand';
 import type { StoreState } from '../useStore.ts';
+import { io } from 'socket.io-client';
 
+const BASE_URL = 'http://localhost:8000';
 // Interfaces /////////////////////////////////////////
 export interface MemberStore {
   member: IMember;
@@ -27,6 +29,7 @@ export interface MemberStore {
   decodedToken: DecodedToken | null;
   alert: Alert | null;
   dialog: any | null;
+  socket: any | null;
   resetMember: () => void;
   searchMembers: (q: string) => Promise<IMember[]>;
   getMemberById: (id: string) => Promise<IMember>;
@@ -36,6 +39,8 @@ export interface MemberStore {
   memberLogin: (data: LoginCredentials) => Promise<boolean>;
   memberCheck: () => void;
   memberRefreshMe: () => void;
+  connectSocket: () => void;
+  disconnectSocket: () => void;
   editProfile: (data: EditCredentials) => Promise<boolean>;
 }
 
@@ -56,6 +61,7 @@ const initialState = {
   alert: null,
   dialog: null,
   loading: false,
+  socket: null,
 };
 
 export const createMemberSlice: StateCreator<
@@ -129,6 +135,8 @@ export const createMemberSlice: StateCreator<
         );
       }
       toast.success('Signed in successfully. Welcome!');
+      get().connectSocket();
+
       return true;
     } catch (error: any) {
       console.error('Signup error:', error);
@@ -171,7 +179,7 @@ export const createMemberSlice: StateCreator<
 
       // loggedInMember in localStorage speichern
       localStorage.setItem('lh_member', JSON.stringify(loggedInMember));
-
+      get().connectSocket();
       return true;
     } catch (error: any) {
       // console.log('was ist error', error);
@@ -182,56 +190,71 @@ export const createMemberSlice: StateCreator<
     }
   },
   memberLogout: () => {
-    // localStorage löschen
+    console.log('memberLogout: Clearing localStorage and resetting state');
     localStorage.removeItem('lh_token');
     localStorage.removeItem('lh_member');
-
-    // Store resetten
+    get().disconnectSocket();
     set({ ...initialState });
   },
   memberCheck: async () => {
     try {
-      // Prüfen, ob Member angemeldet ist
       if (get().loggedInMember) {
+        console.log(
+          `memberCheck: User ${get().loggedInMember._id} already logged in`
+        );
+        if (!get().socket?.connected) {
+          console.log(
+            'memberCheck: Socket not connected, calling connectSocket'
+          );
+          get().connectSocket();
+        }
         return;
       }
 
-      // wenn nicht angemeldet
-      //  Token aus localStorage laden,
       const token = localStorage.getItem('lh_token');
       if (!token) {
+        console.log('memberCheck: No token found in localStorage');
         return;
       }
 
-      // console.log('was ist token', token);
-
-      //  Token dekodieren
-      const decodedToken = jwtDecode(token);
-
-      // console.log('was ist decodedToken', decodedToken);
+      console.log('memberCheck: Decoding token');
+      const decodedToken = jwtDecode<DecodedToken>(token);
       const { id, exp } = decodedToken;
-
-      //  Gültigkeit prüfen (Ablaufdatum/-uhrzeit)
-      // const expireDate = Number(ext);
       const currentDate = Number(new Date()) / 1000;
 
-      // console.log(exp, currentDate);
-
-      //  wenn Token ungültig -> Token und andere Infos aus localStorage löschen
       if (exp < currentDate) {
-        return get().memberLogout();
+        console.log('memberCheck: Token expired');
+        get().memberLogout();
+        return;
       }
 
-      //  wenn Token gültig -> loggedInMember-Daten aus localStorage laden
-      const loggedInMember = JSON.parse(localStorage.getItem('lh_member'));
-      if (!loggedInMember) {
-        return get().memberLogout();
+      const memberData = localStorage.getItem('lh_member');
+      if (!memberData) {
+        console.log('memberCheck: No member data found in localStorage');
+        get().memberLogout();
+        return;
       }
 
-      // Status des Stores updaten
+      let loggedInMember: IMember;
+      try {
+        loggedInMember = JSON.parse(memberData);
+        if (!loggedInMember?._id) {
+          throw new Error('Invalid member data');
+        }
+      } catch (error) {
+        console.error('memberCheck: Failed to parse lh_member:', error);
+        get().memberLogout();
+        return;
+      }
+
+      console.log(`memberCheck: Restoring user ${loggedInMember._id}`);
       set({ token, decodedToken, loggedInMember });
+      console.log('memberCheck: Calling connectSocket');
+      get().connectSocket();
     } catch (error) {
-      console.log(error);
+      console.error('memberCheck error:', error);
+      toast.error('Session check failed, please log in again');
+      get().memberLogout();
     }
   },
 
@@ -283,5 +306,69 @@ export const createMemberSlice: StateCreator<
     } finally {
       set({ isUpdatingProfile: false });
     }
+  },
+
+  connectSocket: () => {
+    const { loggedInMember } = get();
+    if (!loggedInMember) {
+      console.log('connectSocket: No loggedInMember, cannot connect socket');
+      return;
+    }
+    if (get().socket?.connected) {
+      console.log(
+        `connectSocket: Socket already connected for user ${loggedInMember._id}`
+      );
+      return;
+    }
+
+    console.log(
+      `connectSocket: Connecting socket for user ${loggedInMember._id}`
+    );
+    const socket = io(BASE_URL, {
+      transports: ['websocket'],
+      query: { userId: loggedInMember._id },
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+    });
+
+    socket.on('connect', () => {
+      console.log(
+        `Socket connected for user ${loggedInMember._id}, socket ID: ${socket.id}`
+      );
+      set({ socket });
+      if (get().selectedUser?._id) {
+        console.log(
+          `Re-subscribing to messages for selectedUser ${
+            get().selectedUser._id
+          }`
+        );
+        get().subscribeToMessages();
+      }
+    });
+
+    socket.on('connect_error', (error) => {
+      console.error(
+        `Socket connection error for user ${loggedInMember._id}: ${error.message}`
+      );
+      toast.error(`Socket connection failed: ${error.message}`);
+    });
+
+    socket.on('disconnect', (reason) => {
+      console.log(
+        `Socket disconnected for user ${loggedInMember._id}: ${reason}`
+      );
+    });
+
+    set({ socket });
+  },
+
+  disconnectSocket: () => {
+    const socket = get().socket;
+    if (socket && socket.connected) {
+      console.log(`Disconnecting socket for user ${get().loggedInMember?._id}`);
+      socket.disconnect();
+    }
+    set({ socket: null });
   },
 });
