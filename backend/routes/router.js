@@ -17,6 +17,7 @@ import {
 
 import {
   addFriend,
+  deleteFriend,
   getAllFriends,
   getPendingFriendRequests,
   manageFriendRequest,
@@ -31,7 +32,8 @@ import {
   toggleLike,
   getMyPosts,
   getMemberPosts,
-} from '../controllers/posts.js';
+  getFriendsPosts,
+} from '../controllers/posts.js';  
 import {
   getMessages,
   getUsersForSidebar,
@@ -98,10 +100,9 @@ router.post(
 );
 
 router.post(
-  '/friends/add-friend',
+  '/friends/add-friend/:id',
   checkToken,
-  body('sender').escape().isLength({ min: 20, max: 30 }).isMongoId(),
-  body('recipient').escape().isLength({ min: 20, max: 30 }).isMongoId(),
+
   addFriend
 );
 
@@ -113,6 +114,8 @@ router.get(
 );
 
 router.get('/friends/all-friends', checkToken, getAllFriends);
+
+router.delete('/friends/deleteFriend/:friendId', checkToken, deleteFriend);
 
 router.put(
   '/friends/:senderId',
@@ -136,11 +139,12 @@ router.post(
   body('text').trim().escape().isLength({ min: 1, max: 500 }),
   addComment
 );
-router.put('/posts/:id/likes', checkToken, toggleLike);
 router.get('/posts/myPosts', checkToken, getMyPosts);
 router.get('/posts/memberPosts/:username', getMemberPosts);
-router.get('/posts', getAllPosts);
+router.get('/posts/friendPosts', getFriendsPosts);
+router.put('/posts/:id/likes', checkToken, toggleLike);
 router.get('/posts/:id', getPostById);
+router.get('/posts', getAllPosts);
 
 router.get('/messages/users', checkToken, getUsersForSidebar);
 router.get('/messages/:userId', checkToken, getMessages);

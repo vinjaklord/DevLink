@@ -1,5 +1,4 @@
 import useStore from '@/hooks/useStore';
-import type { IMember } from '@/models/member.model';
 import { useEffect } from 'react';
 
 export default function FriendsBar() {

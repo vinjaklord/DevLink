@@ -12,7 +12,9 @@ const addFriend = async (req, res, next) => {
     }
 
     const data = matchedData(req);
-    const { sender, recipient } = data; // as IDs
+    // const { sender, recipient } = data; // as IDs
+    const sender = req.verifiedMember._id;
+    const { id: recipient } = req.params;
 
     const senderMember = await Member.findById(sender);
     const recipientMember = await Member.findById(recipient);
@@ -24,14 +26,7 @@ const addFriend = async (req, res, next) => {
     if (!recipientFriend) {
       recipientFriend = new Friend({ member: recipient });
       await recipientFriend.save();
-      console.log('Created new Friend document for:', recipient);
     } else {
-      console.log(
-        'Found Friend document for:',
-        recipient,
-        'with requests:',
-        recipientFriend.pendingFriendRequests
-      );
     }
 
     if (
@@ -44,15 +39,59 @@ const addFriend = async (req, res, next) => {
 
     recipientFriend.pendingFriendRequests.push(sender);
     await recipientFriend.save();
-    console.log('Added friend request:', {
-      recipient,
-      sender,
-      pendingFriendRequests: recipientFriend.pendingFriendRequests,
-    });
 
     res.json(recipientFriend);
   } catch (error) {
     return next(new HttpError(error, 422));
+  }
+};
+
+const deleteFriend = async (req, res, next) => {
+  try {
+    const loggedInUser = req.verifiedMember._id;
+    const { friendId } = req.params;
+
+    if (loggedInUser === friendId) {
+      throw new HttpError('You cannot remove yourself as a friend.', 400);
+    }
+
+    const updatedUserDocument = await Friend.findOneAndUpdate(
+      { member: loggedInUser },
+      { $pull: { friends: friendId } },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedUserDocument) {
+      throw new HttpError(
+        'Could not find friend list for the logged-in user.',
+        404
+      );
+    }
+
+    const updatedFriendDocument = await Friend.findOneAndUpdate(
+      { member: friendId },
+      { $pull: { friends: loggedInUser } },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedFriendDocument) {
+      console.warn(
+        `Friend list not found for user ${friendId}. Data may be inconsistent.`
+      );
+    }
+
+    res.json({
+      message: 'Friend removed successfully.',
+      updatedUserDocument,
+    });
+  } catch (error) {
+    console.error('Error in removeFriend controller:', error.message);
+    return next(
+      new HttpError(
+        error.message || 'Failed to remove friend.',
+        error.code || 500
+      )
+    );
   }
 };
 
@@ -125,24 +164,8 @@ const manageFriendRequest = async (req, res, next) => {
     if (!recipientFriend) {
       recipientFriend = new Friend({ member: req.verifiedMember._id });
       await recipientFriend.save();
-      console.log(
-        'Created new Friend document for recipient:',
-        req.verifiedMember._id
-      );
     } else {
-      console.log(
-        'Found Friend document for recipient:',
-        req.verifiedMember._id,
-        'with requests:',
-        recipientFriend.pendingFriendRequests
-      );
     }
-
-    console.log(
-      'Pending requests for recipient:',
-      recipientFriend.pendingFriendRequests.map((id) => id.toString())
-    );
-    console.log('Sender ID:', senderId);
 
     if (
       !recipientFriend.pendingFriendRequests.some(
@@ -169,10 +192,6 @@ const manageFriendRequest = async (req, res, next) => {
       recipientFriend.pendingFriendRequests.pull(senderId);
       await recipientFriend.save({ session });
       await session.commitTransaction();
-      console.log(
-        'Declined request, updated requests:',
-        recipientFriend.pendingFriendRequests
-      );
     } else if (action === 'accept') {
       recipientFriend.pendingFriendRequests.pull(senderId);
       recipientFriend.friends.push(senderId);
@@ -196,11 +215,6 @@ const manageFriendRequest = async (req, res, next) => {
       }
 
       await session.commitTransaction();
-      console.log(
-        'Accepted request, recipient friends:',
-        recipientFriend.friends
-      );
-      console.log('Accepted request, sender friends:', senderFriend.friends);
     } else {
       throw new HttpError('You must accept or decline', 422);
     }
@@ -229,4 +243,5 @@ export {
   getPendingFriendRequests,
   manageFriendRequest,
   getAllFriends,
+  deleteFriend,
 };

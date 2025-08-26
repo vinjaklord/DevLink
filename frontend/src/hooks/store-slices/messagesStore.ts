@@ -60,36 +60,28 @@ export const createMessageSlice: StateCreator<
   },
 
   setSelectedUser: (user) => {
-    console.log(`setSelectedUser: Setting user ${user?._id || 'null'}`);
     set({ selectedUser: user, messages: [] });
     if (user?._id) {
-      console.log(`setSelectedUser: Fetching messages for user ${user._id}`);
       get().getMessages(user._id);
       get().subscribeToMessages();
     } else {
-      console.log(
-        'setSelectedUser: No user selected, unsubscribing from messages'
-      );
       get().unsubscribeFromMessages();
     }
   },
   getMessages: async (userId) => {
     if (!userId) {
-      console.log('getMessages: No userId');
       return;
     }
     set({ isMessagesLoading: true });
     try {
       const token = localStorage.getItem('lh_token');
       if (!token) throw new Error('No token found');
-      console.log(`getMessages: Fetching for ${userId}`);
+
       const response = await fetchAPI({
         url: `messages/${userId}`,
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log(
-        `getMessages: Fetched ${response.data.length} messages for ${userId}`
-      );
+
       set({ messages: response.data });
     } catch (error: any) {
       console.error(`getMessages error for ${userId}:`, error);
@@ -111,7 +103,7 @@ export const createMessageSlice: StateCreator<
     try {
       const token = localStorage.getItem('lh_token');
       if (!token) throw new Error('No token found');
-      console.log(`sendMessage: Sending message to user ${selectedUser._id}`);
+
       const response = await fetchAPI({
         method: 'post',
         url: `messages/send/${selectedUser._id}`,
@@ -121,9 +113,7 @@ export const createMessageSlice: StateCreator<
           'Content-Type': 'multipart/form-data',
         },
       });
-      console.log(
-        `sendMessage: Message sent successfully to ${selectedUser._id}`
-      );
+
       set({ messages: [...messages, response.data] });
     } catch (error: any) {
       console.error('sendMessage error:', error);
@@ -134,25 +124,16 @@ export const createMessageSlice: StateCreator<
   subscribeToMessages: () => {
     const { selectedUser, loggedInMember } = get();
     if (!selectedUser || !loggedInMember) {
-      console.log('subscribeToMessages: No selectedUser or loggedInMember');
       return;
     }
 
     const socket = useStore.getState().socket;
     if (!socket) {
-      console.log('subscribeToMessages: No socket available');
       return;
     }
 
-    console.log(
-      `subscribeToMessages: Subscribing for user ${loggedInMember._id} with selectedUser ${selectedUser._id}`
-    );
     socket.off('newMessage');
     socket.on('newMessage', (newMessage: IMessage) => {
-      console.log(
-        `newMessage received for user ${loggedInMember._id}:`,
-        newMessage
-      );
       if (
         (newMessage.senderId === selectedUser._id &&
           newMessage.recipientId === loggedInMember._id) ||
@@ -160,9 +141,6 @@ export const createMessageSlice: StateCreator<
           newMessage.recipientId === selectedUser._id)
       ) {
         set({ messages: [...get().messages, newMessage] });
-        console.log(
-          `Appended message to conversation with ${selectedUser._id}`
-        );
       } else {
         console.log(
           `Message ignored: Not part of conversation with ${selectedUser._id}`
@@ -174,9 +152,6 @@ export const createMessageSlice: StateCreator<
   unsubscribeFromMessages: () => {
     const socket = useStore.getState().socket;
     if (socket) {
-      console.log(
-        'unsubscribeFromMessages: Unsubscribing from newMessage events'
-      );
       socket.off('newMessage');
     }
   },
