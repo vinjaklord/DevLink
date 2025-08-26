@@ -51,16 +51,6 @@ const createPostsSlice: StateCreator<StoreState, [], [], PostsStore> = (
     }
   },
 
-  fetchAllPosts: async () => {
-    try {
-      set({ loading: true });
-      const response = await fetchAPI({ url: '/posts' });
-      set({ allPosts: response.data, loading: false });
-    } catch (error: any) {
-      set({ error: error.message, loading: false });
-      toast.error(error.response?.data?.message || 'Failed to fetch posts');
-    }
-  },
   fetchMyPosts: async () => {
     try {
       set({ loading: true });
@@ -94,6 +84,24 @@ const createPostsSlice: StateCreator<StoreState, [], [], PostsStore> = (
       set({ error: error.message, loading: false });
       toast.error(error.response?.data?.message || 'Failed to fetch posts');
     }
+  },
+
+  fetchAllPosts: async () => {
+    try {
+      set({ loading: true });
+      const response = await fetchAPI({ url: '/posts' });
+      set({ allPosts: response.data, loading: false });
+    } catch (error: any) {
+      set({ error: error.message, loading: false });
+      toast.error(error.response?.data?.message || 'Failed to fetch posts');
+    }
+  },
+
+  fetchFriendsPosts: async () => {
+    try {
+            set({ loading: true });
+
+    } catch (error) {}
   },
 
   uploadPost: async (data: IPost): Promise<boolean> => {
@@ -131,7 +139,7 @@ const createPostsSlice: StateCreator<StoreState, [], [], PostsStore> = (
       // Optimistic toggle
       set((state) => {
         const toggleLikes = (post) =>
-          post._id === posId
+          post._id === postId
             ? {
                 ...post,
                 likes: post.likes?.includes(userId)

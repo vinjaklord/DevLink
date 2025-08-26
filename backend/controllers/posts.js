@@ -151,6 +151,31 @@ const getMyPosts = async (req, res, next) => {
   }
 };
 
+const getFriendsPosts = async (req, res, next) => {
+  const memberId = req.verifiedMember._id;
+
+  try {
+    const friendDocument = await Friend.findOne({ member: memberId });
+
+    if (
+      !friendDocument ||
+      !friendDocument.friends ||
+      friendDocument.friends.length === 0
+    ) {
+      return res.json([]);
+    }
+
+    const postsList = await Post.find({
+      author: { $in: friendDocument.friends },
+    }).populate('author', 'username firstName lastName photo');
+
+    res.json(postsList);
+  } catch (error) {
+    // This will catch any other errors, including if friendDocument is null
+    return next(new HttpError(error, error.errorCode || 500));
+  }
+};
+
 const getMemberPosts = async (req, res, next) => {
   const username = req.params.username;
 
@@ -176,4 +201,5 @@ export {
   getAllPosts,
   getMyPosts,
   getMemberPosts,
+  getFriendsPosts,
 };

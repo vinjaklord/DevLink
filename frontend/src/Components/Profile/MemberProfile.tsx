@@ -1,6 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { ImageOff } from 'lucide-react';
+import { ImageOff, UserMinus, UserPlus, UserCheck } from 'lucide-react';
 
 import useStore from '@/hooks/useStore.ts';
 
@@ -9,21 +9,78 @@ function MemberProfile() {
   const {
     memberPosts,
     fetchMemberPosts,
-    loggedInMember,
     user,
     getMemberByUsername,
+    friends,
+    fetchFriends,
+    deleteFriend,
+    addFriend,
   } = useStore((state) => state);
+
+  const [friendState, setFriendState] = useState('');
 
   useEffect(() => {
     fetchMemberPosts(username);
     getMemberByUsername(username);
-  }, [username, fetchMemberPosts, getMemberByUsername]);
+    fetchFriends();
+    friends;
+  }, [username, fetchMemberPosts, getMemberByUsername, fetchFriends, friends]);
+
+  const isFriend = friends.some((friend) => friend._id === user._id);
+
+  const handleFriendAction = async () => {
+    try {
+      if (isFriend) {
+        await deleteFriend(user._id);
+        setFriendState(''); // Or another appropriate state
+        console.log('Friend deleted!');
+      } else {
+        // Set state to 'pending' right before the API call
+
+        setFriendState('pending');
+        // Wait for the asynchronous API call to finish
+        await addFriend(user._id);
+
+        console.log('Request Sent');
+      }
+    } catch (error) {
+      // Handle errors, maybe set an 'error' state
+      console.error('An error occurred:', error);
+      setFriendState('');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground pt-22">
       <div className="container max-w-4xl mx-auto space-y-6 px-4">
         {/* Header */}
         <div className="bg-card shadow rounded-xl p-6 text-center relative">
+          <button
+            onClick={handleFriendAction}
+            className={`absolute top-4 right-4 flex items-center gap-2 font-semibold text-sm transition-colors duration-200 ease-in-out ${
+              !isFriend
+                ? friendState === 'pending'
+                  ? 'bg-green-800 text-white hover:bg-green-700'
+                  : 'bg-primary text-primary-foreground hover:bg-primary/90'
+                : 'bg-red-500 text-white hover:bg-red-600'
+            } px-4 py-2 rounded-full shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50`}
+          >
+            {!isFriend ? (
+              friendState === 'pending' ? (
+                <>
+                  <UserCheck size={16} /> Request Sent
+                </>
+              ) : (
+                <>
+                  <UserPlus size={16} /> Add Friend
+                </>
+              )
+            ) : (
+              <>
+                <UserMinus size={16} /> Remove Friend
+              </>
+            )}
+          </button>
           {/* Profile Picture */}
           <div className="flex justify-center -mt-16">
             <img

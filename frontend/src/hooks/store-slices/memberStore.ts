@@ -190,7 +190,6 @@ export const createMemberSlice: StateCreator<
     }
   },
   memberLogout: () => {
-    console.log('memberLogout: Clearing localStorage and resetting state');
     localStorage.removeItem('lh_token');
     localStorage.removeItem('lh_member');
     get().disconnectSocket();
@@ -199,13 +198,7 @@ export const createMemberSlice: StateCreator<
   memberCheck: async () => {
     try {
       if (get().loggedInMember) {
-        console.log(
-          `memberCheck: User ${get().loggedInMember._id} already logged in`
-        );
         if (!get().socket?.connected) {
-          console.log(
-            'memberCheck: Socket not connected, calling connectSocket'
-          );
           get().connectSocket();
         }
         return;
@@ -217,7 +210,6 @@ export const createMemberSlice: StateCreator<
         return;
       }
 
-      console.log('memberCheck: Decoding token');
       const decodedToken = jwtDecode<DecodedToken>(token);
       const { id, exp } = decodedToken;
       const currentDate = Number(new Date()) / 1000;
@@ -247,9 +239,8 @@ export const createMemberSlice: StateCreator<
         return;
       }
 
-      console.log(`memberCheck: Restoring user ${loggedInMember._id}`);
       set({ token, decodedToken, loggedInMember });
-      console.log('memberCheck: Calling connectSocket');
+
       get().connectSocket();
     } catch (error) {
       console.error('memberCheck error:', error);
@@ -261,7 +252,6 @@ export const createMemberSlice: StateCreator<
   memberRefreshMe: async () => {
     let loggedInMember = get().loggedInMember;
     if (!loggedInMember) {
-      console.warn('LoggedInMember not Found');
       return;
     }
 
@@ -311,19 +301,12 @@ export const createMemberSlice: StateCreator<
   connectSocket: () => {
     const { loggedInMember } = get();
     if (!loggedInMember) {
-      console.log('connectSocket: No loggedInMember, cannot connect socket');
       return;
     }
     if (get().socket?.connected) {
-      console.log(
-        `connectSocket: Socket already connected for user ${loggedInMember._id}`
-      );
       return;
     }
 
-    console.log(
-      `connectSocket: Connecting socket for user ${loggedInMember._id}`
-    );
     const socket = io(BASE_URL, {
       transports: ['websocket'],
       query: { userId: loggedInMember._id },
@@ -333,16 +316,8 @@ export const createMemberSlice: StateCreator<
     });
 
     socket.on('connect', () => {
-      console.log(
-        `Socket connected for user ${loggedInMember._id}, socket ID: ${socket.id}`
-      );
       set({ socket });
       if (get().selectedUser?._id) {
-        console.log(
-          `Re-subscribing to messages for selectedUser ${
-            get().selectedUser._id
-          }`
-        );
         get().subscribeToMessages();
       }
     });
@@ -354,11 +329,7 @@ export const createMemberSlice: StateCreator<
       toast.error(`Socket connection failed: ${error.message}`);
     });
 
-    socket.on('disconnect', (reason) => {
-      console.log(
-        `Socket disconnected for user ${loggedInMember._id}: ${reason}`
-      );
-    });
+    socket.on('disconnect', (reason) => {});
 
     set({ socket });
   },
@@ -366,7 +337,6 @@ export const createMemberSlice: StateCreator<
   disconnectSocket: () => {
     const socket = get().socket;
     if (socket && socket.connected) {
-      console.log(`Disconnecting socket for user ${get().loggedInMember?._id}`);
       socket.disconnect();
     }
     set({ socket: null });
