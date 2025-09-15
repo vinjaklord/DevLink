@@ -20,6 +20,7 @@ import {
   deleteFriend,
   getAllFriends,
   getPendingFriendRequests,
+  getRelationshipStatus,
   manageFriendRequest,
 } from '../controllers/friends.js';
 
@@ -33,7 +34,7 @@ import {
   getMyPosts,
   getMemberPosts,
   getFriendsPosts,
-} from '../controllers/posts.js';  
+} from '../controllers/posts.js';
 import {
   getMessages,
   getUsersForSidebar,
@@ -116,6 +117,8 @@ router.get(
 router.get('/friends/all-friends', checkToken, getAllFriends);
 
 router.delete('/friends/deleteFriend/:friendId', checkToken, deleteFriend);
+
+router.get('/friends/status/:userId', checkToken, getRelationshipStatus);
 
 router.put(
   '/friends/:senderId',

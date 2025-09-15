@@ -137,6 +137,40 @@ const getAllFriends = async (req, res, next) => {
   }
 };
 
+const getRelationshipStatus = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const currentUserId = req.verifiedMember._id;
+
+    // Find the current user's Friend document
+    const currentUserFriendDoc = await Friend.findOne({
+      member: currentUserId,
+    });
+    const targetUserFriendDoc = await Friend.findOne({ member: userId });
+
+    // Check if the target user has sent a friend request to the current user
+    const isPendingReceived =
+      currentUserFriendDoc?.pendingFriendRequests.includes(userId);
+    // Check if the current user has sent a friend request to the target user
+    const isPendingSent =
+      targetUserFriendDoc?.pendingFriendRequests.includes(currentUserId);
+    // Check if they are friends
+    const isFriend = currentUserFriendDoc?.friends.includes(userId);
+
+    if (isFriend) {
+      return res.json({ status: 'accepted', isSender: false });
+    } else if (isPendingSent) {
+      return res.json({ status: 'pending', isSender: true });
+    } else if (isPendingReceived) {
+      return res.json({ status: 'pending', isSender: false });
+    } else {
+      return res.json({ status: 'none', isSender: false });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 const manageFriendRequest = async (req, res, next) => {
   let session;
   try {
@@ -244,4 +278,5 @@ export {
   manageFriendRequest,
   getAllFriends,
   deleteFriend,
+  getRelationshipStatus,
 };

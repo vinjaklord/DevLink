@@ -15,9 +15,7 @@ import MessagePage from './Components/MessagePage/MessagePage';
 import MemberProfile from './Components/Profile/MemberProfile';
 
 function App() {
-  const { loggedInMember, memberCheck, showAddPost, setShowAddPost } = useStore(
-    (state) => state
-  );
+  const { loggedInMember, memberCheck, showAddPost, setShowAddPost } = useStore((state) => state);
 
   // Check if the user is logged in on every page load
   useEffect(() => {
