@@ -57,15 +57,11 @@ function MemberProfile() {
   const isPending = user?._id ? pending.some((pending) => pending._id === user._id) : false;
   const isMe = loggedInMember?._id && user?._id ? loggedInMember._id === user._id : false;
 
-  let whichPost;
-  if (isMe) {
-    whichPost === myPosts;
-  }
   return (
     <div className="min-h-screen bg-background text-foreground pt-22">
       <div className="container max-w-4xl mx-auto space-y-6 px-4">
         {/* Header */}
-        <div className="bg-card shadow rounded-xl p-6 text-center relative">
+        <div className="bg-card shadow-md rounded-xl p-6 text-center relative">
           <div className="absolute top-4 right-4 flex items-center gap-2">
             {isMe ? (
               <div className="mt-4">
@@ -144,7 +140,7 @@ function MemberProfile() {
         </div>
 
         {/* Posts */}
-        <div className="max-w-[37.5rem] min-h-[10rem] grid grid-cols-3 bg-card mx-auto px-4 py-4">
+        <div className="max-w-[37.5rem] min-h-[10rem] rounded-xl grid grid-cols-3 shadow-md bg-card mx-auto px-4 py-4">
           {memberPosts?.length > 0 ? (
             [...memberPosts].reverse().map((post) => (
               <div key={post._id} className="relative w-full p-0.5 aspect-square">

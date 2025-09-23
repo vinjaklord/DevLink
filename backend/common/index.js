@@ -134,7 +134,7 @@ const getToken = (id) => {
       id,
     },
     process.env.JWT_KEY,
-    { expiresIn: '24h' }
+    { expiresIn: '7d' }
   );
 
   return token;

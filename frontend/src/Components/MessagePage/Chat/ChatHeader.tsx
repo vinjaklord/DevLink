@@ -1,5 +1,6 @@
 import { X } from 'lucide-react';
 import useStore from '@/hooks/useStore';
+import { Link } from 'react-router-dom';
 
 const ChatHeader = () => {
   const { selectedUser, setSelectedUser } = useStore();
@@ -20,9 +21,14 @@ const ChatHeader = () => {
 
           {/* User Info */}
           <div className="text-left">
-            <h3 className="text-sm font-semibold text-foreground">
-              {selectedUser?.firstName} {selectedUser?.lastName}
-            </h3>
+            <button>
+              <Link
+                to={`/members/${selectedUser}`}
+                className="font-semibold text-foreground text-sm"
+              >
+                {selectedUser?.firstName} {selectedUser?.lastName}
+              </Link>
+            </button>
             {/* Status placeholder */}
             <p className="text-xs text-muted-foreground">Online</p>
           </div>

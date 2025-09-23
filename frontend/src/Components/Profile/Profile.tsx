@@ -18,15 +18,11 @@ function Profile() {
         <ProfileHeader />
 
         {/* Posts */}
-        <div className=" max-w-[37.5rem] grid grid-cols-3 bg-card mx-auto space-y-4 px-4 py-4 ">
+        <div className=" max-w-[37.5rem] grid shadow-md grid-cols-3 bg-card rounded-xl mx-auto space-y-4 px-4 py-4 ">
           {[...myPosts].reverse().map((post) => (
             <div className="relative w-full p-0.5 aspect-square">
               <Link to={`/posts/${post._id}`}>
-                <img
-                  src={post.imageUrl}
-                  alt="Post"
-                  className="w-full h-full object-cover"
-                />
+                <img src={post.imageUrl} alt="Post" className="w-full h-full object-cover" />
               </Link>
             </div>
           ))}
