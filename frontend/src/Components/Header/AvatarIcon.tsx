@@ -49,6 +49,9 @@ export default function AvatarIcon() {
               <Link to="/profile">
                 <DropdownMenuItem>Profile</DropdownMenuItem>
               </Link>
+              <Link to="/change-password">
+                <DropdownMenuItem>Change Password</DropdownMenuItem>
+              </Link>
               <DropdownMenuItem>Settings</DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />

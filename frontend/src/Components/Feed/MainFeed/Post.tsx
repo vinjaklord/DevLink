@@ -5,16 +5,14 @@ import { Heart, MessageSquare } from 'lucide-react';
 
 const Post = () => {
   const { id } = useParams();
-  const {
-    currentPost,
-    loading,
-    error,
-    fetchPostById,
-    toggleLike,
-    addComment,
-    loggedInMember,
-  } = useStore((state) => state);
+  const { currentPost, loading, error, fetchPostById, toggleLike, addComment, loggedInMember } =
+    useStore((state) => state);
   const [commentText, setCommentText] = useState('');
+  const [commentsToShow, setCommentsToShow] = useState(10);
+
+  const handleShowMore = async () => {
+    setCommentsToShow((prevCount) => prevCount + 10);
+  };
 
   useEffect(() => {
     if (id) fetchPostById(id);
@@ -32,14 +30,8 @@ const Post = () => {
   };
 
   if (loading) return <p className="text-center text-foreground">Loading...</p>;
-  if (error)
-    return (
-      <p className="text-destructive text-center">
-        An error has occurred: {error}
-      </p>
-    );
-  if (!currentPost)
-    return <p className="text-destructive text-center">Post Not Found</p>;
+  if (error) return <p className="text-destructive text-center">An error has occurred: {error}</p>;
+  if (!currentPost) return <p className="text-destructive text-center">Post Not Found</p>;
 
   return (
     <div className="max-w-[37.5rem] mx-auto mt-15 p-4 bg-card dark:bg-card shadow-lg rounded-lg border border-border">
@@ -57,11 +49,7 @@ const Post = () => {
 
       {/* Image */}
       <div className="relative w-full aspect-square">
-        <img
-          src={currentPost.imageUrl}
-          alt="Post"
-          className="w-full h-full object-cover"
-        />
+        <img src={currentPost.imageUrl} alt="Post" className="w-full h-full object-cover" />
       </div>
 
       {/* Like and Comment */}
@@ -76,15 +64,11 @@ const Post = () => {
             ) : (
               <Heart className="w-6 h-6" />
             )}
-            <span className="ml-1 text-sm">
-              {currentPost.likes?.length || 0}
-            </span>
+            <span className="ml-1 text-sm">{currentPost.likes?.length || 0}</span>
           </button>
           <div className="flex items-center text-foreground">
             <MessageSquare className="w-6 h-6" />
-            <span className="ml-1 text-sm">
-              {currentPost.comments?.length || 0}
-            </span>
+            <span className="ml-1 text-sm">{currentPost.comments?.length || 0}</span>
           </div>
         </div>
       </div>
@@ -92,9 +76,7 @@ const Post = () => {
       {/* Caption */}
       <div className="px-3 py-2">
         <p className="text-foreground text-sm text-left flex items-start pb-2.5">
-          <span className="font-bold mr-2">
-            {currentPost.author?.username || 'Unknown'}
-          </span>
+          <span className="font-bold mr-2">{currentPost.author?.username || 'Unknown'}</span>
           <span className="flex-1">{currentPost.caption}</span>
         </p>
       </div>
@@ -102,21 +84,33 @@ const Post = () => {
       {/* Comments */}
       <div className="px-3 pb-2 max-h-60 overflow-y-auto">
         {currentPost?.comments?.length > 0 ? (
-          currentPost?.comments?.map((comment, index) => (
-            <div
-              key={index}
-              className="text-sm text-muted-foreground mb-2 flex items-start text-left"
-            >
-              <span className="font-bold mr-2">
-                {comment.author?.username || 'Unknown'}
-              </span>
-              <span className="flex-1">{comment.text}</span>
-            </div>
-          ))
+          [...currentPost.comments]
+            .reverse()
+            .slice(0, commentsToShow) // Use .slice() with the new state
+            .map((comment, index) => (
+              <div
+                key={index}
+                className="text-sm text-muted-foreground mb-2 flex items-start text-left"
+              >
+                <span className="font-bold mr-2">{comment.author?.username || 'Unknown'}</span>
+                <span className="flex-1">{comment.text}</span>
+              </div>
+            ))
         ) : (
           <p className="text-sm text-muted-foreground">No comments yet.</p>
         )}
       </div>
+      {/* "Show More" Button */}
+      {currentPost.comments.length > commentsToShow && (
+        <div className="px-3 pb-2">
+          <button
+            onClick={handleShowMore}
+            className="text-primary font-semibold text-sm hover:underline"
+          >
+            Show more...
+          </button>
+        </div>
+      )}
 
       {/* Comment Input */}
       <div className="p-3 border-t border-border">
@@ -128,10 +122,7 @@ const Post = () => {
             placeholder="Add a comment..."
             className="flex-1 bg-transparent border-none focus:ring-0 text-foreground text-sm placeholder-muted-foreground"
           />
-          <button
-            type="submit"
-            className="text-primary font-semibold text-sm hover:underline"
-          >
+          <button type="submit" className="text-primary font-semibold text-sm hover:underline">
             Post
           </button>
         </form>

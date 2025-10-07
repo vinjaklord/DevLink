@@ -3,12 +3,9 @@ import type {
   LoginCredentials,
   SignupCredentials,
   EditCredentials,
+  PasswordData,
 } from '../../models/member.model.ts';
-import type {
-  Alert,
-  DecodedToken,
-  ApiResponse,
-} from '@/models/helper.model.ts';
+import type { Alert, DecodedToken, ApiResponse } from '@/models/helper.model.ts';
 import fetchAPI from '../../utils/index.ts';
 import { jwtDecode } from 'jwt-decode';
 import { toast } from 'sonner';
@@ -42,6 +39,7 @@ export interface MemberStore {
   connectSocket: () => void;
   disconnectSocket: () => void;
   editProfile: (data: EditCredentials) => Promise<boolean>;
+  memberChangePassword: (data: PasswordData) => Promise<boolean>;
 }
 
 const defaultMember: IMember = {
@@ -64,12 +62,10 @@ const initialState = {
   socket: null,
 };
 
-export const createMemberSlice: StateCreator<
-  StoreState,
-  [],
-  [],
-  MemberStore
-> = (set, get): MemberStore => ({
+export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = (
+  set,
+  get
+): MemberStore => ({
   member: defaultMember,
   members: [],
   user: defaultMember,
@@ -120,9 +116,7 @@ export const createMemberSlice: StateCreator<
     }
   },
 
-  memberSignup: async (
-    data: SignupCredentials | FormData
-  ): Promise<boolean> => {
+  memberSignup: async (data: SignupCredentials | FormData): Promise<boolean> => {
     try {
       const response = await fetchAPI({
         method: 'post',
@@ -130,9 +124,7 @@ export const createMemberSlice: StateCreator<
         data,
       });
       if (response.status !== 200) {
-        throw new Error(
-          `Signup failed: ${response.data?.message || 'Unknown error'}`
-        );
+        throw new Error(`Signup failed: ${response.data?.message || 'Unknown error'}`);
       }
       toast.success('Signed in successfully. Welcome!');
       get().connectSocket();
@@ -193,18 +185,13 @@ export const createMemberSlice: StateCreator<
     localStorage.removeItem('lh_token');
     localStorage.removeItem('lh_member');
     get().disconnectSocket();
+    console.log(`member logout has been triggered`);
+
     set({ ...initialState });
   },
 
   memberCheck: async () => {
     try {
-      if (get().loggedInMember) {
-        if (!get().socket?.connected) {
-          get().connectSocket();
-        }
-        return;
-      }
-
       const token = localStorage.getItem('lh_token');
       if (!token) {
         console.log('memberCheck: No token found in localStorage');
@@ -217,6 +204,7 @@ export const createMemberSlice: StateCreator<
 
       if (exp < currentDate) {
         console.log('memberCheck: Token expired');
+
         get().memberLogout();
         return;
       }
@@ -290,9 +278,36 @@ export const createMemberSlice: StateCreator<
       return true;
     } catch (error: any) {
       console.error('error in updating profile', error);
-      toast.error(
-        error.response?.data?.message || error.message || 'Update failed'
-      );
+      toast.error(error.response?.data?.message || error.message || 'Update failed');
+      return false;
+    } finally {
+      set({ isUpdatingProfile: false });
+    }
+  },
+  memberChangePassword: async (data) => {
+    try {
+      set({ isUpdatingProfile: true });
+      const token = localStorage.getItem('lh_token');
+      if (!token) throw new Error('No token found');
+
+      const memberId = get().loggedInMember?._id;
+      if (!memberId) throw new Error('No logged in member found');
+
+      await fetchAPI({
+        method: 'patch',
+        url: '/members/change-password',
+        data,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      get().memberRefreshMe(); // Refresh the member data after successful update
+      toast.success('Password updated successfully!');
+      return true;
+    } catch (error: any) {
+      console.error('error in updating profile', error);
+      toast.error(error.response?.data?.message || error.message || 'Update failed');
       return false;
     } finally {
       set({ isUpdatingProfile: false });
@@ -324,13 +339,13 @@ export const createMemberSlice: StateCreator<
     });
 
     socket.on('connect_error', (error: any) => {
-      console.error(
-        `Socket connection error for user ${loggedInMember._id}: ${error.message}`
-      );
+      console.error(`Socket connection error for user ${loggedInMember._id}: ${error.message}`);
       toast.error(`Socket connection failed: ${error.message}`);
     });
 
-    socket.on('disconnect', (reason: String) => { console.log('Disconected:', reason)});
+    socket.on('disconnect', (reason: String) => {
+      console.log('Disconected:', reason);
+    });
 
     set({ socket });
   },

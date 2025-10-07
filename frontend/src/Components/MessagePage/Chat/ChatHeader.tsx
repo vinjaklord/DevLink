@@ -23,7 +23,7 @@ const ChatHeader = () => {
           <div className="text-left">
             <button>
               <Link
-                to={`/members/${selectedUser}`}
+                to={`/members/${selectedUser?.username}`}
                 className="font-semibold text-foreground text-sm"
               >
                 {selectedUser?.firstName} {selectedUser?.lastName}

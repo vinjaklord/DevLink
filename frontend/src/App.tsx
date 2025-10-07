@@ -9,6 +9,7 @@ import { Toaster } from 'sonner';
 import Feed from './Components/Feed/Feed';
 import AddPost from './Components/AddPost/AddPost';
 import EditProfile from './Components/Profile/EditProfile';
+import ChangePassword from './Components/Profile/ChangePassword';
 import { Post } from './Components/Feed/MainFeed/Post';
 import Profile from './Components/Profile/Profile';
 import MessagePage from './Components/MessagePage/MessagePage';
@@ -19,7 +20,17 @@ function App() {
 
   // Check if the user is logged in on every page load
   useEffect(() => {
+    // 1. Run the check immediately on mount
     memberCheck();
+
+    // 2. Set up a timer to run memberCheck periodically
+    const intervalId = setInterval(() => {
+      // This function executes your token check and logs out if expired
+      memberCheck();
+    }, 10000);
+
+    // 3. Clean up the interval when the component unmounts
+    return () => clearInterval(intervalId);
   }, [memberCheck]);
 
   // Define routes for logged-in users
@@ -29,6 +40,7 @@ function App() {
         {/* Add your routes here when ready */}
         <Route path="/" element={<Feed />} />
         <Route path="/edit-profile" element={<EditProfile />} />
+        <Route path="/change-password" element={<ChangePassword />} />
         <Route path="/posts/:id" element={<Post />} />
         <Route path="/members/:username" element={<MemberProfile />} />
         <Route path="/profile" element={<Profile />} />
@@ -61,9 +73,9 @@ function App() {
   // TEMPORARY ROUTES
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col min-h-screen">
       <Header />
-      <main className="container mx-auto px-6 pt-20 flex-grow">{routes}</main>
+      <main className="container mx-auto px-6 pt-6 flex-grow">{routes}</main>
       <Toaster richColors position="bottom-left" />
     </div>
   );

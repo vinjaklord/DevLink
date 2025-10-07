@@ -14,6 +14,11 @@ interface Photo {
   url?: string;
   photoId?: string;
 }
+export interface PasswordData {
+  oldPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
 
 export interface LoginCredentials {
   username: string;

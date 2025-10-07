@@ -8,16 +8,15 @@ import type { UserData } from '../SignUp/Signup';
 const EditProfile = () => {
   const { loggedInMember, isUpdatingProfile, editProfile } = useStore();
 
-  const { formState, handleFormChange, previewImage, updateFormField } =
-    useForm<UserData>({
-      username: loggedInMember?.username || '',
-      password: '',
-      confirmPassword: '',
-      firstName: loggedInMember?.firstName || '',
-      lastName: loggedInMember?.lastName || '',
-      email: loggedInMember?.email || '',
-      photo: null,
-    });
+  const { formState, handleFormChange, previewImage, updateFormField } = useForm<UserData>({
+    username: loggedInMember?.username || '',
+    password: '',
+    confirmPassword: '',
+    firstName: loggedInMember?.firstName || '',
+    lastName: loggedInMember?.lastName || '',
+    email: loggedInMember?.email || '',
+    photo: null,
+  });
 
   useEffect(() => {
     if (loggedInMember) {
@@ -42,8 +41,7 @@ const EditProfile = () => {
     const formData = new FormData();
     if (formState.username) formData.append('username', formState.username);
     if (formState.password) formData.append('password', formState.password);
-    if (formState.confirmPassword)
-      formData.append('confirmPassword', formState.confirmPassword);
+    if (formState.confirmPassword) formData.append('confirmPassword', formState.confirmPassword);
     if (formState.email) formData.append('email', formState.email);
     if (formState.firstName) formData.append('firstName', formState.firstName);
     if (formState.lastName) formData.append('lastName', formState.lastName);
@@ -83,9 +81,7 @@ const EditProfile = () => {
                   bg-base-content hover:scale-105
                   p-2 rounded-full cursor-pointer 
                   transition-all duration-200
-                  ${
-                    isUpdatingProfile ? 'animate-pulse pointer-events-none' : ''
-                  }
+                  ${isUpdatingProfile ? 'animate-pulse pointer-events-none' : ''}
                 `}
               >
                 <Camera className="w-5 h-5 text-base-200" />
@@ -101,9 +97,7 @@ const EditProfile = () => {
               </label>
             </div>
             <p className="text-sm text-zinc-400">
-              {isUpdatingProfile
-                ? 'Uploading...'
-                : 'Click the camera icon to update your photo'}
+              {isUpdatingProfile ? 'Uploading...' : 'Click the camera icon to update your photo'}
             </p>
           </div>
 

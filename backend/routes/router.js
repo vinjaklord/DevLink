@@ -66,6 +66,7 @@ router.patch(
   checkToken,
   body('oldPassword').escape().isLength({ min: 6, max: 50 }),
   body('newPassword').escape().isLength({ min: 6, max: 50 }),
+  body('confirmPassword').escape().isLength({ min: 6, max: 50 }),
   changePassword
 );
 
