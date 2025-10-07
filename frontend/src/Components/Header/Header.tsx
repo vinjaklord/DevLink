@@ -12,7 +12,14 @@ import {
 } from '@phosphor-icons/react';
 
 export default function Navbar() {
-  const { setShowAddPost } = useStore((state) => state);
+  const { setShowAddPost, loggedInMember } = useStore((state) => state);
+  if (!loggedInMember) {
+    return (
+      <div className="font-poppins fixed top-0 left-0 w-full p-6 flex justify-start items-center bg-white dark:bg-gray-900 shadow-md z-10">
+        <AppNameAndLogo />
+      </div>
+    );
+  }
   return (
     <div className="font-poppins fixed top-0 left-0 w-full p-6 flex justify-between items-center bg-white dark:bg-gray-900 shadow-md z-10">
       {/* Left Section */}

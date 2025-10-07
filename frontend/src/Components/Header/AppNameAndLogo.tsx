@@ -17,8 +17,8 @@ export default function AppNameAndLogo() {
 
       {/* Container for the name */}
       <div className="flex gap-1 items-center text-xl">
-        <span className="font-bold">Ide</span>
-        <span>Gas</span>
+        <span className="font-bold">LH-R</span>
+        <span>Demo</span>
       </div>
     </div>
   );
