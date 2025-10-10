@@ -25,15 +25,13 @@ dotenv.config();
 
 // TODO: user, pass in Umgebungsvariablen speichern
 const transporter = nodemailer.createTransport({
-  host: 'smtp.ethereal.email',
-  port: 587,
+  host: 'smtp.gmail.com',
+  port: 465,
   auth: {
-    user: 'bridgette.pfeffer21@ethereal.email',
-    pass: 'MUU1mH9R46XzPt2RD2',
+    user: process.env.USER,
+    pass: process.env.PASS,
   },
 });
-
-const FOLDER_NAME = 'lh2024';
 
 // Resttoken-Gültigkeit: 5 Minuten
 const RESETTOKEN_EXPIRATION_TIME = 1000 * 60 * 5;
@@ -85,8 +83,59 @@ const signup = async (req, res, next) => {
     await session.commitTransaction();
 
     session.endSession();
+    const link = '123';
 
-    res.json(newMember);
+    const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            .container { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+            .header { color: #1a73e8; font-size: 24px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+            .button { display: inline-block; padding: 10px 20px; margin-top: 15px; background-color: #1a73e8; color: #ffffff !important; text-decoration: none; border-radius: 5px; font-weight: bold; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">Welcome to Our Community! 👋</div>
+            
+            <p>Hello, **${req.body.firstName} ${req.body.lastName}**!</p>
+            
+            <p>We're thrilled to have you join our growing network. Get ready to connect, share, and explore!</p>
+            
+            <br /><br />
+            <p style="font-size: 14px; color: #777;">
+                Best regards,<br>
+                The Admin Team
+            </p>
+        </div>
+    </body>
+    </html>
+`;
+
+    const text = `
+Hello, ${req.body.firstName} ${req.body.lastName}!
+
+We're thrilled to welcome you to our community! Thank you for signing up.
+
+You can set your password and access your new account instantly using the link below:
+
+*Action Link:* ${link}
+
+If you have any questions, please don't hesitate to reach out.
+
+The Admin Team
+`;
+
+    await transporter.sendMail({
+      from: 'noreply.env <noreply.envv@gmail.com>', // sender address
+      to: `${req.body.email}`, // list of receivers
+      subject: `Welcome, ${req.body.firstName}!`, // Subject line
+      text, // plain text body
+      html, // html body
+    });
+
+    res.status(201).json(newMember);
   } catch (error) {
     if (photo) {
       deleteFile(photo);
@@ -345,6 +394,7 @@ const resetPassword = async (req, res, next) => {
     const link = `http://${req.hostname}:${
       process.env.port || 80
     }/set-new-password?t=${token}`;
+
     const html = `
     <p>Lieber ${foundMember.firstName} ${foundMember.lastName}!</p>
     <p>Mittels nachfolgendem Link können Sie ein neues Passwort setzen!</p>
@@ -364,7 +414,7 @@ const resetPassword = async (req, res, next) => {
   `;
 
     await transporter.sendMail({
-      from: '"Maddison Foo Koch 👻" <maddison53@ethereal.email>', // sender address
+      from: '"noreply-env <luna40@ethereal.email>', // sender address
       to: 'bar@example.com, baz@example.com', // list of receivers
       subject: 'Kennwort zurücksetzen', // Subject line
       text, // plain text body

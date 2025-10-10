@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import type { PasswordData } from '@/models/member.model';
 
 const ChangePassword = () => {
-  const { loggedInMember, isUpdatingProfile, memberChangePassword } = useStore();
+  const { loggedInMember, isUpdatingProfile, memberChangePassword, memberLogout } = useStore();
 
   const { formState, handleFormChange, previewImage } = useForm<PasswordData>({
     oldPassword: '',
@@ -24,18 +24,16 @@ const ChangePassword = () => {
       toast.warning('Passwords do not match!');
       return;
     }
+    const passwordData = {
+      oldPassword: formState.oldPassword,
+      newPassword: formState.newPassword,
+      confirmPassword: formState.confirmPassword,
+    };
 
-    const formData = new FormData();
+    // Pass the simple object to the store action
+    const response = await memberChangePassword(passwordData);
 
-    formData.append('oldPassword', formState.oldPassword);
-    formData.append('newPassword', formState.newPassword);
-    formData.append('confirmPassword', formState.confirmPassword);
-
-    const response = await memberChangePassword(formData);
-
-    if (response) {
-      toast.success('Profile edited successfully!');
-    } else {
+    if (!response) {
       toast.error('Error while editing!');
     }
   };
@@ -122,7 +120,10 @@ const ChangePassword = () => {
           </div>
 
           <button
-            onClick={handleChangePassword}
+            onClick={() => {
+              handleChangePassword();
+              memberLogout();
+            }}
             disabled={isUpdatingProfile}
             className="w-full  bg-primary text-white py-2 rounded-lg hover:bg-primary/90 disabled:opacity-50"
           >

@@ -1,10 +1,5 @@
 import { Button } from '../ui/button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '../ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { useState } from 'react';
@@ -51,18 +46,12 @@ export function Login() {
       {/* Background dark horizontal box */}
       <div className="bg-secondary w-[85%] h-[280px] rounded-md flex items-center justify-between px-12">
         <div className="max-w-md">
-          <h2 className="text-2xl font-semibold mb-3">
-            Don’t have an account?
-          </h2>
+          <h2 className="text-2xl font-semibold mb-3">Don’t have an account?</h2>
           <p className="text-sm mb-8 leading-relaxed">
-            Banjo tote bag bicycle rights, High Life sartorial cray craft beer
-            whatever street art fap.
+            Banjo tote bag bicycle rights, High Life sartorial cray craft beer whatever street art
+            fap.
           </p>
-          <Button
-            asChild
-            variant="outline"
-            className="px-6"
-          >
+          <Button asChild variant="outline" className="px-6">
             <Link to="/signup">Sign Up</Link>
           </Button>
         </div>
@@ -71,9 +60,7 @@ export function Login() {
       {/* Floating login card */}
       <Card className="absolute right-[10%] top-1/2 -translate-y-1/2 w-[450px] shadow-xl rounded-md">
         <CardHeader className="pb-2">
-          <CardTitle className="text-lg tracking-wide">
-            LOGIN
-          </CardTitle>
+          <CardTitle className="text-lg tracking-wide">LOGIN</CardTitle>
         </CardHeader>
 
         <CardContent>
@@ -81,14 +68,14 @@ export function Login() {
             {/* Email */}
             <div className="flex flex-col space-y-2">
               <Label htmlFor="username" className="text-sm text-gray-700">
-                Email
+                Username
               </Label>
               <Input
                 id="username"
                 name="username"
                 value={formState.username}
                 onChange={handleFormChange}
-                placeholder="Enter your email"
+                placeholder="Enter your username"
                 className="border-gray-300 focus-visible:ring-red-300"
               />
             </div>
@@ -124,19 +111,13 @@ export function Login() {
 
             {/* Forgot password */}
             <div className="text-right text-sm">
-              <Link
-                to="/forgot-password"
-                className="hover:text-red-400"
-              >
+              <Link to="/forgot-password" className="hover:text-red-400">
                 Forgot password?
               </Link>
             </div>
 
             {/* Login button */}
-            <Button
-              onClick={handleLogin}
-              className="uppercase tracking-wide w-full"
-            >
+            <Button onClick={handleLogin} className="uppercase tracking-wide w-full">
               Log In
             </Button>
           </div>
