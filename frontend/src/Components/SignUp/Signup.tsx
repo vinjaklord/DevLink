@@ -6,76 +6,85 @@ import {
   CardTitle,
 } from '../ui/card';
 import { Input } from '../ui/input';
-import { Label } from '../ui/label';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import useForm from '../../hooks/useForm';
+import { useNavigate, Link } from 'react-router-dom';
 import useStore from '../../hooks/useStore';
-import { Link } from 'react-router-dom';
 import { EyeIcon, EyeSlashIcon } from '@phosphor-icons/react';
 import { toast } from 'sonner';
 import useEnter from '@/hooks/useEnter';
-// import ImageUploader from '../../constant/ImageUploader';
 
-export type UserData = {
-  username: string;
-  password: string;
-  confirmPassword: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  photo: unknown;
-};
+import { Form, FormField, FormItem, FormControl, FormLabel, FormMessage } from '../ui/form';
+
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+const SignupSchema = z
+  .object({
+    firstName: z.string().min(1, 'First name is required'),
+    lastName: z.string().min(1, 'Last name is required'),
+    username: z.string().min(1, 'Username is required'),
+    email: z
+      .string()
+      .min(1, 'Email is required')
+      .email('Invalid email format'),
+    password: z.string().min(1, 'Password is required'),
+    confirmPassword: z.string().min(1, 'Please confirm your password'),
+    // photo can stay commented out / optional
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
 
 export function Signup() {
   const { memberSignup } = useStore((state) => state);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const togglePasswordVisibility = () => setShowPassword(!showPassword);
-  const toggleConfirmPasswordVisibility = () =>
-    setShowConfirmPassword(!showConfirmPassword);
-
   const navigate = useNavigate();
 
-  const { formState, handleFormChange } = useForm<UserData>({
-    username: '',
-    password: '',
-    confirmPassword: '',
-    firstName: '',
-    lastName: '',
-    email: '',
-    photo: null,
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const togglePasswordVisibility = () =>
+    setShowPassword((prev) => !prev);
+  const toggleConfirmPasswordVisibility = () =>
+    setShowConfirmPassword((prev) => !prev);
+
+  const form = useForm({
+    resolver: zodResolver(SignupSchema),
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      username: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      // photo: null,
+    },
   });
 
-  // Signup.tsx
-  const handleSignup = async () => {
-    if (formState.password !== formState.confirmPassword) {
-      toast.warning('Passwords do not match!');
-      return;
-    }
-
+  const handleSignup = form.handleSubmit(async (values) => {
     const formData = new FormData();
-    formData.append('username', formState.username);
-    formData.append('password', formState.password);
-    formData.append('confirmPassword', formState.confirmPassword);
-    formData.append('email', formState.email);
-    formData.append('firstName', formState.firstName);
-    formData.append('lastName', formState.lastName);
-    formData.append('photo', formState.photo); // Send File object
+    formData.append('firstName', values.firstName);
+    formData.append('lastName', values.lastName);
+    formData.append('username', values.username);
+    formData.append('email', values.email);
+    formData.append('password', values.password);
+    formData.append('confirmPassword', values.confirmPassword);
+    // formData.append('photo', values.photo);
 
     const response = await memberSignup(formData);
 
     if (response) {
-      navigate('/login');
       toast.success('Successfully signed up. Welcome!');
+      navigate('/login');
     } else {
       toast.error('Error while signing up!');
     }
-  };
+  });
 
   useEnter(handleSignup);
 
-return (
+  return (
     <div className="flex justify-center items-center h-[80vh] relative overflow-hidden pt-5">
       {/* Background horizontal box */}
       <div className="bg-secondary w-[85%] h-[280px] rounded-md flex items-center justify-end px-12">
@@ -87,11 +96,7 @@ return (
             Banjo tote bag bicycle rights, High Life sartorial cray craft beer
             whatever street art fap.
           </p>
-          <Button
-            asChild
-            variant="outline"
-            className="px-6"
-          >
+          <Button asChild variant="outline" className="px-6">
             <Link to="/login">Log In</Link>
           </Button>
         </div>
@@ -100,149 +105,209 @@ return (
       {/* Floating signup card */}
       <Card className="absolute left-[10%] top-1/2 -translate-y-1/2 w-[450px] shadow-xl rounded-md">
         <CardHeader className="pb-2">
-          <CardTitle className="text-lg tracking-wide">
+          <CardTitle className="text-lg tracking-wide h-1">
             SIGN UP
           </CardTitle>
         </CardHeader>
 
         <CardContent>
-          <div className="space-y-4">
-            {/* First Name */}
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="firstName">
-                First Name
-              </Label>
-              <Input
-                id="firstName"
+          <Form {...form}>
+            <form onSubmit={handleSignup} className="space-y-4">
+              {/* First Name */}
+              <FormField
+                control={form.control}
                 name="firstName"
-                value={formState.firstName}
-                onChange={handleFormChange}
-                placeholder="Enter your first name"
+                render={({ field }) => (
+                  <FormItem className='mt-6'>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>First Name</FormLabel>
+                      <FormMessage className="text-xs" >
+                        <span />
+                      </FormMessage>
+                    </div>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter your first name"
+                        className={`pr-10 ${form.formState.errors.firstName ? 'border-red-500 shake' : ''}`}
+                        {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
               />
-            </div>
 
-            {/* Last Name */}
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="lastName">
-                Last Name
-              </Label>
-              <Input
-                id="lastName"
+              {/* Last Name */}
+              <FormField
+                control={form.control}
                 name="lastName"
-                value={formState.lastName}
-                onChange={handleFormChange}
-                placeholder="Enter your last name"
+                render={({ field }) => (
+                  <FormItem className='mt-6'>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>Last Name</FormLabel>
+                      <FormMessage className="text-xs" >
+                        <span />
+                      </FormMessage>
+                    </div>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter your last name"
+                        className={`pr-10 ${form.formState.errors.lastName ? 'border-red-500 shake' : ''}`}
+                        {...field}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
               />
-            </div>
 
-            {/* Username */}
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="username">
-                Username
-              </Label>
-              <Input
-                id="username"
+              {/* Username */}
+              <FormField
+                control={form.control}
                 name="username"
-                value={formState.username}
-                onChange={handleFormChange}
-                placeholder="Enter your username"
+                render={({ field }) => (
+                  <FormItem className='mt-6'>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>Username</FormLabel>
+                      <FormMessage className="text-xs" >
+                        <span />
+                      </FormMessage>
+                    </div>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter your username"
+                        className={`pr-10 ${form.formState.errors.username ? 'border-red-500 shake' : ''}`}
+                        {...field}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
               />
-            </div>
 
-            {/* Email */}
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="email">
-                Email
-              </Label>
-              <Input
-                id="email"
+              {/* Email */}
+              <FormField
+                control={form.control}
                 name="email"
-                value={formState.email}
-                onChange={handleFormChange}
-                placeholder="Enter your email"
+                render={({ field }) => (
+                  <FormItem className='mt-6'>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>Email</FormLabel>
+                      <FormMessage className="text-xs" >
+                        <span />
+                      </FormMessage>
+                    </div>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter your email"
+                        className={`pr-10 ${form.formState.errors.email ? 'border-red-500 shake' : ''}`}
+                        {...field}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
               />
-            </div>
 
-            {/* Password */}
-            <div className="flex flex-col space-y-1.5 relative">
-              <Label htmlFor="password">
-                Password
-              </Label>
-              <Input
-                id="password"
+              {/* Password */}
+              <FormField
+                control={form.control}
                 name="password"
-                type={showPassword ? 'text' : 'password'}
-                value={formState.password}
-                onChange={handleFormChange}
-                placeholder="Enter your password"
-                className="pr-10"
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={togglePasswordVisibility}
-                className="absolute right-2 top-8 h-8 w-8 p-0 hover:bg-transparent"
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-              >
-                {showPassword ? (
-                  <EyeSlashIcon className="h-5 w-5" />
-                ) : (
-                  <EyeIcon className="h-5 w-5" />
+                render={({ field }) => (
+                  <FormItem className="relative mt-6">
+                    <div className="flex items-center justify-between">
+                      <FormLabel>Password</FormLabel>
+                      <FormMessage className="text-xs" >
+                        <span />
+                      </FormMessage>
+                    </div>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          type={showPassword ? 'text' : 'password'}
+                          placeholder="Enter your password"
+                          className={
+                            `pr-10 ${form.formState.errors.password ? 'border-red-500 shake' : ''}`}
+                          {...field}
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={togglePasswordVisibility}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 hover:bg-transparent"
+                        >
+                          {showPassword ? (
+                            <EyeSlashIcon className="h-5 w-5" />
+                          ) : (
+                            <EyeIcon className="h-5 w-5" />
+                          )}
+                        </Button>
+                      </div>
+                    </FormControl>
+                  </FormItem>
                 )}
-              </Button>
-            </div>
+              />
 
-            {/* Confirm Password */}
-            <div className="flex flex-col space-y-1.5 relative">
-              <Label htmlFor="confirmPassword">
-                Confirm Password
-              </Label>
-              <Input
-                id="confirmPassword"
+              {/* Confirm Password */}
+              <FormField
+                control={form.control}
                 name="confirmPassword"
-                type={showConfirmPassword ? 'text' : 'password'}
-                value={formState.confirmPassword}
-                onChange={handleFormChange}
-                placeholder="Confirm your password"
-                className="pr-10"
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={toggleConfirmPasswordVisibility}
-                className="absolute right-2 top-8 h-8 w-8 p-0 hover:bg-transparent"
-                aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
-              >
-                {showConfirmPassword ? (
-                  <EyeSlashIcon className="h-5 w-5" />
-                ) : (
-                  <EyeIcon className="h-5 w-5" />
+                render={({ field }) => (
+                  <FormItem className="relative mt-6">
+                    <div className="flex items-center justify-between">
+                      <FormLabel>Confirm Password</FormLabel>
+                      <FormMessage className="text-xs" >
+                        <span />
+                      </FormMessage>
+                    </div>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          type={showConfirmPassword ? 'text' : 'password'}
+                          placeholder="Confirm your password"
+                          className={`pr-10 ${form.formState.errors.confirmPassword ? 'border-red-500 shake' : ''}`}
+                          {...field}
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={toggleConfirmPasswordVisibility}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 hover:bg-transparent"
+                        >
+                          {showConfirmPassword ? (
+                            <EyeSlashIcon className="h-5 w-5" />
+                          ) : (
+                            <EyeIcon className="h-5 w-5" />
+                          )}
+                        </Button>
+                      </div>
+                    </FormControl>
+                  </FormItem>
                 )}
-              </Button>
-            </div>
-
-            {/* Photo */}
-            {/* <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="photo">
-                Photo
-              </Label>
-              <ImageUploader
-                handleFormChange={handleFormChange}
-                photo={formState.photo}
               />
-            </div> */}
 
+              {/* Photo (commented out) */}
+              {/*
+              <FormField
+                control={form.control}
+                name="photo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Photo</FormLabel>
+                    <FormControl>
+                      <Input type="file" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              */}
 
-            {/* Signup Button */}
-            <Button
-              onClick={handleSignup}
-              className="uppercase tracking-wide w-full"
-            >
-              Sign Up
-            </Button>
-          </div>
+              <Button
+                type="submit"
+                className="uppercase tracking-wide w-full mt-5"
+              >
+                Sign Up
+              </Button>
+            </form>
+          </Form>
         </CardContent>
       </Card>
     </div>

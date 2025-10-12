@@ -1,7 +1,6 @@
 import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Input } from '../ui/input';
-import { Label } from '../ui/label';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -86,16 +85,22 @@ export function Login() {
                 name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm text-gray-700">Username</FormLabel>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>Username</FormLabel>
+                      <FormMessage className="text-xs" >
+                        <span>
+                          {form.formState.errors.username?.message || form.formState.errors.root?.message}
+                        </span>
+                      </FormMessage>
+                    </div>
                     <FormControl>
                       <Input
                         placeholder="Enter your username"
-                        className={`border-gray-300 focus-visible:ring-red-300 ${form.formState.errors.root ? 'border border-red-500 shake' : ''
+                        className={`${form.formState.errors.username || form.formState.errors.root ? 'border border-red-500 shake' : ''
                           }`}
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -105,14 +110,21 @@ export function Login() {
                 control={form.control}
                 name="password"
                 render={({ field }) => (
-                  <FormItem className="relative">
-                    <FormLabel className="text-sm text-gray-700">Password</FormLabel>
+                  <FormItem className="relative mt-6">
+                    <div className="flex items-center justify-between">
+                      <FormLabel>Password</FormLabel>
+                      <FormMessage className="text-xs" >
+                        <span>
+                          {form.formState.errors.username?.message || form.formState.errors.root?.message}
+                        </span>
+                      </FormMessage>
+                    </div>
                     <FormControl>
                       <div className="relative">
                         <Input
                           type={showPassword ? 'text' : 'password'}
                           placeholder="Enter your password"
-                          className={`pr-10 border-gray-300 focus-visible:ring-red-300 ${form.formState.errors.root ? 'border border-red-500 shake' : ''
+                          className={`${form.formState.errors.password || form.formState.errors.root ? 'border border-red-500 shake' : ''
                             }`}
                           {...field}
                         />
@@ -127,16 +139,9 @@ export function Login() {
                         </Button>
                       </div>
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
-
-              {form.formState.errors.root && (
-                <p className="text-red-500 text-sm">
-                  {form.formState.errors.root.message}
-                </p>
-              )}
 
               <div className="text-right text-sm">
                 <Link to="/reset-password" className="hover:text-red-400">
