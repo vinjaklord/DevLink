@@ -21,6 +21,8 @@ import {
   getGeoDistance,
 } from '../common/index.js';
 
+import { signupMailHTML } from '../utils/emailTemplates/signupMail.js';
+
 dotenv.config();
 
 // TODO: user, pass in Umgebungsvariablen speichern
@@ -58,11 +60,11 @@ const signup = async (req, res, next) => {
       ...data,
       photo: req.file
         ? {
-            fileId: (await uploadImage(req.file.buffer, req.file.originalname))
-              .fileId,
-            url: (await uploadImage(req.file.buffer, req.file.originalname))
-              .url,
-          }
+          fileId: (await uploadImage(req.file.buffer, req.file.originalname))
+            .fileId,
+          url: (await uploadImage(req.file.buffer, req.file.originalname))
+            .url,
+        }
         : {},
     });
 
@@ -140,6 +142,17 @@ The Admin Team
     if (photo) {
       deleteFile(photo);
     }
+    if (error.code === 11000) {
+      const value = Object.keys(error.keyValue)[0];
+      let message = '';
+      if (value === 'username') {
+        message = 'This username is already taken.';
+      } else if (value === 'email') {
+        message = 'This email is already registered.';
+      }
+      return next(new HttpError(message, 409));
+    }
+
     return next(new HttpError(error.message || error, 422));
   }
 };
@@ -171,7 +184,7 @@ const login = async (req, res, next) => {
     // Hash mit Klartext-Passwort vergleichen
     // wenn keine Überstimmung -> Abbruch mit Fehlermeldung
     if (!checkHash(data.password, foundPassword.password)) {
-      throw new HttpError('Wrong username / email or password', 401);
+      throw new HttpError('Invalid Credentials ', 401);
     }
 
     // Token generieren mit ID des Members als Inhalt

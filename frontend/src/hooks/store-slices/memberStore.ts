@@ -137,7 +137,15 @@ export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = 
     } catch (error: any) {
       console.error('Signup error:', error);
       toast.error(error.response?.data?.message || 'Signup failed');
-      return false;
+      set({
+        alert: {
+          type: 'error',
+          title: 'Signup Failed',
+          description: error?.response?.data?.message || 'Something went wrong.',
+          duration: 1000,
+        },
+      });
+      throw error;
     }
   },
   memberLogin: async (data: LoginCredentials): Promise<boolean> => {

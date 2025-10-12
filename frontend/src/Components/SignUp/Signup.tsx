@@ -62,23 +62,38 @@ export function Signup() {
     },
   });
 
+  const { setError } = form;
+
   const handleSignup = form.handleSubmit(async (values) => {
-    const formData = new FormData();
-    formData.append('firstName', values.firstName);
-    formData.append('lastName', values.lastName);
-    formData.append('username', values.username);
-    formData.append('email', values.email);
-    formData.append('password', values.password);
-    formData.append('confirmPassword', values.confirmPassword);
-    // formData.append('photo', values.photo);
+    try {
+      const formData = new FormData();
+      formData.append('firstName', values.firstName);
+      formData.append('lastName', values.lastName);
+      formData.append('username', values.username);
+      formData.append('email', values.email);
+      formData.append('password', values.password);
+      formData.append('confirmPassword', values.confirmPassword);
+      // formData.append('photo', values.photo);
 
-    const response = await memberSignup(formData);
+      const response = await memberSignup(formData);
 
-    if (response) {
-      toast.success('Successfully signed up. Welcome!');
-      navigate('/login');
-    } else {
-      toast.error('Error while signing up!');
+      if (response) {
+        toast.success('Successfully signed up. Welcome!');
+        navigate('/login');
+      }
+    } catch (error) {
+      const { alert } = useStore.getState();
+      console.log("alert is ", alert);
+      const msg = alert?.description?.toLowerCase();
+      console.log("msg is ", msg);
+      if (msg?.includes('username')) {
+        setError('username', { type: 'manual', message: alert?.description });
+      } else if (msg?.includes('email')) {
+        setError('email', { type: 'manual', message: alert?.description });
+      } else {
+        setError('root', { type: 'manual', message: alert?.description });
+      }
+      return;
     }
   });
 
@@ -121,9 +136,7 @@ export function Signup() {
                   <FormItem className='mt-6'>
                     <div className="flex items-center justify-between">
                       <FormLabel>First Name</FormLabel>
-                      <FormMessage className="text-xs" >
-                        <span />
-                      </FormMessage>
+                      <FormMessage className="text-xs" />
                     </div>
                     <FormControl>
                       <Input
@@ -143,9 +156,7 @@ export function Signup() {
                   <FormItem className='mt-6'>
                     <div className="flex items-center justify-between">
                       <FormLabel>Last Name</FormLabel>
-                      <FormMessage className="text-xs" >
-                        <span />
-                      </FormMessage>
+                      <FormMessage className="text-xs" />
                     </div>
                     <FormControl>
                       <Input
@@ -166,9 +177,7 @@ export function Signup() {
                   <FormItem className='mt-6'>
                     <div className="flex items-center justify-between">
                       <FormLabel>Username</FormLabel>
-                      <FormMessage className="text-xs" >
-                        <span />
-                      </FormMessage>
+                      <FormMessage className="text-xs" />
                     </div>
                     <FormControl>
                       <Input
@@ -189,9 +198,7 @@ export function Signup() {
                   <FormItem className='mt-6'>
                     <div className="flex items-center justify-between">
                       <FormLabel>Email</FormLabel>
-                      <FormMessage className="text-xs" >
-                        <span />
-                      </FormMessage>
+                      <FormMessage className="text-xs" />
                     </div>
                     <FormControl>
                       <Input
@@ -212,9 +219,7 @@ export function Signup() {
                   <FormItem className="relative mt-6">
                     <div className="flex items-center justify-between">
                       <FormLabel>Password</FormLabel>
-                      <FormMessage className="text-xs" >
-                        <span />
-                      </FormMessage>
+                      <FormMessage className="text-xs" />
                     </div>
                     <FormControl>
                       <div className="relative">
