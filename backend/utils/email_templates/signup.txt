@@ -1,0 +1,11 @@
+Hello, [FIRST_NAME] [LAST_NAME]!
+
+We're thrilled to welcome you to our community! Thank you for signing up.
+
+Start here!
+
+*Action Link:* [LINK]
+
+If you have any questions, please don't hesitate to reach out.
+
+The Admin Team

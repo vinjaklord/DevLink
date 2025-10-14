@@ -1,27 +1,25 @@
-// benötigte Imports
 import * as dotenv from 'dotenv';
 import { validationResult, matchedData } from 'express-validator';
 import mongoose from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 import nodemailer from 'nodemailer';
 import { uploadImage, deleteFileInImageKit } from '../utils/imageKit.js';
-
-// Import der Models
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { Member, Password, Resettoken } from '../models/members.js';
 
 import HttpError from '../models/http-error.js';
 
 import { handleValidationErrors } from '../common/index.js';
 
-import {
-  getHash,
-  deleteFile,
-  checkHash,
-  getToken,
-  getGeoDistance,
-} from '../common/index.js';
+import { getHash, deleteFile, checkHash, getToken, getGeoDistance } from '../common/index.js';
 
-import { signupMailHTML } from '../utils/emailTemplates/signupMail.js';
+///////////////////////////////////////////////////////////////////////////////////////
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const templatesDir = path.join(__dirname, '..', 'utils', 'email_templates');
 
 dotenv.config();
 
@@ -60,11 +58,9 @@ const signup = async (req, res, next) => {
       ...data,
       photo: req.file
         ? {
-          fileId: (await uploadImage(req.file.buffer, req.file.originalname))
-            .fileId,
-          url: (await uploadImage(req.file.buffer, req.file.originalname))
-            .url,
-        }
+            fileId: (await uploadImage(req.file.buffer, req.file.originalname)).fileId,
+            url: (await uploadImage(req.file.buffer, req.file.originalname)).url,
+          }
         : {},
     });
 
@@ -85,56 +81,29 @@ const signup = async (req, res, next) => {
     await session.commitTransaction();
 
     session.endSession();
-    const link = '123';
+    const link = process.env.FRONTEND_URL;
 
-    const html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <style>
-            .container { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
-            .header { color: #1a73e8; font-size: 24px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-            .button { display: inline-block; padding: 10px 20px; margin-top: 15px; background-color: #1a73e8; color: #ffffff !important; text-decoration: none; border-radius: 5px; font-weight: bold; }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="header">Welcome to Our Community! 👋</div>
-            
-            <p>Hello, **${req.body.firstName} ${req.body.lastName}**!</p>
-            
-            <p>We're thrilled to have you join our growing network. Get ready to connect, share, and explore!</p>
-            
-            <br /><br />
-            <p style="font-size: 14px; color: #777;">
-                Best regards,<br>
-                The Admin Team
-            </p>
-        </div>
-    </body>
-    </html>
-`;
+    const signupHtmlTemplate = path.join(templatesDir, 'signup.html');
+    const signupTextTemplate = path.join(templatesDir, 'signup.txt');
 
-    const text = `
-Hello, ${req.body.firstName} ${req.body.lastName}!
+    let signupHtml = fs.readFileSync(signupHtmlTemplate, 'utf-8');
+    let signupText = fs.readFileSync(signupTextTemplate, 'utf-8');
 
-We're thrilled to welcome you to our community! Thank you for signing up.
-
-You can set your password and access your new account instantly using the link below:
-
-*Action Link:* ${link}
-
-If you have any questions, please don't hesitate to reach out.
-
-The Admin Team
-`;
+    signupHtml = signupHtml.replace(
+      '[FIRST_NAME] [LAST_NAME]',
+      `${req.body.firstName} ${req.body.lastName}`
+    );
+    signupText = signupText
+      .replace('[FIRST_NAME]', req.body.lastName)
+      .replace('[LAST_NAME]', req.body.firstName)
+      .replace('[LINK]', link);
 
     await transporter.sendMail({
       from: 'noreply.env <noreply.envv@gmail.com>', // sender address
-      to: `${req.body.email}`, // list of receivers
+      to: `aronpozsar@gmail.com`, // list of receivers
       subject: `Welcome, ${req.body.firstName}!`, // Subject line
-      text, // plain text body
-      html, // html body
+      text: signupText, // plain text body
+      html: signupHtml, // html body
     });
 
     res.status(201).json(newMember);
@@ -368,10 +337,7 @@ const updateMember = async (req, res, next) => {
     // wenn ein Bild kommt:
     if (req.file) {
       // Neues Bild in ImageKit speichern
-      const uploadResponse = await uploadImage(
-        req.file.buffer,
-        req.file.originalname
-      );
+      const uploadResponse = await uploadImage(req.file.buffer, req.file.originalname);
 
       // ImageKit Bild löschen (using fileId instead of cloudinaryPublicId)
       if (foundMember.photo && foundMember.photo.fileId) {
@@ -420,39 +386,33 @@ const resetPassword = async (req, res, next) => {
     // Email produzieren (Text mit Link) und raussenden an Email-Adresse
     const link = `${process.env.FRONTEND_URL}/set-new-password?t=${token}`;
 
-    const html = `
-    <p>Lieber ${foundMember.firstName} ${foundMember.lastName}!</p>
-    <p>Mittels nachfolgendem Link können Sie ein neues Passwort setzen!</p>
-    <a href="${link}">Link für Password resetten</a>
-    <br /><br />
-    <p>Liebe Grüße, dein Admin.</p>
-  `;
+    const ResetPasswordHtmlTemplate = path.join(templatesDir, 'reset-password.html');
+    const ResetPasswordTextTemplate = path.join(templatesDir, 'reset-password.txt');
 
-    const text = `
-  Lieber ${foundMember.firstName} ${foundMember.lastName}!
+    let ResetPasswordHtml = fs.readFileSync(ResetPasswordHtmlTemplate, 'utf-8');
+    let ResetPasswordText = fs.readFileSync(ResetPasswordTextTemplate, 'utf-8');
 
-  Mittels nachfolgendem Link können Sie ein neues Passwort setzen!
-
-  ${link}
-
-  Liebe Grüße, dein Admin.
-  `;
+    ResetPasswordHtml = ResetPasswordHtml.replace(
+      '[FIRST_NAME] [LAST_NAME]',
+      `${foundMember.firstName} ${foundMember.lastName}`
+    );
+    ResetPasswordText = ResetPasswordText.replace('[FIRST_NAME]', foundMember.lastName)
+      .replace('[LAST_NAME]', foundMember.firstName)
+      .replace('[LINK]', link);
 
     await transporter.sendMail({
-      from: '"noreply-env <luna40@ethereal.email>', // sender address
+      from: 'DevLink <noreply.envv@gmail.com>', // sender address
       to: 'aronpozsar@gmail.com', // list of receivers
-      subject: 'Kennwort zurücksetzen', // Subject line
-      text, // plain text body
-      html, // html body
+      subject: 'Password Reset', // Subject line
+      text: ResetPasswordText, // plain text body
+      html: ResetPasswordHtml, // html body
     });
 
     // Erfolgsmeldung rausschicken
     res.send('Mail was sent successfully');
   } catch (error) {
     const status = error.errorCode || error.statusCode || 500;
-    return res
-      .status(status)
-      .json({ message: error.message || 'Internal Server Error' });
+    return res.status(status).json({ message: error.message || 'Internal Server Error' });
   }
 };
 
@@ -502,10 +462,7 @@ const setNewPassword = async (req, res, next) => {
     const newPassword = getHash(password);
 
     // Altes Passwort suchen, mit neuem überschreiben, speichern
-    await Password.findOneAndUpdate(
-      { member: foundResettoken.member },
-      { password: newPassword }
-    );
+    await Password.findOneAndUpdate({ member: foundResettoken.member }, { password: newPassword });
 
     // alle bestehenden Reset-Tokens dieses Members löschen
     await Resettoken.deleteMany({ member: foundResettoken.member });
@@ -513,9 +470,7 @@ const setNewPassword = async (req, res, next) => {
     // Erfolgsmeldung rausschicken
     res.send('New Password was set successfully');
   } catch (error) {
-    return next(
-      new HttpError(error, error.errorCode || 500, error.messageArray)
-    );
+    return next(new HttpError(error, error.errorCode || 500, error.messageArray));
   }
 };
 

@@ -127,13 +127,12 @@ export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = 
         url: 'members/signup',
         data,
       });
-      if (response.status !== 200) {
-        throw new Error(`Signup failed: ${response.data?.message || 'Unknown error'}`);
-      }
-      toast.success('Signed in successfully. Welcome!');
-      get().connectSocket();
+      if (response.status === 201 || response.status === 200) {
+        toast.success('Signed in successfully. Welcome!');
+        get().connectSocket();
 
-      return true;
+        return true;
+      }
     } catch (error: any) {
       console.error('Signup error:', error);
       toast.error(error.response?.data?.message || 'Signup failed');
@@ -142,7 +141,7 @@ export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = 
           type: 'error',
           title: 'Signup Failed',
           description: error?.response?.data?.message || 'Something went wrong.',
-          duration: 1000,
+          duration: 10000,
         },
       });
       throw error;

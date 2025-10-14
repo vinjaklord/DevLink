@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #f4f7fa;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+      .inner-container {
+        background-color: #ffffff;
+        padding: 40px 30px;
+        text-align: center;
+      }
+      .header {
+        color: #1a73e8;
+        font-size: 32px;
+        margin-bottom: 10px;
+        font-weight: 700;
+      }
+      .subheader {
+        color: #5f6368;
+        font-size: 18px;
+        margin-bottom: 30px;
+      }
+      .greeting {
+        font-size: 20px;
+        color: #333;
+        margin-bottom: 20px;
+        font-weight: 600;
+      }
+      .message {
+        font-size: 16px;
+        color: #555;
+        line-height: 1.7;
+        margin-bottom: 40px;
+      }
+      .cta-button {
+        display: inline-block;
+        padding: 15px 30px;
+        margin: 20px 0;
+        background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+        color: #ffffff !important;
+        text-decoration: none;
+        border-radius: 50px;
+        font-weight: bold;
+        font-size: 16px;
+        box-shadow: 0 4px 15px rgba(26, 115, 232, 0.3);
+        transition: transform 0.2s ease;
+      }
+      .cta-button:hover {
+        transform: translateY(-2px);
+      }
+      .signature {
+        font-size: 14px;
+        color: #777;
+        margin-top: 40px;
+        border-top: 1px solid #eee;
+        padding-top: 20px;
+      }
+      .emoji {
+        font-size: 24px;
+        margin-right: 10px;
+      }
+      @media (max-width: 600px) {
+        .inner-container {
+          padding: 30px 20px;
+        }
+        .header {
+          font-size: 28px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="inner-container">
+        <h1 class="header">
+          Welcome to Our Community! <span class="emoji">👋</span>
+        </h1>
+        <p class="subheader">Your adventure starts here</p>
+
+        <p class="greeting">
+          Hello, <strong>[FIRST_NAME] [LAST_NAME]</strong>!
+        </p>
+
+        <p class="message">
+          We're absolutely thrilled to have you join our vibrant and growing
+          network. Get ready to connect with like-minded individuals, share your
+          passions, and explore endless opportunities together!
+        </p>
+
+        <!-- <a href="#" class="cta-button">Explore Now</a> -->
+
+        <div class="signature">
+          <p>
+            Best regards,<br />
+            <strong>The Admin Team</strong>
+          </p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
