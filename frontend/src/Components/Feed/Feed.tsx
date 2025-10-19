@@ -6,10 +6,10 @@ const LeftSidebar: FC = () => <div className="bg-card p-4">Left Sidebar</div>;
 // const MainFeed: FC = () => <div className="bg-card p-4">Main Feed</div>;
 
 export default function Feed() {
-  const [isWideEnough, setIsWideEnough] = useState(window.innerWidth >= 800);
+  const [isWideEnough, setIsWideEnough] = useState(window.innerWidth >= 1100);
 
   useEffect(() => {
-    const handleResize = () => setIsWideEnough(window.innerWidth >= 800);
+    const handleResize = () => setIsWideEnough(window.innerWidth >= 1100);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);

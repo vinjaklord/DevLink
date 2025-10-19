@@ -26,7 +26,7 @@ export default function Navbar() {
       </div>
 
       {/* Center Section: NavLinks */}
-      <div className="absolute left-1/2 -translate-x-1/2 flex gap-20">
+      <div className="absolute left-1/2 -translate-x-1/2 flex gap-20 max-[1100px]:hidden">
         <NavLink to="/" className="hover:text-primary">
           <HouseIcon size={32} weight="thin" />
         </NavLink>
