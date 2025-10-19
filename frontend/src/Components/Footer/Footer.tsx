@@ -3,10 +3,13 @@ import useStore from '@/hooks/useStore';
 import { NavLink } from 'react-router-dom';
 
 export default function FooterNav() {
-  const { setShowAddPost } = useStore((state) => state);
+    const { setShowAddPost, loggedInMember } = useStore((state) => state);
+  if (!loggedInMember) {
+    return;
+  }
 
   return (
-    <div className="fixed hidden bottom-0 left-0 w-full bg-white dark:bg-gray-900 shadow-inner border-t border-gray-200 dark:border-gray-700 flex justify-around items-center h-15 px-6 max-[1100px]:flex z-20">
+    <div className="fixed hidden bottom-0 left-0 w-full bg-white dark:bg-gray-900 shadow-inner border-t mt-100 border-gray-200 dark:border-gray-700 justify-around items-center h-15 px-6 max-[1100px]:flex z-20">
       <NavLink to="/" className="hover:text-primary flex flex-col items-center justify-center">
         <HouseIcon size={28} weight="thin" />
       </NavLink>

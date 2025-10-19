@@ -82,7 +82,7 @@ function App() {
   return (
     <div className="flex flex-col">
       <Header />
-      <main className="container mx-auto px-6 pt-10 flex-1 overflow-y-auto">{routes}</main>
+      <main className="container mx-auto px-6 pt-10 flex-1 overflow-y-auto max-[1100px]:pb-[60px]">{routes}</main>
       <FooterNav />
       <Toaster richColors position="bottom-left" />
     </div>

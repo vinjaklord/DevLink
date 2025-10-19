@@ -34,7 +34,7 @@ export interface MemberStore {
   memberSignup: (data: SignupCredentials) => Promise<boolean>;
   memberLogout: () => void;
   memberLogin: (data: LoginCredentials) => Promise<boolean>;
-  memberResetPassword: (data: string) => Promise<boolean>;
+  memberResetPassword: (data: { email: string }) => Promise<boolean>;
   memberSetNewPassword: (data: string) => Promise<boolean>;
   memberCheck: () => void;
   memberRefreshMe: () => void;
@@ -133,6 +133,8 @@ export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = 
 
         return true;
       }
+
+      return false;
     } catch (error: any) {
       console.error('Signup error:', error);
       toast.error(error.response?.data?.message || 'Signup failed');

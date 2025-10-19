@@ -119,7 +119,7 @@ export function Signup() {
       {/* Floating signup card */}
       <Card className={clsx(
         'absolute top-1/2 -translate-y-1/2 w-[450px] shadow-xl rounded-md transition-all duration-700 ease-in-out',
-        'left-[10%] max-[1300px]:left-1/2 max-[1300px]:-translate-x-1/2 max-[1300px]:w-[550px]'
+        'left-[10%] max-[1300px]:left-1/2 max-[1300px]:-translate-x-1/2 max-[1300px]:w-[550px] max-[700px]:w-full'
       )}>
 
         <CardContent>
