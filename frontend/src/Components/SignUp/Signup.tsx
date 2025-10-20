@@ -57,7 +57,6 @@ export function Signup() {
       email: '',
       password: '',
       confirmPassword: '',
-      // photo: null,
     },
   });
 
@@ -65,20 +64,11 @@ export function Signup() {
 
   const handleSignup = form.handleSubmit(async (values) => {
     try {
-      const formData = new FormData();
-      formData.append('firstName', values.firstName);
-      formData.append('lastName', values.lastName);
-      formData.append('username', values.username);
-      formData.append('email', values.email);
-      formData.append('password', values.password);
-      formData.append('confirmPassword', values.confirmPassword);
-      // formData.append('photo', values.photo);
-
-      const response = await memberSignup(formData);
+      const response = await memberSignup(values);
 
       if (response) {
         toast.success('Successfully signed up. Welcome!');
-        navigate('/login');
+        navigate('/welcome-test');
       }
     } catch (error) {
       const { alert } = useStore.getState();
@@ -284,23 +274,6 @@ export function Signup() {
                   </FormItem>
                 )}
               />
-
-              {/* Photo (commented out) */}
-              {/*
-              <FormField
-                control={form.control}
-                name="photo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Photo</FormLabel>
-                    <FormControl>
-                      <Input type="file" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              */}
 
               <Button
                 type="submit"

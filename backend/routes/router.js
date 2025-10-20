@@ -47,7 +47,6 @@ router.get('/members/username/:username', getMemberByUsername);
 
 router.post(
   '/members/signup',
-  upload.single('photo'),
   body('firstName').trim().escape().isLength({ min: 2, max: 50 }),
   body('lastName').trim().escape().isLength({ min: 2, max: 50 }),
   body('username').trim().escape().isLength({ min: 4, max: 50 }),

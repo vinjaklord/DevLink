@@ -30,7 +30,6 @@ export interface SignupCredentials {
   lastName: string;
   username: string;
   email: string;
-  photo?: Photo;
   password: string;
   confirmPassword: string;
 }

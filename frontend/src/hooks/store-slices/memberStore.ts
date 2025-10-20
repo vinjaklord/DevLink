@@ -120,15 +120,18 @@ export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = 
     }
   },
 
-  memberSignup: async (data: SignupCredentials | FormData): Promise<boolean> => {
+  memberSignup: async (data: SignupCredentials): Promise<boolean> => {
     try {
-      const response = await fetchAPI({
+      const response: ApiResponse<string> = await fetchAPI({
         method: 'post',
         url: 'members/signup',
         data,
       });
       if (response.status === 201 || response.status === 200) {
         toast.success('Signed in successfully. Welcome!');
+
+        await get().memberLogin({ username: data.username, password: data.password });
+
         get().connectSocket();
 
         return true;

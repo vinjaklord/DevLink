@@ -108,9 +108,6 @@ const signup = async (req, res, next) => {
 
     res.status(201).json(newMember);
   } catch (error) {
-    if (photo) {
-      deleteFile(photo);
-    }
     if (error.code === 11000) {
       const value = Object.keys(error.keyValue)[0];
       let message = '';
