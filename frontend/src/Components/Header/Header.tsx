@@ -4,11 +4,15 @@ import SearchBar from './SearchBar';
 import AppNameAndLogo from './AppNameAndLogo';
 import AvatarIcon from './AvatarIcon';
 import useStore from '@/hooks/useStore';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { HouseIcon, CameraPlusIcon, ChatsCircleIcon } from '@phosphor-icons/react';
 
 export default function Navbar() {
   const { setShowAddPost, loggedInMember } = useStore((state) => state);
+  const location = useLocation();
+
+  const isResultsPage = location.pathname.startsWith('/results');
+
   if (!loggedInMember) {
     return (
       <div className="font-poppins fixed top-0 left-0 w-full p-6 flex justify-between items-center bg-white dark:bg-gray-900 shadow-md z-10">
@@ -22,7 +26,7 @@ export default function Navbar() {
       {/* Left Section */}
       <div className="flex items-center gap-10 flex-1 max-w-[34%]">
         <AppNameAndLogo />
-        <SearchBar />
+        <SearchBar buttonMode={isResultsPage}/>
       </div>
 
       {/* Center Section: NavLinks */}
