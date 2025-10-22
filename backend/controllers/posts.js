@@ -1,8 +1,7 @@
 import { Post } from '../models/posts.js';
 import { Member } from '../models/members.js';
 import { uploadImage } from '../utils/imageKit.js';
-import { Friend } from '../models/members.js';
-
+import { Friend } from '../models/friends.js';
 import HttpError from '../models/http-error.js';
 import { matchedData, validationResult } from 'express-validator';
 

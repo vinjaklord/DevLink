@@ -1,7 +1,8 @@
 import { validationResult, matchedData } from 'express-validator';
 import mongoose from 'mongoose';
 import HttpError from '../models/http-error.js';
-import { Friend, Member } from '../models/members.js';
+import { Member } from '../models/members.js';
+import { Friend } from '../models/friends.js';
 
 const addFriend = async (req, res, next) => {
   try {
@@ -107,15 +108,99 @@ const getAllFriends = async (req, res, next) => {
   try {
     if (!req.verifiedMember) throw new HttpError('Unauthorized', 401);
 
-    const friendDoc = await Friend.findOne({
-      member: req.verifiedMember._id,
-    }).populate('friends', 'username firstName lastName photo email');
-    if (!friendDoc) {
-      return res.json([]);
+    const loggedInMemberId = req.verifiedMember._id;
+
+    const friendsWithLastMessage = await Friend.aggregate([
+      // Stage 1: Match the current user's Friend document
+      {
+        $match: {
+          member: loggedInMemberId,
+        },
+      },
+
+      // Stage 2: Deconstruct the 'friends' array to process each friend individually
+      {
+        $unwind: '$friends',
+      },
+
+      // Stage 3: Look up the full Member details for each friend ID
+      {
+        $lookup: {
+          from: 'members', // Name of the collection (usually plural: 'members')
+          localField: 'friends',
+          foreignField: '_id',
+          as: 'friendDetails', // Output will be an array of 1 member object
+        },
+      },
+
+      // Stage 4: Deconstruct the 'friendDetails' array to get a single object
+      {
+        $unwind: '$friendDetails',
+      },
+
+      // Stage 5: Look up the LAST message between the logged-in user and the current friend
+      {
+        $lookup: {
+          from: 'messages',
+          let: { friendId: '$friends' }, // Define a variable 'friendId'
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $or: [
+                    // Sent by friend to me
+                    {
+                      $and: [
+                        { $eq: ['$senderId', '$$friendId'] },
+                        { $eq: ['$recipientId', loggedInMemberId] },
+                      ],
+                    },
+                    // Sent by me to friend
+                    {
+                      $and: [
+                        { $eq: ['$recipientId', '$$friendId'] },
+                        { $eq: ['$senderId', loggedInMemberId] },
+                      ],
+                    },
+                  ],
+                },
+              },
+            },
+            { $sort: { createdAt: -1 } }, // Newest message first
+            { $limit: 1 }, // Take only the most recent one
+            { $project: { text: 1, createdAt: 1, senderId: 1, _id: 0 } }, // Keep essential message fields
+          ],
+          as: 'lastMessageArray', // Output is an array of 0 or 1 message
+        },
+      },
+
+      // Stage 6: Final Projection - format the output for the frontend
+      {
+        $project: {
+          _id: '$friendDetails._id', // Rename fields for clean output
+          username: '$friendDetails.username',
+          firstName: '$friendDetails.firstName',
+          lastName: '$friendDetails.lastName',
+          photo: '$friendDetails.photo',
+          // Extract the single message object from the array (will be null if empty)
+          lastMessage: { $arrayElemAt: ['$lastMessageArray', 0] },
+        },
+      },
+    ]);
+
+    // Handle the case where the Friend document exists but the friends array is empty
+    if (!friendsWithLastMessage.length) {
+      const friendDoc = await Friend.findOne({ member: loggedInMemberId });
+      if (friendDoc && friendDoc.friends.length === 0) {
+        return res.json([]);
+      }
     }
-    res.json(friendDoc.friends);
+
+    // The final result is the array of enriched friend objects
+    res.json(friendsWithLastMessage);
   } catch (error) {
-    return next(new HttpError(error, error.errorCode || 500));
+    console.error('Error in getAllFriends aggregation:', error.message);
+    return next(new HttpError(error.message, error.errorCode || 500));
   }
 };
 

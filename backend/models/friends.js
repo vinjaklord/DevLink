@@ -5,18 +5,11 @@ const Schema = mongoose.Schema;
 import { Member } from './members.js';
 import HttpError from './http-error.js';
 
-const friendsSchema = new Schema(
-  {
-    sender: { type: mongoose.Types.ObjectId, required: true, ref: 'Member' },
-    recipient: { type: mongoose.Types.ObjectId, required: true, ref: 'Member' },
-    status: {
-      type: String,
-      enum: ['pending', 'accepted', 'rejected'], // add blocked?
-      default: 'pending',
-    },
-  },
-  { timestamps: true }
-);
+const friendsSchema = new Schema({
+  member: { type: mongoose.Types.ObjectId, required: true, ref: 'Member' },
+  pendingFriendRequests: [{ type: mongoose.Types.ObjectId, ref: 'Member', default: [] }],
+  friends: [{ type: mongoose.Types.ObjectId, ref: 'Member', default: [] }],
+});
 
 friendsSchema.pre('save', async function () {
   const foundMember = await Member.findById(this.sender);
@@ -31,8 +24,7 @@ friendsSchema.pre('save', async function () {
     throw new HttpError('Recipient unknown', 404);
   }
 
-  if (this.sender.equals(this.recipient))
-    throw new HttpError('Cannot friend yourself', 422);
+  if (this.sender.equals(this.recipient)) throw new HttpError('Cannot friend yourself', 422);
 });
 
 export const Friend = mongoose.model('Friend', friendsSchema);

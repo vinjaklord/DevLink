@@ -162,7 +162,7 @@ const createPostsSlice: StateCreator<StoreState, [], [], PostsStore> = (set, get
             : post;
 
         return {
-          friendsPosts: state.friendsPosts.map(toggleLikes),
+          allPosts: state.allPosts.map(toggleLikes),
           currentPost: state.currentPost ? toggleLikes(state.currentPost) : state.currentPost,
         };
       });
@@ -178,7 +178,7 @@ const createPostsSlice: StateCreator<StoreState, [], [], PostsStore> = (set, get
 
       // Update with backend likes array
       set((state) => ({
-        friendsPosts: state.friendsPosts.map((post) =>
+        allPosts: state.allPosts.map((post) =>
           post._id === postId ? { ...post, likes: response.data.likes } : post
         ),
         currentPost:
@@ -197,12 +197,12 @@ const createPostsSlice: StateCreator<StoreState, [], [], PostsStore> = (set, get
           post._id === postId
             ? {
                 ...post,
-                likes: state.friendsPosts.find((p) => p._id === postId)?.likes || [],
+                likes: state.allPosts.find((p) => p._id === postId)?.likes || [],
               }
             : post;
 
         return {
-          friendsPosts: state.friendsPosts.map(revertLikes),
+          allPosts: state.allPosts.map(revertLikes),
           currentPost: state.currentPost ? revertLikes(state.currentPost) : state.currentPost,
         };
       });

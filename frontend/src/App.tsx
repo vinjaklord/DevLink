@@ -16,7 +16,9 @@ import MessagePage from './Components/MessagePage/MessagePage';
 import MemberProfile from './Components/Profile/MemberProfile';
 import { ResetPassword } from './Components/ForgotPassword/ResetPassword';
 import { SetNewPassword } from './Components/ForgotPassword/SetNewPassword';
-import Footer from './Components/Footer/Footer';
+import FooterNav from './Components/Footer/Footer';
+import { SearchResults } from './Components/SearchResults/SearchResults';
+
 
 function App() {
   const { loggedInMember, memberCheck, showAddPost, setShowAddPost } = useStore((state) => state);
@@ -50,6 +52,7 @@ function App() {
         <Route path="/members/:username" element={<MemberProfile />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/messages" element={<MessagePage />} />
+        <Route path="/results" element={<SearchResults />} />
         {/* <Route path="/post" element={<Post />} /> */}
       </Routes>
       <AddPost isOpen={showAddPost} onClose={() => setShowAddPost(false)} />
@@ -82,8 +85,8 @@ function App() {
   return (
     <div className="flex flex-col">
       <Header />
-      <main className="container mx-auto px-6 pt-10 flex-1 overflow-y-auto">{routes}</main>
-      {/* <Footer /> */}
+      <main className="container mx-auto px-6 pt-10 flex-1 overflow-y-auto max-[1100px]:pb-[60px]">{routes}</main>
+      <FooterNav />
       <Toaster richColors position="bottom-left" />
     </div>
   );

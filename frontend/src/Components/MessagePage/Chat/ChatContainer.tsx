@@ -4,6 +4,7 @@ import ChatHeader from './ChatHeader';
 import MessageInput from './MessageInput';
 import MessageSkeleton from './MessageSkeleton';
 import { formatMessageTime } from '@/utils/timeFormat';
+import { linkifyText } from '@/utils/messageFormat';
 
 const ChatContainer = () => {
   const {
@@ -36,51 +37,6 @@ const ChatContainer = () => {
       });
     }
   }, [messages]);
-
-  const decodeHtml = (text) => {
-    const textarea = document.createElement('textarea');
-    textarea.innerHTML = text;
-    return textarea.value;
-  };
-
-  const linkifyText = (text) => {
-    const decoded = decodeHtml(text);
-    const urlRegex = /\b((https?:\/\/|www\.)[^\s]+)/gi;
-
-    const parts = [];
-    let lastIndex = 0;
-    let match;
-
-    while ((match = urlRegex.exec(decoded)) !== null) {
-      const { index } = match;
-      const url = match[0];
-
-      if (index > lastIndex) {
-        parts.push(decoded.slice(lastIndex, index));
-      }
-
-      const href = url.startsWith('http') ? url : `https://${url}`;
-      parts.push(
-        <a
-          key={index}
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className=" underline break-words"
-        >
-          {url}
-        </a>
-      );
-
-      lastIndex = index + url.length;
-    }
-
-    if (lastIndex < decoded.length) {
-      parts.push(decoded.slice(lastIndex));
-    }
-
-    return parts;
-  };
 
   if (!selectedUser)
     return (

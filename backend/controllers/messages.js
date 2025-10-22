@@ -52,10 +52,7 @@ export const sendMessage = async (req, res) => {
 
     let imageUrl = null;
     if (req.file) {
-      const uploadResponse = await uploadImage(
-        req.file.buffer,
-        req.file.originalname
-      );
+      const uploadResponse = await uploadImage(req.file.buffer, req.file.originalname);
       imageUrl = uploadResponse.url;
     }
 
@@ -72,13 +69,9 @@ export const sendMessage = async (req, res) => {
     const recieverSocketId = getRecieverSocketId(recipientId);
     if (recieverSocketId) {
       io.to(recieverSocketId).emit('newMessage', newMessage);
-      console.log(
-        `Emitted newMessage to ${recieverSocketId} for user ${recipientId}`
-      );
+      console.log(`Emitted newMessage to ${recieverSocketId} for user ${recipientId}`);
     } else {
-      console.log(
-        `Recipient ${recipientId} is offline; message saved to database`
-      );
+      console.log(`Recipient ${recipientId} is offline; message saved to database`);
     }
 
     res.json(newMessage);

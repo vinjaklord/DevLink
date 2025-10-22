@@ -11,8 +11,8 @@ import {
   updateMember,
   resetPassword,
   setNewPassword,
-  filterMember,
   getMemberByUsername,
+  filterMember,
 } from '../controllers/members.js';
 
 import {
@@ -39,7 +39,6 @@ import { getMessages, getUsersForSidebar, sendMessage } from '../controllers/mes
 
 const router = new Router();
 
-// TODO: check token einbauen
 router.get('/members', getAllMembers);
 router.get('/members/search', checkToken, filterMember);
 router.get('/members/:id', getOneMember);
@@ -47,7 +46,6 @@ router.get('/members/username/:username', getMemberByUsername);
 
 router.post(
   '/members/signup',
-  upload.single('photo'),
   body('firstName').trim().escape().isLength({ min: 2, max: 50 }),
   body('lastName').trim().escape().isLength({ min: 2, max: 50 }),
   body('username').trim().escape().isLength({ min: 4, max: 50 }),

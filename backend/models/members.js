@@ -11,8 +11,7 @@ const photoSchema = new Schema({
 photoSchema.pre('save', function (next) {
   if (!this.fileId || !this.url) {
     this.fileId = '1';
-    this.url =
-      'https://ik.imagekit.io/LHR/user-octagon-svgrepo-com.svg?updatedAt=1750339421935';
+    this.url = 'https://ik.imagekit.io/LHR/user-octagon-svgrepo-com.svg?updatedAt=1750339421935';
   }
   next();
 });
@@ -29,14 +28,6 @@ const membersSchema = new Schema(
   },
   { timestamps: true }
 );
-
-const friendsSchema = new Schema({
-  member: { type: mongoose.Types.ObjectId, required: true, ref: 'Member' },
-  pendingFriendRequests: [
-    { type: mongoose.Types.ObjectId, ref: 'Member', default: [] },
-  ],
-  friends: [{ type: mongoose.Types.ObjectId, ref: 'Member', default: [] }],
-});
 
 const passwordsSchema = new Schema(
   {
@@ -85,4 +76,3 @@ membersSchema.post('findOneAndDelete', async (deletedMember) => {
 export const Member = mongoose.model('Member', membersSchema);
 export const Password = mongoose.model('Password', passwordsSchema);
 export const Resettoken = mongoose.model('Resettoken', resettokensSchema);
-export const Friend = mongoose.model('Friend', friendsSchema);

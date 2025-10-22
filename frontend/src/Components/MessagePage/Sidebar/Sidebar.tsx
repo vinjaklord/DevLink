@@ -2,15 +2,10 @@ import { useEffect } from 'react';
 import useStore from '@/hooks/useStore';
 import SidebarSkeleton from './SidebarLoading';
 import { Users } from 'lucide-react';
+import { formatSidebarMessage } from '@/utils/messageFormat';
 
 const Sidebar = () => {
-  const {
-    friends,
-    fetchFriends,
-    selectedUser,
-    setSelectedUser,
-    isUsersLoading,
-  } = useStore();
+  const { friends, fetchFriends, selectedUser, setSelectedUser, isUsersLoading } = useStore();
 
   useEffect(() => {
     fetchFriends();
@@ -34,12 +29,8 @@ const Sidebar = () => {
             onClick={() => setSelectedUser(user)}
             className={`
               w-full p-3 flex items-center gap-3
-              hover:bg-base-300 transition-colors
-              ${
-                selectedUser?._id === user._id
-                  ? 'bg-base-300 ring-1 ring-base-300'
-                  : ''
-              }
+              hover:bg-base-300 transition-colors rounded-l-xl
+              ${selectedUser?._id === user._id ? 'bg-gray-300 dark:bg-[oklch(0.22_0.015_285)]' : ''}
             `}
           >
             <div className="relative mx-auto lg:mx-0">
@@ -52,7 +43,9 @@ const Sidebar = () => {
 
             <div className="hidden lg:block text-left min-w-0">
               <div className="font-medium truncate">{`${user.firstName} ${user.lastName}`}</div>
-              <div className="text-sm text-zinc-400"></div>
+              <div className="text-sm text-zinc-400">
+                {formatSidebarMessage(user.lastMessage?.text)}
+              </div>
             </div>
           </button>
         ))}

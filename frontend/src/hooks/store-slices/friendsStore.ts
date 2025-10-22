@@ -4,9 +4,10 @@ import fetchAPI from '../../utils/index.ts';
 import { toast } from 'sonner';
 import type { StateCreator } from 'zustand';
 import type { StoreState } from '../useStore.ts';
+import type { IChatUser } from '@/models/messages.model.ts';
 
 export interface FriendsStore {
-  friends: IMember[];
+  friends: IChatUser[];
   pending: IMember[];
 
   friendsLoading: boolean;
@@ -53,7 +54,7 @@ export const createFriendsSlice: StateCreator<StoreState, [], [], FriendsStore> 
         set({ friendsError: 'Not logged in!' });
       }
 
-      const response: ApiResponse<IMember[]> = await fetchAPI({
+      const response: ApiResponse<IChatUser[]> = await fetchAPI({
         url: 'friends/all-friends',
         headers: { Authorization: `Bearer ${token}` },
       });

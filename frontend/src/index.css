@@ -16,6 +16,7 @@ a,
 html {
   height: 100%;
 }
+
 body {
   font-family: 'Poppins', sans-serif;
   background: var(--background);
@@ -66,9 +67,11 @@ body {
   0% {
     opacity: 0.6;
   }
+
   50% {
     opacity: 1;
   }
+
   100% {
     opacity: 0.6;
   }
@@ -119,19 +122,25 @@ body {
 :root {
   --radius: 0.5rem;
   --background: oklch(0.985 0 0);
-  --foreground: oklch(0.3 0.01 285); /* Darker for better contrast */
+  --foreground: oklch(0.3 0.01 285);
+  /* Darker for better contrast */
   --card: oklch(0.99 0 0);
-  --card-foreground: oklch(0.3 0.01 285); /* Darker for better contrast */
+  --card-foreground: oklch(0.3 0.01 285);
+  /* Darker for better contrast */
   --popover: oklch(0.99 0 0);
-  --popover-foreground: oklch(0.3 0.01 285); /* Darker for better contrast */
+  --popover-foreground: oklch(0.3 0.01 285);
+  /* Darker for better contrast */
   --primary: oklch(0.623 0.214 259.815);
   --primary-foreground: oklch(0.99 0.01 255);
   --secondary: oklch(0.94 0.01 285);
-  --secondary-foreground: oklch(0.3 0.01 285); /* Darker for better contrast */
+  --secondary-foreground: oklch(0.3 0.01 285);
+  /* Darker for better contrast */
   --muted: oklch(86.995% 0.0001 271.152);
-  --muted-foreground: oklch(0.5 0.01 285); /* Darker for better contrast */
+  --muted-foreground: oklch(0.5 0.01 285);
+  /* Darker for better contrast */
   --accent: oklch(0.96 0.01 286.375);
-  --accent-foreground: oklch(0.3 0.01 285); /* Darker for better contrast */
+  --accent-foreground: oklch(0.3 0.01 285);
+  /* Darker for better contrast */
   --destructive: oklch(0.6 0.2 27.325);
   --border: oklch(0.85 0.01 285);
   --input: oklch(0.85 0.01 285);
@@ -142,11 +151,13 @@ body {
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
   --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.3 0.01 285); /* Darker for better contrast */
+  --sidebar-foreground: oklch(0.3 0.01 285);
+  /* Darker for better contrast */
   --sidebar-primary: oklch(0.623 0.214 259.815);
   --sidebar-primary-foreground: oklch(0.99 0.01 255);
   --sidebar-accent: oklch(0.96 0.01 286.375);
-  --sidebar-accent-foreground: oklch(0.3 0.01 285); /* Darker for better contrast */
+  --sidebar-accent-foreground: oklch(0.3 0.01 285);
+  /* Darker for better contrast */
   --sidebar-border: oklch(0.85 0.01 285);
   --sidebar-ring: oklch(0.6 0.2 259.815);
 }
@@ -164,7 +175,7 @@ body {
   --secondary-foreground: oklch(0.98 0 0);
   --muted: oklch(32.864% 0.01581 285.472);
   --muted-foreground: oklch(0.7 0.01 285);
-  --accent: oklch(0.25 0.01 285);
+  --accent: oklch(0.22 0.015 285);
   --accent-foreground: oklch(0.98 0 0);
   --destructive: oklch(0.7 0.18 22);
   --border: oklch(1 0 0 / 10%);
@@ -189,6 +200,7 @@ body {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -198,15 +210,19 @@ body {
   0% {
     transform: translateX(0);
   }
+
   25% {
     transform: translateX(-4px);
   }
+
   50% {
     transform: translateX(4px);
   }
+
   75% {
     transform: translateX(-4px);
   }
+
   100% {
     transform: translateX(0);
   }
@@ -214,4 +230,85 @@ body {
 
 .shake {
   animation: shake 0.5s ease-in-out;
+}
+
+/* Drop-down animation for Sign Up button */
+@keyframes dropIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-dropIn {
+  animation: dropIn 0.5s forwards;
+}
+
+/* Collapse horizontally toward right */
+@keyframes collapseRight {
+  0% { transform: scaleX(1); opacity: 1; }
+  100% { transform: scaleX(0); opacity: 0; }
+}
+
+/* Expand from collapsed */
+@keyframes expandRight {
+  0% { transform: scaleX(0); opacity: 0; }
+  100% { transform: scaleX(1); opacity: 1; }
+}
+
+/* Default state for background box */
+.background-box {
+  transform-origin: right;
+  transition: all 0.5s ease-in-out;
+}
+
+/* Collapse animation when hidden (below 1300px) */
+@media (max-width: 1300px) {
+  .background-box {
+    animation: collapseRight 0.35s forwards;
+  }
+}
+
+/* Expand animation when back above 1300px */
+@media (min-width: 1301px) {
+  .background-box {
+    animation: expandRight 0.5s forwards;
+  }
+}
+
+/* Collapse horizontally toward left */
+@keyframes collapseLeft {
+  0% { transform: scaleX(1); opacity: 1; }
+  100% { transform: scaleX(0); opacity: 0; }
+}
+
+/* Expand from collapsed */
+@keyframes expandLeft {
+  0% { transform: scaleX(0); opacity: 0; }
+  100% { transform: scaleX(1); opacity: 1; }
+}
+
+/* Default state for background box */
+.signup-background-box {
+  transform-origin: left; /* collapse toward left */
+  transition: all 0.5s ease-in-out;
+}
+
+/* Collapse animation when hidden (below 1300px) */
+@media (max-width: 1300px) {
+  .signup-background-box {
+    animation: collapseLeft 0.5s forwards;
+  }
+}
+
+/* Expand animation when back above 1300px */
+@media (min-width: 1301px) {
+  .signup-background-box {
+    animation: expandLeft 0.5s forwards;
+  }
 }

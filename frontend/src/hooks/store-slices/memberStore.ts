@@ -3,6 +3,7 @@ import type {
   LoginCredentials,
   SignupCredentials,
   EditCredentials,
+  ForgotPasswordData,
   PasswordData,
 } from '../../models/member.model.ts';
 import type { Alert, DecodedToken, ApiResponse } from '@/models/helper.model.ts';
@@ -18,7 +19,8 @@ const BASE_URL = 'http://localhost:8000';
 export interface MemberStore {
   member: IMember;
   user: IMember;
-  members: IMember[];
+  friendsSearchResults: IMember[];
+  wideSearchResults: IMember[];
   loading: boolean;
   isUpdatingProfile: boolean;
   loggedInMember: IMember | null;
@@ -28,19 +30,20 @@ export interface MemberStore {
   dialog: any | null;
   socket: any | null;
   resetMember: () => void;
-  searchMembers: (q: string) => Promise<IMember[]>;
+  searchMembersFriends: (q: string) => Promise<IMember[]>;
+  searchMembersWide: (q: string, limit?: number) => Promise<IMember[]>;
   getMemberById: (id: string) => Promise<IMember>;
   getMemberByUsername: (username: string) => Promise<IMember>;
   memberSignup: (data: SignupCredentials) => Promise<boolean>;
   memberLogout: () => void;
   memberLogin: (data: LoginCredentials) => Promise<boolean>;
   memberResetPassword: (data: string) => Promise<boolean>;
-  memberSetNewPassword: (data: string) => Promise<boolean>;
+  memberSetNewPassword: (data: ForgotPasswordData) => Promise<boolean>;
   memberCheck: () => void;
   memberRefreshMe: () => void;
   connectSocket: () => void;
   disconnectSocket: () => void;
-  editProfile: (data: EditCredentials) => Promise<boolean>;
+  editProfile: (data: EditCredentials | FormData) => Promise<boolean>;
   memberChangePassword: (data: PasswordData) => Promise<boolean>;
 }
 
@@ -69,29 +72,51 @@ export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = 
   get
 ): MemberStore => ({
   member: defaultMember,
-  members: [],
+  friendsSearchResults: [],
+  wideSearchResults: [],
   user: defaultMember,
   ...initialState,
 
   resetMember: () => set({ member: defaultMember }),
 
-  searchMembers: async (q: string) => {
+  searchMembersFriends: async (q: string) => {
     try {
       const token = localStorage.getItem('lh_token');
+      const url = `/members/search?q=${encodeURIComponent(q)}&type=friends`;
+
       const response = await fetchAPI({
         method: 'get',
-        url: `/members/search?q=${q}`,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        url,
+        headers: { Authorization: `Bearer ${token}` },
       });
 
-      // Update state with fetched members and reset loading
-      set({ members: response.data, loading: false });
+      set({ friendsSearchResults: response.data, loading: false });
       return response.data;
     } catch (err) {
-      console.error('Error fetching members', err);
+      console.error('Error fetching friends search', err);
       set({ loading: false });
+      return [];
+    }
+  },
+
+  searchMembersWide: async (q: string, limit?: number) => {
+    try {
+      const token = localStorage.getItem('lh_token');
+      const url = `/members/search?q=${encodeURIComponent(q)}&type=all${
+        limit ? `&limit=${limit}` : ''
+      }`;
+
+      const response = await fetchAPI({
+        method: 'get',
+        url,
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      set({ wideSearchResults: response.data });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching members wide search', error);
+      return [];
     }
   },
 
@@ -120,19 +145,24 @@ export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = 
     }
   },
 
-  memberSignup: async (data: SignupCredentials | FormData): Promise<boolean> => {
+  memberSignup: async (data: SignupCredentials): Promise<boolean> => {
     try {
-      const response = await fetchAPI({
+      const response: ApiResponse<string> = await fetchAPI({
         method: 'post',
         url: 'members/signup',
         data,
       });
       if (response.status === 201 || response.status === 200) {
         toast.success('Signed in successfully. Welcome!');
+
+        await get().memberLogin({ username: data.username, password: data.password });
+
         get().connectSocket();
 
         return true;
       }
+
+      return false;
     } catch (error: any) {
       console.error('Signup error:', error);
       toast.error(error.response?.data?.message || 'Signup failed');
@@ -273,7 +303,7 @@ export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = 
     localStorage.setItem('lh_member', JSON.stringify(loggedInMember));
   },
 
-  editProfile: async (data: EditCredentials) => {
+  editProfile: async (data: EditCredentials | FormData) => {
     try {
       set({ isUpdatingProfile: true });
       const token = localStorage.getItem('lh_token');
@@ -282,7 +312,7 @@ export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = 
       const memberId = get().loggedInMember?._id;
       if (!memberId) throw new Error('No logged in member found');
 
-      const response = await fetchAPI({
+      await fetchAPI({
         method: 'patch',
         url: `members/${memberId}`,
         data, // FormData object
@@ -333,7 +363,7 @@ export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = 
     }
   },
 
-  memberResetPassword: async (data: any) => {
+  memberResetPassword: async (data: string) => {
     try {
       await fetchAPI({
         method: 'post',
@@ -349,7 +379,8 @@ export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = 
       return false;
     }
   },
-  memberSetNewPassword: async (data: any) => {
+  
+  memberSetNewPassword: async (data: ForgotPasswordData) => {
     const { t: token, password } = data;
 
     try {
