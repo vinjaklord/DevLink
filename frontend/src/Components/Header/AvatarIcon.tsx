@@ -17,18 +17,18 @@ export default function AvatarIcon() {
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
-        <Avatar className="relative w-13 h-13">
+        <Avatar className="relative w-12 h-12">
           {' '}
-          {/* Changed from w-9 h-9 to w-13 h-13 */}
+          {/* Changed from w-9 h-9 to w-12 h-12 */}
           <div className="absolute inset-0 flex items-center justify-center">
             <AvatarImage
-              className="w-13 h-13 rounded-full object-cover border-background" // Changed from w-14 h-14 to w-13 h-13
+              className="w-12 h-12 rounded-full object-cover border-background" // Changed from w-14 h-14 to w-12 h-12
               src={loggedInMember?.photo?.url}
               alt="@shadcn"
             />
-            <AvatarFallback className="w-13 h-13 text-xl">
+            <AvatarFallback className="w-12 h-12 text-xl">
               {' '}
-              {/* Changed from w-14 h-14 to w-13 h-13, and text-lg to text-xl for better fit */}
+              {/* Changed from w-14 h-14 to w-12 h-12, and text-lg to text-xl for better fit */}
               {`${loggedInMember?.firstName[0]} ${loggedInMember?.lastName[0]}`}
             </AvatarFallback>
           </div>
