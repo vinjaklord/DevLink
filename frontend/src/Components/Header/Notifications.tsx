@@ -12,6 +12,7 @@ import {
 import useStore from '@/hooks/useStore';
 import { Avatar, AvatarImage, AvatarFallback } from '../ui/avatar';
 import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 
 export default function Notifications() {
   const {
@@ -23,6 +24,8 @@ export default function Notifications() {
     subscribeToNotifications,
     // unsubscribeFromNotifications
   } = useStore((state) => state);
+
+  const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
 
@@ -37,6 +40,28 @@ useEffect(() => {
 //   return () => unsubscribeFromNotifications();
 }, []);
 
+const handleNotificationClick = (n: any) => {
+  markAsRead(n._id);
+
+  switch (n.type) {
+    case 'comment':
+    case 'like':
+      if (n.relatedPost?._id) {
+        navigate(`/posts/${n.relatedPost._id}`);
+      }
+      break;
+    case 'friend_request':
+    case 'friend_accept':
+      if (n.fromUser?._id) {
+        navigate(`/members/${n.fromUser.username}`);
+      }
+      break;
+    default:
+      console.warn('Unknown notification type', n.type);
+  }
+
+  setOpen(false); // close dropdown after click
+};
 //   useEffect(() => {
 //     if (open && unreadCount > 0) markAllAsRead();
 //   }, [open]);
@@ -85,7 +110,7 @@ useEffect(() => {
           {notifications.map((n) => (
             <DropdownMenuItem
               key={n._id}
-              onClick={() => markAsRead(n._id)}
+              onClick={() => handleNotificationClick(n)}
               className={cn(
                 'flex items-center gap-3 py-2 cursor-pointer',
                 !n.isRead ? 'bg-blue-50 dark:bg-gray-800' : ''
