@@ -7,10 +7,13 @@ import type { MemberStore } from './store-slices/memberStore.ts';
 import type { FriendsStore } from './store-slices/friendsStore.ts';
 import { createPostsSlice, type PostsStore } from './store-slices/postsStore.ts';
 import { jwtDecode } from 'jwt-decode';
+import { createNotificationSlice, type NotificationsStore } from './store-slices/notificationsStore.ts';
 
-export type StoreState = MemberStore &
+export type StoreState = 
+  MemberStore &
   FriendsStore &
   PostsStore &
+  NotificationsStore &
   MessagesStore & {
     _hasHydrated: boolean;
     setHasHydrated: (hydrated: boolean) => void;
@@ -40,6 +43,7 @@ const useStore = create<StoreState>()(
       ...createFriendsSlice(set, get, ...args),
       ...createPostsSlice(set, get, ...args),
       ...createMessageSlice(set, get, ...args),
+      ...createNotificationSlice(set, get, ...args),
       _hasHydrated: false,
       setHasHydrated: (hydrated: boolean) => set({ _hasHydrated: hydrated }),
       token: null,

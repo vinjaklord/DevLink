@@ -63,7 +63,7 @@ export const createFriendsSlice: StateCreator<StoreState, [], [], FriendsStore> 
         friendsLoading: false,
         friendsError: null,
       });
-    } catch (error: any) {
+    } catch (error: any|unknown) {
       set({
         friendsError: error.message || 'Failed to fetch friends!',
         friendsLoading: false,
@@ -84,7 +84,7 @@ export const createFriendsSlice: StateCreator<StoreState, [], [], FriendsStore> 
         headers: { Authorization: `Bearer ${token}` },
       });
       set({ pending: response.data });
-    } catch (error) {
+    } catch (error: any|unknown) {
       toast.error(error.message);
     }
   },
@@ -105,7 +105,7 @@ export const createFriendsSlice: StateCreator<StoreState, [], [], FriendsStore> 
       console.log('Friend removed');
       get().fetchFriends();
       get().fetchPending();
-    } catch (error) {
+    } catch (error: any|unknown) {
       console.error(`Error while deleting, ${error}`);
       toast.error(`Error while deleting a friend!`);
     }
@@ -130,7 +130,7 @@ export const createFriendsSlice: StateCreator<StoreState, [], [], FriendsStore> 
       await get().fetchPending();
 
       await get().fetchRelationshipStatus(friendId);
-    } catch (error) {
+    } catch (error: any|unknown) {
       console.error(`Error while adding, ${error}`);
       toast.error(`Error while adding a friend!`);
     }
@@ -151,7 +151,7 @@ export const createFriendsSlice: StateCreator<StoreState, [], [], FriendsStore> 
       });
 
       toast.success('Friend request accepted!');
-    } catch (error) {
+    } catch (error: any|unknown) {
       toast.error(error.message);
     }
   },
@@ -171,7 +171,7 @@ export const createFriendsSlice: StateCreator<StoreState, [], [], FriendsStore> 
       });
 
       toast.success('Friend request rejected!');
-    } catch (error) {
+    } catch (error: any|unknown) {
       toast.error(error.message);
     }
   },
@@ -191,7 +191,7 @@ export const createFriendsSlice: StateCreator<StoreState, [], [], FriendsStore> 
         relationshipStatus: response.data.status,
         isSender: response.data.isSender,
       });
-    } catch (error) {
+    } catch (error: any|unknown) {
       toast.error(error.message);
     }
   },

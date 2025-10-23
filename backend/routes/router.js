@@ -25,6 +25,7 @@ import {
 } from '../controllers/friends.js';
 
 import { upload, checkToken } from '../common/middlewares.js';
+
 import {
   addComment,
   createPost,
@@ -35,7 +36,15 @@ import {
   getMemberPosts,
   getFriendsPosts,
 } from '../controllers/posts.js';
+
 import { getMessages, getUsersForSidebar, sendMessage } from '../controllers/messages.js';
+
+import {
+  getNotifications,
+  getUnreadCount,
+  getUnreadNotifications,
+  markAsRead,
+} from '../controllers/notifications.js';
 
 const router = new Router();
 
@@ -43,6 +52,11 @@ router.get('/members', getAllMembers);
 router.get('/members/search', checkToken, filterMember);
 router.get('/members/:id', getOneMember);
 router.get('/members/username/:username', getMemberByUsername);
+
+router.get('/notifications', checkToken, getNotifications);
+router.get('/notifications/unread', checkToken, getUnreadNotifications);
+router.get('/notifications/unread/count', checkToken, getUnreadCount);
+router.patch('/notifications/:id/read', checkToken, markAsRead);
 
 router.post(
   '/members/signup',
@@ -94,7 +108,6 @@ router.post(
 router.post(
   '/friends/add-friend/:id',
   checkToken,
-
   addFriend
 );
 

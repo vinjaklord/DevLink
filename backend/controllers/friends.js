@@ -3,6 +3,8 @@ import mongoose from 'mongoose';
 import HttpError from '../models/http-error.js';
 import { Member } from '../models/members.js';
 import { Friend } from '../models/friends.js';
+import { Notification } from '../models/notifications.js';
+
 
 const addFriend = async (req, res, next) => {
   try {
@@ -18,6 +20,7 @@ const addFriend = async (req, res, next) => {
     const { id: recipient } = req.params;
 
     const senderMember = await Member.findById(sender);
+    if (!sender) throw new HttpError('Sender is unknown', 404);
     const recipientMember = await Member.findById(recipient);
     if (!senderMember || !recipientMember) {
       throw new HttpError('Cannot find member by id', 404);
@@ -37,9 +40,17 @@ const addFriend = async (req, res, next) => {
     recipientFriend.pendingFriendRequests.push(sender);
     await recipientFriend.save();
 
+    await Notification.create({
+      targetUser: recipient,
+      type: 'friend_request',
+      fromUser: sender,
+      message: `${senderMember.username} sent you a friend request`
+    })
+
     res.json(recipientFriend);
   } catch (error) {
-    return next(new HttpError(error, 422));
+    console.error("addFriend error:", error);
+    return next(new HttpError(error, 500));
   }
 };
 

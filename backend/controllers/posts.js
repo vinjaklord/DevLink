@@ -4,6 +4,7 @@ import { uploadImage } from '../utils/imageKit.js';
 import { Friend } from '../models/friends.js';
 import HttpError from '../models/http-error.js';
 import { matchedData, validationResult } from 'express-validator';
+import { Notification } from '../models/notifications.js';
 
 const createPost = async (req, res, next) => {
   try {
@@ -47,8 +48,9 @@ const toggleLike = async (req, res, next) => {
   try {
     const postId = req.params.id;
     const userId = req.verifiedMember._id;
+    const user = await Member.findById(userId);
 
-    const post = await Post.findById(postId);
+    const post = await Post.findById(postId).populate('author');
     if (!post) {
       throw new HttpError('Post is not found', 404);
     }
@@ -62,6 +64,7 @@ const toggleLike = async (req, res, next) => {
     }
 
     await post.save();
+
     res.status(200).json({
       liked: !alreadyLiked,
       likes: post.likes,
@@ -85,21 +88,32 @@ const addComment = async (req, res, next) => {
 
     const { text } = data;
     const postId = req.params.id;
-    const authorId = req.verifiedMember;
-    const author = await Member.findById(authorId);
+    const commentAuthorId = req.verifiedMember;
+    const commentAuthor = await Member.findById(commentAuthorId);
 
-    const post = await Post.findById(postId);
+    const post = await Post.findById(postId).populate('author');
     if (!post) {
       throw new HttpError('Post is not found', 404);
     }
 
     const comment = {
-      author,
+      author: commentAuthorId,
       text,
     };
 
     post.comments.push(comment);
     await post.save();
+
+    if (post.author._id.toString() !== commentAuthorId) {
+      const notify = await Notification.create({
+        targetUser: post.author._id,
+        type: 'comment',
+        fromUser: commentAuthorId,
+        relatedPost: postId,
+        message: `${commentAuthor.username} commented on your post.`,
+      });
+      console.log(notify, 'Notification Created')
+    }
 
     res.status(201).json({ comment, commentCount: post.comments.length });
   } catch (error) {

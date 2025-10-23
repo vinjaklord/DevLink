@@ -36,8 +36,8 @@ export function SearchResults() {
   useEffect(() => {
     if (!query) return;
     const debounce = setTimeout(() => {
-        searchMembersFriends(query);
-        searchMembersWide(query, 10); // initial limited wide search
+      searchMembersFriends(query);
+      searchMembersWide(query, 10); // initial limited wide search
     }, 300);
 
     return () => clearTimeout(debounce);
@@ -61,17 +61,17 @@ export function SearchResults() {
     <div className="p-4 space-y-6 pt-14">
       {/* Top Search Input */}
       <div className='flex justify-center'>
-      <form onSubmit={handleSearchSubmit}>
-        <div className="relative max-w-md w-3xl max-[600px]:w-full">
-          <IoSearch className="absolute top-2 left-3 text-2xl" />
-          <Input
-            className="pl-11 rounded-3xl h-10 w-full shadow-none bg-card"
-            placeholder="Find a new Link"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-        </div>
-      </form>
+        <form onSubmit={handleSearchSubmit}>
+          <div className="relative max-w-md w-3xl max-[600px]:w-full">
+            <IoSearch className="absolute top-2 left-3 text-2xl" />
+            <Input
+              className="pl-11 rounded-3xl h-10 w-full shadow-none bg-card"
+              placeholder="Find a new Link"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </div>
+        </form>
       </div>
       {/* Friends Card */}
       {showFriends && friendsSearchResults.length > 0 && (
@@ -112,17 +112,19 @@ export function SearchResults() {
           </h3>
           <ul className="space-y-2">
             {(showAll ? wideSearchResults : wideSearchResults.slice(0, 10)).map((m) => (
-              <li key={m._id} className="flex items-center gap-3">
-                <img
-                  src={m.photo?.url || 'https://ik.imagekit.io/LHR/user-octagon-svgrepo-com.svg'}
-                  alt={m.username}
-                  className="w-10 h-10 rounded-full object-cover"
-                />
-                <div>
-                  <p className="font-medium">{m.username}</p>
-                  <p className="text-sm text-gray-500">{m.firstName} {m.lastName}</p>
-                </div>
-              </li>
+              <Link to={`/members/${m.username}`} className="flex items-center gap-2 w-full">
+                <li key={m._id} className="flex items-center gap-3">
+                  <img
+                    src={m.photo?.url || 'https://ik.imagekit.io/LHR/user-octagon-svgrepo-com.svg'}
+                    alt={m.username}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                  <div>
+                    <p className="font-medium">{m.username}</p>
+                    <p className="text-sm text-gray-500">{m.firstName} {m.lastName}</p>
+                  </div>
+                </li>
+              </Link>
             ))}
           </ul>
 
