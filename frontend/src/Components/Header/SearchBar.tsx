@@ -56,10 +56,10 @@ export default function SearchBar({ buttonMode = false, collapseThreshold = 1100
 
   return (
     <div ref={containerRef} className="relative flex items-center min-w-[150px] max-w-[270px]">
-      {/* Search icon stays fixed on the left */}
-      <IoSearch className={`search-icon absolute left-3 top-2 text-2xl z-20 text-gray-400`} />
+      {/* Search icon */}
+      <IoSearch className="search-icon absolute left-3 top-2 text-2xl z-20 text-gray-400" />
 
-      {/* Drawer input */}
+      {/* Search drawer */}
       <div
         className={`search-drawer relative flex-1 transition-all duration-400 ease-in-out
           ${isCollapsed ? 'scale-x-0 opacity-0' : 'scale-x-100 opacity-100'}
@@ -76,57 +76,68 @@ export default function SearchBar({ buttonMode = false, collapseThreshold = 1100
         />
 
         {showDropdown && (
-          <div className="absolute mt-2 w-full z-10">
-            {query && friendsSearchResults.length === 0 && (
-              <div className="text-sm text-popover-foreground bg-popover shadow rounded p-2">
-                No users found.
-              </div>
-            )}
+          <div className="absolute mt-2 w-full z-10 bg-card shadow rounded-sm overflow-hidden">
+            {/* Scrollable results */}
+            <div className="max-h-48 overflow-auto">
+              {query && friendsSearchResults.length === 0 && (
+                <div className="text-sm text-popover-foreground bg-popover p-2">
+                  No users found.
+                </div>
+              )}
 
-            {friendsSearchResults.length > 0 && (
-              <ul className="absolute overflow-auto bg-card text-popover-foreground shadow rounded-sm max-h-48 w-full">
-                {friendsSearchResults.map((member: IMember) => (
-                  <li key={member._id} className="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-[var(--accent)] ">
+              {friendsSearchResults.length > 0 &&
+                friendsSearchResults.map((member: IMember) => (
+                  <li
+                    key={member._id}
+                    className="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-[var(--accent)]"
+                  >
                     <Link
                       to={`/members/${member.username}`}
-                      className="flex items-center gap-2 w-full"
+                      className="flex items-center gap-2 w-full truncate"
                     >
                       <img
-                        src={member.photo?.url || 'https://ik.imagekit.io/LHR/user-octagon-svgrepo-com.svg'}
+                        src={
+                          member.photo?.url ||
+                          'https://ik.imagekit.io/LHR/user-octagon-svgrepo-com.svg'
+                        }
                         alt={member.username}
                         className="w-8 h-8 rounded-full object-cover"
                       />
-                      <div className="flex flex-col">
-                        <span className="font-medium">{member.username}</span>
-                        <span className="text-sm text-gray-500">
+                      <div className="flex flex-col overflow-hidden">
+                        <span className="font-medium truncate max-w-[150px]">
+                          {member.username}
+                        </span>
+                        <span className="text-sm text-gray-500 truncate max-w-[150px]">
                           {member.firstName} {member.lastName}
                         </span>
                       </div>
                     </Link>
                   </li>
                 ))}
-              </ul>
+            </div>
+
+            {/* Always-visible "See all" button */}
+            {query && (
+              <div
+                className="flex items-center gap-2 justify-center p-2 hover:bg-gray-100 cursor-pointer border-t sticky bottom-0"
+                onClick={handleSeeAll}
+              >
+                <IoSearch className="text-lg text-blue-600" />
+                <span className="text-sm text-blue-600 font-medium truncate max-w-[150px]">
+                  "{query}"
+                </span>
+              </div>
             )}
-                <li
-                  className="flex items-center gap-2 justify-center p-2 hover:bg-gray-100 cursor-pointer border-t"
-                  onClick={handleSeeAll}
-                >
-                  <IoSearch className="text-lg text-blue-600" />
-                  <span className="text-sm text-blue-600 font-medium">
-                    See more results for "{query}"
-                  </span>
-                </li>
           </div>
         )}
       </div>
 
-      {/* Button mode overlay */}
+      {/* Button mode */}
       {isCollapsed && (
         <button
           onClick={handleButtonClick}
           className="absolute left-0 flex items-center justify-center h-10 w-10 rounded-full hover:opacity-90 transition-all z-30"
-        >
-        </button>
+        />
       )}
     </div>
   );

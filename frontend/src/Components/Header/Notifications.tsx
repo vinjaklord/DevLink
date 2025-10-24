@@ -67,7 +67,7 @@ const handleNotificationClick = (n: any) => {
 //   }, [open]);
 
   return (
-    <DropdownMenu open={open} onOpenChange={setOpen}>
+    <DropdownMenu open={open} modal={false} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
