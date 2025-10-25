@@ -13,8 +13,10 @@ export interface PostsStore {
   friendsPosts: IPost[];
   memberPosts: IPost[];
   showAddPost: boolean;
+  showSharePost: boolean;
 
   setShowAddPost: (value: boolean) => void;
+  setShowSharePost: (value: boolean) => void;
   fetchPostById: (id: string) => Promise<void>;
   fetchMyPosts: () => Promise<void>;
   fetchMemberPosts: (username: string) => Promise<void>;
@@ -37,7 +39,10 @@ const initialState = {
 
 const createPostsSlice: StateCreator<StoreState, [], [], PostsStore> = (set, get): PostsStore => ({
   showAddPost: false,
+  showSharePost: false,
   setShowAddPost: (value) => set({ showAddPost: value }),
+
+  setShowSharePost: (value) => set({ showSharePost: value }),
   ...initialState,
 
   fetchPostById: async (id: string) => {
@@ -111,7 +116,7 @@ const createPostsSlice: StateCreator<StoreState, [], [], PostsStore> = (set, get
         },
       });
       set({ friendsPosts: response.data, loading: false });
-    } catch (error: any|unknown) {
+    } catch (error: any | unknown) {
       set({ error: error.message, loading: false });
       toast.error(error.response?.data?.message || 'Failed to fetch posts');
     }

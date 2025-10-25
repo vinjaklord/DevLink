@@ -16,12 +16,19 @@ import MessagePage from './Components/MessagePage/MessagePage';
 import MemberProfile from './Components/Profile/MemberProfile';
 import { ResetPassword } from './Components/ForgotPassword/ResetPassword';
 import { SetNewPassword } from './Components/ForgotPassword/SetNewPassword';
+import SharePost from './Components/Feed/MainFeed/SharePost';
 import FooterNav from './Components/Footer/Footer';
 import { SearchResults } from './Components/SearchResults/SearchResults';
 
-
 function App() {
-  const { loggedInMember, memberCheck, showAddPost, setShowAddPost } = useStore((state) => state);
+  const {
+    loggedInMember,
+    memberCheck,
+    showAddPost,
+    setShowAddPost,
+    showSharePost,
+    setShowSharePost,
+  } = useStore((state) => state);
 
   // Check if the user is logged in on every page load
   useEffect(() => {
@@ -56,6 +63,7 @@ function App() {
         {/* <Route path="/post" element={<Post />} /> */}
       </Routes>
       <AddPost isOpen={showAddPost} onClose={() => setShowAddPost(false)} />
+      <SharePost isOpen={showSharePost} onClose={() => setShowSharePost(false)} />
     </>
   );
 
@@ -85,7 +93,9 @@ function App() {
   return (
     <div className="flex flex-col">
       <Header />
-      <main className="container mx-auto px-6 pt-10 flex-1 overflow-y-auto max-[1100px]:pb-[60px]">{routes}</main>
+      <main className="container mx-auto px-6 pt-10 flex-1 overflow-y-auto max-[1100px]:pb-[60px]">
+        {routes}
+      </main>
       <FooterNav />
       <Toaster richColors position="bottom-left" />
     </div>

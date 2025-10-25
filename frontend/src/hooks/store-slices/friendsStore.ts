@@ -21,12 +21,6 @@ export interface FriendsStore {
   acceptFriendRequest: (senderId: string) => Promise<void>;
   rejectFriendRequest: (senderId: string) => Promise<void>;
   fetchRelationshipStatus: (userId: string) => Promise<void>;
-  //   loggedInMember: IMember | null;
-  //   token: string | null;
-  //   decodedToken: DecodedToken | null;
-  //   member: IMember;
-  //   members: IMember[];
-  //   loading: boolean;
 }
 
 const initialState = {
