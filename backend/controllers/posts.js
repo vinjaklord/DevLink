@@ -23,19 +23,23 @@ const createPost = async (req, res, next) => {
 
     const author = await Member.findById(authorId);
 
-    if (!image) {
-      throw new HttpError('Image is required', 400);
-    }
     if (!author) {
       throw new HttpError('author is required', 400);
     }
 
-    const uploadResponse = await uploadImage(image.buffer, image.originalname);
+    let imageUrl = null;
+    let imageFileId = null;
+
+    if (image) {
+      const uploadResponse = await uploadImage(image.buffer, image.originalname);
+      imageUrl = uploadResponse.url,
+      imageFileId = uploadResponse.fileId
+    }
 
     const post = await Post.create({
       caption,
-      imageUrl: uploadResponse.url,
-      imageFileId: uploadResponse.fileId,
+      imageUrl,
+      imageFileId,
       author,
     });
 

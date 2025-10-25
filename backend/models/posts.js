@@ -6,7 +6,7 @@ const Schema = mongoose.Schema;
 const postSchema = new Schema({
     author: { type: mongoose.Schema.Types.ObjectId, ref: "Member", required: true },
     caption: { type: String, required: true },
-    imageUrl: { type: String, required: true },
+    imageUrl: { type: String },
     imageFileId: { type: String },
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Member" }],
     comments: [
