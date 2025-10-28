@@ -63,7 +63,7 @@ const ImageUploader = (props) => {
       />
       <div
         onClick={handlePhotoUpload}
-        className="relative w-full max-w-xs border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors duration-200"
+        className="relative w-full max-w-xs border-2 border-dashed border-border/50 bg-background/50 rounded-xl flex items-center justify-center cursor-pointer hover:bg-accent/10 hover:border-accent/50 transition-all duration-200 shadow-sm hover:shadow-md"
         style={{ width: imageDimensions.width, height: imageDimensions.height }}
       >
         {previewUrl ? (
@@ -73,7 +73,7 @@ const ImageUploader = (props) => {
             className="w-full h-full object-cover rounded-lg"
           />
         ) : (
-          <div className="flex flex-col items-center justify-center text-gray-500">
+          <div className="flex flex-col items-center justify-center text-muted-foreground">
             <svg
               className="w-12 h-12 mb-2"
               fill="none"
@@ -88,7 +88,7 @@ const ImageUploader = (props) => {
                 d="M12 4v16m8-8H4"
               />
             </svg>
-            <Label className="text-sm">Foto auswählen</Label>
+            <Label className="text-sm">Upload Photo</Label>
           </div>
         )}
       </div>
