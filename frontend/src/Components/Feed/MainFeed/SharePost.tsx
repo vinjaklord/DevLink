@@ -129,7 +129,7 @@ export default function SharePost({ isOpen, onClose }: { isOpen: boolean; onClos
                       </div>
                       <div className="text-center space-y-0.5">
                         <div className="font-semibold text-xs text-foreground max-w-full">
-                          @{friend.username}
+                          {friend.username}
                         </div>
                       </div>
                     </div>

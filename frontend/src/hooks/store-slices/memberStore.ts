@@ -213,6 +213,7 @@ export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = 
       // loggedInMember in localStorage speichern
       localStorage.setItem('lh_member', JSON.stringify(loggedInMember));
       get().connectSocket();
+      get().subscribeToMessages();
       return true;
     } catch (error: any) {
       console.error(error, error.response?.data?.message);
@@ -233,6 +234,7 @@ export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = 
     localStorage.removeItem('lh_member');
     localStorage.removeItem('chat-storage');
     get().disconnectSocket();
+    get().unsubscribeFromMessages();
     set({
       ...initialState,
       selectedUser: null, // Explicitly annul selectedUser to ensure it's cleared

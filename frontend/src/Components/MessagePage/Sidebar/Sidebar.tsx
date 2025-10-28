@@ -1,15 +1,53 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import useStore from '@/hooks/useStore';
 import SidebarSkeleton from './SidebarLoading';
-import { Users } from 'lucide-react';
+import { Users, Search } from 'lucide-react';
 import { formatSidebarMessage } from '@/utils/messageFormat';
+import { formatRelativeTime } from '@/utils/lastSentFormat';
 
 const Sidebar = () => {
-  const { friends, fetchFriends, selectedUser, setSelectedUser, isUsersLoading } = useStore();
+  const {
+    friends,
+    fetchFriends,
+    selectedUser,
+    setSelectedUser,
+    isUsersLoading,
+    lastMessages,
+    subscribeToMessages,
+    unsubscribeFromMessages,
+  } = useStore();
+
+  const [searchQuery, setSearchQuery] = useState(''); // NEW: Search state
 
   useEffect(() => {
-    fetchFriends();
-  }, [fetchFriends]);
+    fetchFriends().then(() => {
+      subscribeToMessages();
+    });
+
+    return () => {
+      unsubscribeFromMessages();
+    };
+  }, [fetchFriends, subscribeToMessages, unsubscribeFromMessages]);
+
+  // UPDATED: Filter friends first, then sort filtered results
+  const filteredFriends = useMemo(() => {
+    const query = searchQuery.toLowerCase();
+    return friends.filter((friend) =>
+      `${friend.firstName} ${friend.lastName} ${friend.username}`.toLowerCase().includes(query)
+    );
+  }, [friends, searchQuery]);
+
+  const sortedFriends = useMemo(() => {
+    return [...filteredFriends].sort((a, b) => {
+      const timestampA = lastMessages[a._id]?.createdAt;
+      const timestampB = lastMessages[b._id]?.createdAt;
+
+      const dateA = timestampA ? new Date(timestampA).getTime() : 0;
+      const dateB = timestampB ? new Date(timestampB).getTime() : 0;
+
+      return dateB - dateA;
+    });
+  }, [filteredFriends, lastMessages]);
 
   if (isUsersLoading) return <SidebarSkeleton />;
 
@@ -22,8 +60,22 @@ const Sidebar = () => {
         </div>
       </div>
 
-      <div className="overflow-y-auto w-full py-3">
-        {friends.map((friend) => (
+      {/* NEW: Search input section */}
+      <div className="hidden lg:block p-3 border-b border-base-300">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-zinc-400" />
+          <input
+            type="text"
+            placeholder="Search contacts..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 bg-transparent border border-zinc-700 rounded-lg outline-none text-sm text-foreground placeholder-zinc-500 focus:border-primary transition-colors"
+          />
+        </div>
+      </div>
+
+      <div className="overflow-y-auto w-full py-3 flex-1">
+        {sortedFriends.map((friend) => (
           <button
             key={friend._id}
             onClick={() => setSelectedUser(friend)}
@@ -45,17 +97,27 @@ const Sidebar = () => {
               />
             </div>
 
-            <div className="hidden lg:block text-left min-w-0">
-              <div className="font-medium truncate">{`${friend.firstName} ${friend.lastName}`}</div>
-              <div className="text-sm text-zinc-400">
-                {formatSidebarMessage(friend.lastMessage?.text)}
+            <div className="hidden lg:flex text-left min-w-0 flex-1 justify-between items-center">
+              <div className="min-w-0 flex-1">
+                <div className="font-medium truncate">{`${friend.firstName} ${friend.lastName}`}</div>
+                <div className="text-sm text-zinc-400 truncate">
+                  {formatSidebarMessage(lastMessages[friend._id]?.text)}
+                </div>
+              </div>
+              <div className="text-xs text-zinc-500 ml-2 whitespace-nowrap">
+                {(() => {
+                  const createdAt = lastMessages[friend._id]?.createdAt;
+                  return createdAt ? formatRelativeTime(createdAt) : '';
+                })()}
               </div>
             </div>
           </button>
         ))}
 
-        {friends.length === 0 && (
-          <div className="text-center text-zinc-500 py-4">No online users</div>
+        {sortedFriends.length === 0 && (
+          <div className="text-center text-zinc-500 py-4">
+            {searchQuery ? 'No contacts found' : 'No online users'}
+          </div>
         )}
       </div>
     </aside>

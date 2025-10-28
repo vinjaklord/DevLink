@@ -5,14 +5,15 @@ import { toast } from 'sonner';
 import type { StateCreator } from 'zustand';
 import type { StoreState } from '../useStore.ts';
 
-
 export interface MessagesStore {
   messages: IMessage[];
   users: IMember[];
   selectedUser: IMember | null;
   isUsersLoading: boolean;
   isMessagesLoading: boolean;
+  lastMessages: Record<string, IMessage | null>;
 
+  updateLastMessages: (updates: Record<string, IMessage | null>) => void;
   subscribeToMessages: () => void;
   unsubscribeFromMessages: () => void;
   setSelectedUser: (userId: IMember | null) => void;
@@ -26,6 +27,7 @@ const initialState = {
   selectedUser: null,
   isUsersLoading: false,
   isMessagesLoading: false,
+  lastMessages: {},
 };
 
 export const createMessageSlice: StateCreator<StoreState, [], [], MessagesStore> = (
@@ -33,6 +35,12 @@ export const createMessageSlice: StateCreator<StoreState, [], [], MessagesStore>
   get
 ): MessagesStore => ({
   ...initialState,
+
+  updateLastMessages: (updates) => {
+    set((state) => ({
+      lastMessages: { ...state.lastMessages, ...updates },
+    }));
+  },
 
   setSelectedUser: (user) => {
     set({ selectedUser: user, messages: [] });
@@ -59,6 +67,16 @@ export const createMessageSlice: StateCreator<StoreState, [], [], MessagesStore>
       });
 
       set({ messages: response.data });
+
+      const lastMessage = response.data[response.data.length - 1];
+      if (lastMessage) {
+        set((state) => ({
+          lastMessages: {
+            ...state.lastMessages,
+            [userId]: lastMessage,
+          },
+        }));
+      }
     } catch (error: any) {
       console.error(`getMessages error for ${userId}:`, error);
       toast.error(error.response?.data?.message || 'Failed to fetch messages');
@@ -75,11 +93,9 @@ export const createMessageSlice: StateCreator<StoreState, [], [], MessagesStore>
       toast.error('No user selected to send message');
       return;
     }
-
     try {
       const token = localStorage.getItem('lh_token');
       if (!token) throw new Error('No token found');
-
       const response = await fetchAPI({
         method: 'post',
         url: `messages/send/${selectedUser._id}`,
@@ -89,8 +105,15 @@ export const createMessageSlice: StateCreator<StoreState, [], [], MessagesStore>
           'Content-Type': 'multipart/form-data',
         },
       });
-
+      // Update open chat messages
       set({ messages: [...messages, response.data] });
+      // NEW: Update lastMessages for sender (real-time sidebar update)
+      set((state) => ({
+        lastMessages: {
+          ...state.lastMessages,
+          [selectedUser._id]: response.data,
+        },
+      }));
     } catch (error: any) {
       console.error('sendMessage error:', error);
       toast.error(error.response?.data?.message || 'Failed to send message');
@@ -98,21 +121,35 @@ export const createMessageSlice: StateCreator<StoreState, [], [], MessagesStore>
   },
 
   subscribeToMessages: () => {
-    const { selectedUser, loggedInMember, socket } = get();
-    if (!selectedUser || !loggedInMember || !socket) {
+    const { loggedInMember, socket } = get();
+    if (!loggedInMember || !socket) {
       return;
     }
 
     socket.off('newMessage');
 
     socket.on('newMessage', (newMessage: IMessage) => {
+      const { loggedInMember, messages, lastMessages, selectedUser } = get();
+
+      // Always update lastMessages (for sidebar)
+      const friendId =
+        newMessage.senderId === loggedInMember?._id ? newMessage.recipientId : newMessage.senderId;
+
+      set({
+        lastMessages: {
+          ...lastMessages,
+          [friendId]: newMessage,
+        },
+      });
+
       if (
-        (newMessage.senderId === selectedUser._id && newMessage.recipientId === loggedInMember._id) ||
-        (newMessage.senderId === loggedInMember._id && newMessage.recipientId === selectedUser._id)
+        selectedUser &&
+        ((newMessage.senderId === selectedUser._id &&
+          newMessage.recipientId === loggedInMember?._id) ||
+          (newMessage.senderId === loggedInMember?._id &&
+            newMessage.recipientId === selectedUser._id))
       ) {
-        set({ messages: [...get().messages, newMessage] });
-      } else {
-        console.log(`Message ignored: Not part of conversation with ${selectedUser._id}`);
+        set({ messages: [...messages, newMessage] });
       }
     });
   },

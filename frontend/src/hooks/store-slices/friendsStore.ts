@@ -1,4 +1,5 @@
 import type { IMember } from '../../models/member.model.ts';
+import type { IMessage } from '@/models/messages.model.ts';
 import type { ApiResponse } from '@/models/helper.model.ts';
 import fetchAPI from '../../utils/index.ts';
 import { toast } from 'sonner';
@@ -46,6 +47,7 @@ export const createFriendsSlice: StateCreator<StoreState, [], [], FriendsStore> 
       const token = localStorage.getItem('lh_token');
       if (!token) {
         set({ friendsError: 'Not logged in!' });
+        return;
       }
 
       const response: ApiResponse<IChatUser[]> = await fetchAPI({
@@ -57,15 +59,31 @@ export const createFriendsSlice: StateCreator<StoreState, [], [], FriendsStore> 
         friendsLoading: false,
         friendsError: null,
       });
+
+      const updates: Record<string, IMessage | null> = {};
+      response.data.forEach((friend) => {
+        if (friend._id) {
+          if (friend.lastMessage) {
+            updates[friend._id] = {
+              senderId: friend.lastMessage.senderId,
+              recipientId: friend._id,
+              text: friend.lastMessage.text,
+              createdAt: new Date(friend.lastMessage.createdAt).toISOString(),
+            } as IMessage;
+          } else {
+            updates[friend._id] = null;
+          }
+        }
+      });
+      get().updateLastMessages(updates);
     } catch (error: any | unknown) {
       set({
-        friendsError: error.message || 'Failed to fetch friends!',
+        friendsError: error.response?.data?.message || error.message || 'Failed to fetch friends!',
         friendsLoading: false,
       });
-      toast.error(error.message);
+      toast.error(error.response?.data?.message || error.message || 'Failed to fetch friends!');
     }
   },
-
   fetchPending: async () => {
     try {
       const token = localStorage.getItem('lh_token');
