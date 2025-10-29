@@ -1,11 +1,15 @@
-import { Button } from '../ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Label,
+  Input,
+  Button,
+} from '@/Components/ui';
 import { useState } from 'react';
 import useForm from '../../hooks/useForm';
 import useStore from '../../hooks/useStore';
-import { toast } from 'sonner';
 import { useSearchParams } from 'react-router-dom';
 
 type UserData = {

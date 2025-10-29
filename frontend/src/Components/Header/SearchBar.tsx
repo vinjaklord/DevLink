@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Input } from '../ui/input';
+import { Input } from '@/Components/ui';
 import { IoSearch } from 'react-icons/io5';
 import useStore from '../../hooks/useStore.ts';
 import type { IMember } from '@/models/member.model.ts';

@@ -1,6 +1,3 @@
-import { useEffect, useState } from 'react';
-import { BellIcon } from 'lucide-react';
-import { Button } from '../ui/button';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -8,9 +5,14 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuLabel,
-} from '../ui/dropdown-menu';
+  Avatar,
+  AvatarImage,
+  AvatarFallback,
+  Button
+} from '@/Components/ui';
+import { useEffect, useState } from 'react';
+import { BellIcon } from 'lucide-react';
 import useStore from '@/hooks/useStore';
-import { Avatar, AvatarImage, AvatarFallback } from '../ui/avatar';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 
@@ -29,42 +31,42 @@ export default function Notifications() {
 
   const [open, setOpen] = useState(false);
 
-useEffect(() => {
-  getNotifications();
+  useEffect(() => {
+    getNotifications();
 
-  const { socket } = useStore.getState();
-  if (socket?.connected) {
-    subscribeToNotifications();
-  }
+    const { socket } = useStore.getState();
+    if (socket?.connected) {
+      subscribeToNotifications();
+    }
 
-//   return () => unsubscribeFromNotifications();
-}, []);
+    //   return () => unsubscribeFromNotifications();
+  }, []);
 
-const handleNotificationClick = (n: any) => {
-  markAsRead(n._id);
+  const handleNotificationClick = (n: any) => {
+    markAsRead(n._id);
 
-  switch (n.type) {
-    case 'comment':
-    case 'like':
-      if (n.relatedPost?._id) {
-        navigate(`/posts/${n.relatedPost._id}`);
-      }
-      break;
-    case 'friend_request':
-    case 'friend_accept':
-      if (n.fromUser?._id) {
-        navigate(`/members/${n.fromUser.username}`);
-      }
-      break;
-    default:
-      console.warn('Unknown notification type', n.type);
-  }
+    switch (n.type) {
+      case 'comment':
+      case 'like':
+        if (n.relatedPost?._id) {
+          navigate(`/posts/${n.relatedPost._id}`);
+        }
+        break;
+      case 'friend_request':
+      case 'friend_accept':
+        if (n.fromUser?._id) {
+          navigate(`/members/${n.fromUser.username}`);
+        }
+        break;
+      default:
+        console.warn('Unknown notification type', n.type);
+    }
 
-  setOpen(false); // close dropdown after click
-};
-//   useEffect(() => {
-//     if (open && unreadCount > 0) markAllAsRead();
-//   }, [open]);
+    setOpen(false); // close dropdown after click
+  };
+  //   useEffect(() => {
+  //     if (open && unreadCount > 0) markAllAsRead();
+  //   }, [open]);
 
   return (
     <DropdownMenu open={open} modal={false} onOpenChange={setOpen}>
@@ -92,9 +94,9 @@ const handleNotificationClick = (n: any) => {
             Notifications
           </span>
           {unreadCount > 0 && (
-          <Button onClick={markAllAsRead} className='bg-transparent border-transparent text-foreground text-sm'>
-            Mark all as read
-          </Button>
+            <Button onClick={markAllAsRead} className='bg-transparent border-transparent text-foreground text-sm'>
+              Mark all as read
+            </Button>
           )}
         </DropdownMenuLabel>
 

@@ -1,5 +1,3 @@
-import useStore from '@/hooks/useStore';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -8,7 +6,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuGroup,
-} from '../ui/dropdown-menu';
+  Avatar, 
+  AvatarFallback, 
+  AvatarImage
+} from '@/Components/ui';
+import useStore from '@/hooks/useStore';
 import { Link } from 'react-router-dom';
 
 export default function AvatarIcon() {

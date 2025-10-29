@@ -5,8 +5,8 @@ import {
   DialogHeader,
   DialogFooter,
   DialogDescription,
-} from '@/Components/ui/dialog';
-import { Button } from '@/Components/ui/button';
+  Button,
+} from '@/Components/ui';
 import { Search } from 'lucide-react';
 import useStore from '@/hooks/useStore';
 import { toast } from 'sonner';

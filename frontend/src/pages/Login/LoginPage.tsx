@@ -1,12 +1,22 @@
-import { Button } from '../ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Input } from '../ui/input';
+import { 
+  Card, 
+  CardContent, 
+  CardHeader, 
+  CardTitle, 
+  Input, 
+  Button, 
+  Form, 
+  FormField, 
+  FormItem, 
+  FormControl, 
+  FormLabel, 
+  FormMessage
+} from '@/Components/ui';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import useStore from '../../hooks/useStore';
 import { Link } from 'react-router-dom';
-import { Form, FormField, FormItem, FormControl, FormLabel, FormMessage } from '../ui/form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { EyeIcon, EyeSlashIcon } from '@phosphor-icons/react';
@@ -19,7 +29,7 @@ const FormSchema = z.object({
   password: z.string().min(1, 'Password is required'),
 });
 
-export function Login() {
+export function LoginPage() {
   const { memberLogin } = useStore((state) => state);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();

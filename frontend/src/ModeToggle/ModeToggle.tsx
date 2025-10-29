@@ -1,6 +1,6 @@
+import { Button } from '@/Components/ui';
 import * as React from 'react';
 import { Moon, Sun } from 'lucide-react';
-import { Button } from '@/Components/ui/button';
 
 export function ModeToggle() {
   // Initialize theme from localStorage or default to 'light'

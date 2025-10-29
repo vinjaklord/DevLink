@@ -1,4 +1,4 @@
-import { Separator } from '../ui/separator';
+import { Separator } from '@/Components/ui';
 import { ModeToggle } from '@/ModeToggle/ModeToggle';
 import SearchBar from './SearchBar';
 import AppNameAndLogo from './AppNameAndLogo';

@@ -1,10 +1,20 @@
-import { Button } from '../ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Input } from '../ui/input';
+import { 
+  Form, 
+  FormField, 
+  FormItem, 
+  FormControl, 
+  FormLabel, 
+  FormMessage, 
+  Input, 
+  Button, 
+  Card, 
+  CardContent, 
+  CardHeader, 
+  CardTitle
+ } from '@/Components/ui';
 import { useState } from 'react';
 import useStore from '../../hooks/useStore';
 import { toast } from 'sonner';
-import { Form, FormField, FormItem, FormControl, FormLabel, FormMessage } from '../ui/form';
 import z from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -57,7 +67,7 @@ export function ResetPassword() {
           absolute right-[10%] top-1/2 -translate-y-1/2 w-[450px] h-[380px] shadow-xl rounded-md transition-all duration-700 ease-in-out 
           max-[1300px]:h-[300px] max-[700px]:w-full max-[1300px]:right-0 max-[1300px]:left-1/2 max-[1300px]:-translate-x-1/2"
           >
-   <Form {...form}>
+            <Form {...form}>
               <form onSubmit={handleReset} className="h-full flex flex-col justify-center">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-lg tracking-wide">Enter your Email Address</CardTitle>
@@ -82,11 +92,10 @@ export function ResetPassword() {
                         <FormControl>
                           <Input
                             placeholder="Enter your email"
-                            className={`${
-                              form.formState.errors.email || form.formState.errors.root
+                            className={`${form.formState.errors.email || form.formState.errors.root
                                 ? 'border border-red-500 shake'
                                 : ''
-                            }`}
+                              }`}
                             {...field}
                           />
                         </FormControl>

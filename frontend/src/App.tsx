@@ -3,10 +3,10 @@ import { Routes, Route, Navigate } from 'react-router-dom'; // Remove BrowserRou
 import useStore from './hooks/useStore';
 import Header from './Components/Header/Header';
 import { Signup } from './Components/SignUp/Signup';
-import { Login } from './Components/Login/Login';
+import { LoginPage } from './pages/Login/LoginPage';
 import './App.css';
 import { Toaster } from 'sonner';
-import Feed from './Components/Feed/Feed';
+import Feed from './pages/MainFeed/Feed';
 import AddPost from './Components/AddPost/AddPost';
 import EditProfile from './Components/Profile/EditProfile';
 import ChangePassword from './Components/Profile/ChangePassword';
@@ -76,7 +76,7 @@ function App() {
   const routerNotLoggedIn = (
     <Routes>
       <Route path="/signup" element={<Signup />} />
-      <Route path="/login" element={<Login />} />
+      <Route path="/login" element={<LoginPage />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/set-new-password" element={<SetNewPassword />} />
       <Route path="*" element={<Navigate to="/login" replace />} />

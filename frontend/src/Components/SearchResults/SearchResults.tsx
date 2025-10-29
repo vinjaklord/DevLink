@@ -1,11 +1,14 @@
+import {
+  Input,
+  Button,
+  Card,
+  CardContent
+} from '@/Components/ui';
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import useStore from '../../hooks/useStore.ts';
-import { Button } from '../ui/button.tsx';
-import { Card, CardContent } from '../ui/card.tsx';
 import { Link } from 'react-router-dom';
 import { IoSearch } from 'react-icons/io5';
-import { Input } from '../ui/input.tsx';
 
 export function SearchResults() {
   const [searchParams] = useSearchParams();

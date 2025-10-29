@@ -1,9 +1,16 @@
-import { Button } from '../ui/button';
 import {
-  Card,
-  CardContent,
-} from '../ui/card';
-import { Input } from '../ui/input';
+  Form,
+  FormField, 
+  FormItem, 
+  FormControl, 
+  FormLabel, 
+  FormMessage, 
+  Input, 
+  Button, 
+  Card, 
+  CardContent
+} from '@/Components/ui';
+
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import useStore from '../../hooks/useStore';
@@ -11,7 +18,6 @@ import { EyeIcon, EyeSlashIcon } from '@phosphor-icons/react';
 import { toast } from 'sonner';
 import useEnter from '@/hooks/useEnter';
 
-import { Form, FormField, FormItem, FormControl, FormLabel, FormMessage } from '../ui/form';
 
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';

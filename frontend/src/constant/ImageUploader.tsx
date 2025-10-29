@@ -1,5 +1,5 @@
+import { Label } from '../Components/ui';
 import { useState, useEffect, useRef } from 'react';
-import { Label } from '../Components/ui/label';
 
 const ImageUploader = (props) => {
   const { handleFormChange, photo } = props;

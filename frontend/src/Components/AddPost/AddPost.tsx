@@ -5,9 +5,9 @@ import {
   DialogHeader,
   DialogFooter,
   DialogDescription,
-} from '../ui/dialog';
-import { Input } from '../ui/input';
-import { Button } from '../ui/button';
+  Input,
+  Button,
+} from '@/Components/ui';
 import ImageUploader from '../../constant/ImageUploader';
 import useForm from '@/hooks/useForm';
 import useStore from '@/hooks/useStore';
