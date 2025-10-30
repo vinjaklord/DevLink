@@ -13,6 +13,7 @@ import useForm from '@/hooks/useForm';
 import useStore from '@/hooks/useStore';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useState } from 'react';
 
 type PostData = {
   caption: string;
@@ -26,6 +27,7 @@ export default function AddPost({ isOpen, onClose }: { isOpen: boolean; onClose:
     photo: null,
   });
   const navigate = useNavigate();
+  const [isPosting, setIsPosting] = useState(false);
 
   const handlePosting = async () => {
     if (!formState.photo) {
@@ -33,18 +35,29 @@ export default function AddPost({ isOpen, onClose }: { isOpen: boolean; onClose:
       return;
     }
 
-    const formData = new FormData();
-    formData.append('photo', formState.photo);
-    formData.append('caption', formState.caption);
+    setIsPosting(true);
+    onClose(); // Close dialog immediately to prevent multiple clicks
 
-    const response = await uploadPost(formData);
+    try {
+      const formData = new FormData();
+      formData.append('photo', formState.photo);
+      formData.append('caption', formState.caption);
 
-    if (response) {
-      navigate('/');
-      setShowAddPost(false);
-      toast.success('Successfully posted!');
-    } else {
+      const response = await uploadPost(formData);
+
+      if (response) {
+        navigate('/');
+        setShowAddPost(false);
+        memberRefreshMe();
+        toast.success('Successfully posted!');
+      } else {
+        toast.error('Error while posting!');
+      }
+    } catch (error) {
+      console.error('Error posting:', error);
       toast.error('Error while posting!');
+    } finally {
+      setIsPosting(false);
     }
   };
 
@@ -69,6 +82,7 @@ export default function AddPost({ isOpen, onClose }: { isOpen: boolean; onClose:
               placeholder="Caption goes here..."
               onChange={handleFormChange}
               className="bg-background/50 border border-border/50 rounded-xl outline-none text-sm"
+              disabled={isPosting}
             />
           </div>
         </div>
@@ -76,13 +90,11 @@ export default function AddPost({ isOpen, onClose }: { isOpen: boolean; onClose:
           <div className="w-full flex items-center justify-between">
             <div className="text-sm text-muted-foreground"></div>
             <Button
-              onClick={() => {
-                handlePosting();
-                memberRefreshMe();
-              }}
+              onClick={handlePosting}
+              disabled={isPosting}
               className="ml-auto bg-primary hover:bg-primary/90 shadow-lg hover:shadow-primary/20 transition-all duration-300 px-6"
             >
-              Post!
+              {isPosting ? 'Posting...' : 'Post!'}
             </Button>
           </div>
         </DialogFooter>

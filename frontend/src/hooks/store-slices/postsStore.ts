@@ -20,10 +20,12 @@ export interface PostsStore {
   setShowSharePost: (value: boolean) => void;
   setSharePostId: (postId: string | null) => void;
   fetchPostById: (id: string) => Promise<void>;
+  deletePost: (id: string) => Promise<void>;
   fetchMyPosts: () => Promise<void>;
   fetchMemberPosts: (username: string) => Promise<void>;
   fetchAllPosts: () => Promise<void>;
   fetchFriendsPosts: () => Promise<void>;
+  clearCurrentPost: () => Promise<void>;
   uploadPost: (data: IPost) => Promise<boolean>;
   toggleLike: (postId: string) => Promise<void>;
   addComment: (postId: string, data: { text: string }) => Promise<void>;
@@ -45,6 +47,7 @@ const createPostsSlice: StateCreator<StoreState, [], [], PostsStore> = (set, get
   showSharePost: false,
   sharePostId: null,
   setShowAddPost: (value) => set({ showAddPost: value }),
+  clearCurrentPost: async () => set({ currentPost: null }),
   setShowSharePost: (value) => set({ showSharePost: value }),
   setSharePostId: (postId) => set({ sharePostId: postId }),
 
@@ -124,6 +127,22 @@ const createPostsSlice: StateCreator<StoreState, [], [], PostsStore> = (set, get
     } catch (error: any | unknown) {
       set({ error: error.message, loading: false });
       toast.error(error.response?.data?.message || 'Failed to fetch posts');
+    }
+  },
+
+  deletePost: async (id) => {
+    try {
+      const token = localStorage.getItem('lh_token');
+      await fetchAPI({
+        method: 'delete',
+        url: `posts/delete/${id}`,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      toast.success(`Post deleted!`);
+    } catch (error) {
+      console.error(error);
     }
   },
 

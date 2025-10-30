@@ -253,6 +253,21 @@ export const sharePost = async (req, res) => {
   res.json(messages);
 };
 
+export const deletePost = async (req, res, next) => {
+  try {
+    // Member suchen und gleichzeitig löschen, wenn nicht vorhanden -> Fehlermeldung ausgeben
+    const deletedPost = await Post.findOneAndDelete({ _id: req.params.id });
+    if (!deletedPost) {
+      throw new HttpError('Member was not found', 404);
+    }
+
+    // Erfolgsmeldung rausschicken
+    res.send('Post was deleted successfully');
+  } catch (error) {
+    return next(new HttpError(error, error.errorCode || 500));
+  }
+};
+
 export {
   createPost,
   toggleLike,

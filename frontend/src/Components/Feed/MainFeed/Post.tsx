@@ -1,10 +1,18 @@
 import useStore from '@/hooks/useStore';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Heart, MessageSquare, SendIcon } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Heart, MessageSquare, SendIcon, MoreVertical, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import {
+  DropdownMenu,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+} from '@/Components/ui/dropdown-menu';
+
 const Post = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const {
     currentPost,
     loading,
@@ -12,6 +20,7 @@ const Post = () => {
     fetchPostById,
     toggleLike,
     addComment,
+    deletePost,
     loggedInMember,
     setShowSharePost,
     setSharePostId,
@@ -19,6 +28,8 @@ const Post = () => {
 
   const [commentText, setCommentText] = useState('');
   const [commentsToShow, setCommentsToShow] = useState(10);
+
+  const isAuthor = loggedInMember?._id === currentPost?.author?._id;
 
   const handleShowMore = () => {
     setCommentsToShow((prevCount) => prevCount + 10);
@@ -39,28 +50,74 @@ const Post = () => {
     }
   };
 
-  if (loading) return <p className="text-center text-foreground">Loading...</p>;
-  if (error) return <p className="text-destructive text-center">An error has occurred: {error}</p>;
+  const handleDelete = async () => {
+    try {
+      if (id) {
+        await deletePost(id);
+        navigate(-1); // Or to feed: navigate('/feed')
+      }
+    } catch (err) {
+      console.error('Error deleting post:', err);
+    }
+  };
+
+  if (loading)
+    return (
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" />
+          <p className="text-muted-foreground">Loading profile...</p>
+        </div>
+      </div>
+    );
+  if (error)
+    return <p className="text-destructive mt-10 text-center">An error has occurred: {error}</p>;
   if (!currentPost) return <p className="text-destructive text-center">Post Not Found</p>;
 
   return (
     <div className="max-w-[37.5rem] mx-auto space-y-6 px-4 mt-7">
       <div className="bg-card dark:bg-card shadow-lg rounded-lg border border-border overflow-hidden">
         {/* Header */}
-        <div className="flex items-center p-3 border-b border-border">
-          <img
-            src={currentPost.author?.photo?.url || '/default-avatar.png'}
-            alt="Author"
-            className="w-8 h-8 rounded-full mr-2 object-cover"
-          />
-          <button>
-            <Link
-              to={`/members/${currentPost.author?.username}`}
-              className="font-semibold text-foreground text-sm"
-            >
-              {currentPost.author?.username || 'Unknown'}
-            </Link>
-          </button>
+        <div className="flex items-center justify-between p-3 border-b border-border">
+          <div className="flex items-center">
+            <img
+              src={currentPost.author?.photo?.url || '/default-avatar.png'}
+              alt="Author"
+              className="w-8 h-8 rounded-full mr-2 object-cover"
+            />
+            <button>
+              <Link
+                to={`/members/${currentPost.author?.username}`}
+                className="font-semibold text-foreground text-sm"
+              >
+                {currentPost.author?.username || 'Unknown'}
+              </Link>
+            </button>
+          </div>
+          {isAuthor && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="h-8 w-8 p-0">
+                  <MoreVertical className="h-4 w-4" />
+                  <span className="sr-only">Open menu</span>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem
+                  asChild
+                  className="focus:bg-muted focus:text-destructive-foreground"
+                >
+                  <Link to={`/posts/edit/${id}`}>Edit Post</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={handleDelete}
+                  className="focus:bg-destructive focus:text-destructive-foreground"
+                >
+                  Delete Post
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
 
         {/* Image */}
