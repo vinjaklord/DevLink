@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { ImageOff, UserMinus, UserPlus, UserCheck, Users2Icon, UserX } from 'lucide-react';
+import { useEffect, useLayoutEffect, useState } from 'react';
+import { ImageOff, UserMinus, UserPlus, UserCheck, UserX } from 'lucide-react';
+import { Loader2 } from 'lucide-react'; // Assuming you have this for a spinner; add if needed
 
 import useStore from '@/hooks/useStore.ts';
 
@@ -20,42 +21,63 @@ function MemberProfile() {
     loggedInMember,
     acceptFriendRequest,
     rejectFriendRequest,
-    myPosts,
     fetchRelationshipStatus,
     fetchMyPosts,
     relationshipStatus,
+    clearProfileData, // Add this to your store extraction
   } = useStore((state) => state);
 
   const [isAddingFriend, setIsAddingFriend] = useState(false); // Optimistic UI state
+  const [profileLoading, setProfileLoading] = useState(false);
 
+  // Load global data once on mount
   useEffect(() => {
-    if (!username) return; // Guard against undefined username
-
-    // Fetch member data
-    fetchMemberPosts(username);
-    getMemberByUsername(username);
-    // Fetch friend-related data
     fetchFriends();
     fetchPending();
     fetchMyPosts();
-    // Fetch relationship status only if user._id exists
-    if (user?._id) {
-      fetchRelationshipStatus(user._id);
-    }
-  }, [
-    username,
-    user?._id,
-    fetchMemberPosts,
-    getMemberByUsername,
-    fetchFriends,
-    fetchPending,
-    fetchRelationshipStatus,
-    fetchMyPosts,
-  ]);
+  }, [fetchFriends, fetchPending, fetchMyPosts]);
+
+  // Handle profile load with useLayoutEffect for sync clear/loading to prevent flash
+  useLayoutEffect(() => {
+    if (!username) return;
+
+    setProfileLoading(true);
+    clearProfileData();
+
+    // Kick off async load (non-blocking for layout)
+    (async () => {
+      try {
+        const [_, userRes] = await Promise.all([
+          fetchMemberPosts(username),
+          getMemberByUsername(username),
+        ]);
+
+        if (userRes?._id) {
+          await fetchRelationshipStatus(userRes._id);
+        }
+      } catch (error) {
+        console.error('Failed to load profile:', error);
+        // Optionally handle error state here
+      } finally {
+        setProfileLoading(false);
+      }
+    })().catch(console.error);
+  }, [username, clearProfileData, fetchMemberPosts, getMemberByUsername, fetchRelationshipStatus]);
 
   const isFriend = user?._id ? friends.some((friend) => friend._id === user._id) : false;
   const isPending = user?._id ? pending.some((pending) => pending._id === user._id) : false;
   const isMe = loggedInMember?._id && user?._id ? loggedInMember._id === user._id : false;
+
+  if (profileLoading || !user) {
+    return (
+      <div className="min-h-screen bg-background text-foreground pt-22 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" />
+          <p className="text-muted-foreground">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground pt-22">

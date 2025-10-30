@@ -16,18 +16,18 @@ export default function Navbar() {
 
   if (!loggedInMember) {
     return (
-      <div className="font-poppins fixed top-0 left-0 w-full p-6 flex justify-between items-center bg-white dark:bg-gray-900 shadow-md z-10">
+      <div className="font-poppins fixed top-0 left-0 w-full p-4 flex justify-between items-center bg-white dark:bg-gray-900 shadow-md z-10">
         <AppNameAndLogo />
         <ModeToggle />
       </div>
     );
   }
   return (
-    <div className="font-poppins fixed top-0 left-0 w-full p-6 flex justify-between items-center bg-white dark:bg-gray-900 shadow-md z-10">
+    <div className="font-poppins fixed top-0 left-0 w-full p-4 flex justify-between items-center bg-white dark:bg-gray-900 shadow-md z-10">
       {/* Left Section */}
       <div className="flex items-center gap-10 flex-1 max-w-[34%]">
         <AppNameAndLogo />
-        <SearchBar buttonMode={isResultsPage}/>
+        <SearchBar buttonMode={isResultsPage} />
       </div>
 
       {/* Center Section: NavLinks */}
@@ -47,7 +47,7 @@ export default function Navbar() {
 
       {/* Right Section */}
       <div className="flex items-center gap-5">
-        <Notifications/>
+        <Notifications />
         <ModeToggle />
         <AvatarIcon />
         <Separator orientation="vertical" className="h-5 w-[2px] bg-gray-500" />

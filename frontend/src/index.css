@@ -130,7 +130,7 @@ body {
   --popover: oklch(0.99 0 0);
   --popover-foreground: oklch(0.3 0.01 285);
   /* Darker for better contrast */
-  --primary: oklch(0.623 0.214 259.815);
+  --primary: oklch(63.377% 0.1753 263.633 / 0.767);
   --primary-foreground: oklch(0.99 0.01 255);
   --secondary: oklch(0.94 0.01 285);
   --secondary-foreground: oklch(0.3 0.01 285);
@@ -169,7 +169,7 @@ body {
   --card-foreground: oklch(0.98 0 0);
   --popover: oklch(0.25 0.01 285);
   --popover-foreground: oklch(0.98 0 0);
-  --primary: oklch(0.55 0.2 262);
+  --primary: oklch(41.723% 0.18607 262.431);
   --primary-foreground: oklch(0.1 0.01 270);
   --secondary: oklch(0.25 0.01 285);
   --secondary-foreground: oklch(0.98 0 0);
@@ -251,14 +251,26 @@ body {
 
 /* Collapse horizontally toward right */
 @keyframes collapseRight {
-  0% { transform: scaleX(1); opacity: 1; }
-  100% { transform: scaleX(0); opacity: 0; }
+  0% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleX(0);
+    opacity: 0;
+  }
 }
 
 /* Expand from collapsed */
 @keyframes expandRight {
-  0% { transform: scaleX(0); opacity: 0; }
-  100% { transform: scaleX(1); opacity: 1; }
+  0% {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
 }
 
 /* Default state for background box */
@@ -283,14 +295,26 @@ body {
 
 /* Collapse horizontally toward left */
 @keyframes collapseLeft {
-  0% { transform: scaleX(1); opacity: 1; }
-  100% { transform: scaleX(0); opacity: 0; }
+  0% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleX(0);
+    opacity: 0;
+  }
 }
 
 /* Expand from collapsed */
 @keyframes expandLeft {
-  0% { transform: scaleX(0); opacity: 0; }
-  100% { transform: scaleX(1); opacity: 1; }
+  0% {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
 }
 
 /* Default state for background box */

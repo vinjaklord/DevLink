@@ -2,7 +2,7 @@ import useStore from '@/hooks/useStore';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Heart, MessageSquare, SendIcon } from 'lucide-react';
-
+import { Link } from 'react-router-dom';
 const Post = () => {
   const { id } = useParams();
   const {
@@ -16,10 +16,11 @@ const Post = () => {
     setShowSharePost,
     setSharePostId,
   } = useStore((state) => state);
+
   const [commentText, setCommentText] = useState('');
   const [commentsToShow, setCommentsToShow] = useState(10);
 
-  const handleShowMore = async () => {
+  const handleShowMore = () => {
     setCommentsToShow((prevCount) => prevCount + 10);
   };
 
@@ -43,107 +44,123 @@ const Post = () => {
   if (!currentPost) return <p className="text-destructive text-center">Post Not Found</p>;
 
   return (
-    <div className="max-w-[37.5rem] mx-auto mt-15 p-4 bg-card dark:bg-card shadow-lg rounded-lg border border-border">
-      {/* Header */}
-      <div className="flex items-center p-3 border-b border-border">
-        <img
-          src={currentPost.author?.photo?.url}
-          alt="Author"
-          className="w-8 h-8 rounded-full mr-2 object-cover"
-        />
-        <span className="font-semibold text-foreground text-sm">
-          {currentPost.author?.username || 'Unknown'}
-        </span>
-      </div>
-
-      {/* Image */}
-      <div className="relative w-full aspect-square">
-        <img src={currentPost.imageUrl} alt="Post" className="w-full h-full object-cover" />
-      </div>
-
-      {/* Like and Comment */}
-      <div className="p-3 border-b border-border">
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={() => toggleLike(id!)}
-            className="flex items-center text-foreground hover:text-primary transition-colors"
-          >
-            {currentPost.likes?.includes(loggedInMember?._id) ? (
-              <Heart className="w-6 h-6 text-destructive fill-destructive" />
-            ) : (
-              <Heart className="w-6 h-6" />
-            )}
-            <span className="ml-1 text-sm">{currentPost.likes?.length || 0}</span>
-          </button>
-          <div className="flex items-center text-foreground">
-            <MessageSquare className="w-6 h-6" />
-            <span className="ml-1 text-sm">{currentPost.comments?.length || 0}</span>
-          </div>
-          <button
-            className="flex items-center text-foreground hover:text-primary transition-colors"
-            onClick={() => {
-              setSharePostId(id!);
-              setShowSharePost(true);
-            }}
-          >
-            <SendIcon className="w-6 h-6" />
-          </button>
-        </div>
-      </div>
-
-      {/* Caption */}
-      <div className="px-3 py-2">
-        <p className="text-foreground text-sm text-left flex items-start pb-2.5">
-          <span className="font-bold mr-2">{currentPost.author?.username || 'Unknown'}</span>
-          <span className="flex-1">{currentPost.caption}</span>
-        </p>
-      </div>
-
-      {/* Comments */}
-      <div className="px-3 pb-2 max-h-60 overflow-y-auto">
-        {currentPost?.comments?.length > 0 ? (
-          [...currentPost.comments]
-            .reverse()
-            .slice(0, commentsToShow) // Use .slice() with the new state
-            .map((comment, index) => (
-              <div
-                key={index}
-                className="text-sm text-muted-foreground mb-2 flex items-start text-left"
-              >
-                <span className="font-bold mr-2">{comment.author?.username || 'Unknown'}</span>
-                <span className="flex-1">{comment.text}</span>
-              </div>
-            ))
-        ) : (
-          <p className="text-sm text-muted-foreground">No comments yet.</p>
-        )}
-      </div>
-      {/* "Show More" Button */}
-      {currentPost.comments.length > commentsToShow && (
-        <div className="px-3 pb-2">
-          <button
-            onClick={handleShowMore}
-            className="text-primary font-semibold text-sm hover:underline"
-          >
-            Show more...
-          </button>
-        </div>
-      )}
-
-      {/* Comment Input */}
-      <div className="p-3 border-t border-border">
-        <form onSubmit={handleCommentSubmit} className="flex items-center">
-          <input
-            type="text"
-            value={commentText}
-            onChange={(e) => setCommentText(e.target.value)}
-            placeholder="Add a comment..."
-            className="flex-1 bg-transparent border-none focus:ring-0 text-foreground text-sm placeholder-muted-foreground"
+    <div className="max-w-[37.5rem] mx-auto space-y-6 px-4 mt-7">
+      <div className="bg-card dark:bg-card shadow-lg rounded-lg border border-border overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center p-3 border-b border-border">
+          <img
+            src={currentPost.author?.photo?.url || '/default-avatar.png'}
+            alt="Author"
+            className="w-8 h-8 rounded-full mr-2 object-cover"
           />
-          <button type="submit" className="text-primary font-semibold text-sm hover:underline">
-            Post
+          <button>
+            <Link
+              to={`/members/${currentPost.author?.username}`}
+              className="font-semibold text-foreground text-sm"
+            >
+              {currentPost.author?.username || 'Unknown'}
+            </Link>
           </button>
-        </form>
+        </div>
+
+        {/* Image */}
+        <div className="relative w-full aspect-square">
+          <img src={currentPost.imageUrl} alt="Post" className="w-full h-full object-cover" />
+        </div>
+
+        {/* Like, Comment, Share */}
+        <div className="p-3 border-b border-border">
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={() => toggleLike(id!)}
+              className="flex items-center text-foreground hover:text-primary transition-colors"
+            >
+              {currentPost.likes?.includes(loggedInMember?._id) ? (
+                <Heart className="w-6 h-6 text-destructive fill-destructive" />
+              ) : (
+                <Heart className="w-6 h-6" />
+              )}
+              <span className="ml-1 text-sm">{currentPost.likes?.length || 0}</span>
+            </button>
+            <div className="flex items-center text-foreground">
+              <MessageSquare className="w-6 h-6" />
+              <span className="ml-1 text-sm">{currentPost.comments?.length || 0}</span>
+            </div>
+            <button
+              className="flex items-center text-foreground hover:text-primary transition-colors"
+              onClick={() => {
+                setSharePostId(id!);
+                setShowSharePost(true);
+              }}
+            >
+              <SendIcon className="w-6 h-6" />
+            </button>
+          </div>
+        </div>
+
+        {/* Caption */}
+        <div className="px-3 py-2">
+          <p className="text-foreground text-sm text-left flex items-start pb-2.5">
+            <button>
+              <Link to={`/members/${currentPost.author?.username}`} className="font-bold mr-2">
+                {currentPost.author?.username || 'Unknown'}
+              </Link>
+            </button>
+            <span className="flex-1">{currentPost.caption}</span>
+          </p>
+        </div>
+
+        {/* Comments */}
+        <div className="px-3 pb-2 max-h-60 overflow-y-auto">
+          {currentPost?.comments?.length > 0 ? (
+            [...currentPost.comments]
+              .reverse()
+              .slice(0, commentsToShow)
+              .map((comment, index) => (
+                <div
+                  key={index}
+                  className="text-sm text-muted-foreground mb-2 flex items-start text-left"
+                >
+                  <button>
+                    <Link to={`/members/${comment.author?.username}`} className="font-bold mr-2">
+                      {comment.author?.username || 'Unknown'}
+                    </Link>
+                  </button>
+                  <span className="flex-1">{comment.text}</span>
+                </div>
+              ))
+          ) : (
+            <p className="text-sm text-muted-foreground">No comments yet.</p>
+          )}
+        </div>
+
+        {/* Show More Comments */}
+        {currentPost.comments.length > commentsToShow && (
+          <div className="px-3 pb-2">
+            <button
+              onClick={handleShowMore}
+              className="text-primary font-extralight text-sm hover:underline flex items-start text-left mb-3"
+            >
+              Show more comments...
+            </button>
+          </div>
+        )}
+
+        {/* Comment Input */}
+        <div className="p-3 border-t border-border">
+          <form onSubmit={handleCommentSubmit} className="flex items-center">
+            <input
+              type="text"
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              placeholder="Add a comment..."
+              className="flex-1 bg-transparent border-none focus:ring-0 text-foreground text-sm placeholder-muted-foreground"
+            />
+            <button type="submit" className="text-primary font-semibold text-sm hover:underline">
+              Post
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

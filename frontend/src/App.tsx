@@ -3,10 +3,10 @@ import { Routes, Route, Navigate } from 'react-router-dom'; // Remove BrowserRou
 import useStore from './hooks/useStore';
 import Header from './Components/Header/Header';
 import { Signup } from './Components/SignUp/Signup';
-import { LoginPage } from './pages/Login/LoginPage';
+import { LoginPage } from './Components/pages/Login/LoginPage';
 import './App.css';
 import { Toaster } from 'sonner';
-import Feed from './pages/MainFeed/Feed';
+import Feed from './Components/pages/MainFeed/Feed';
 import AddPost from './Components/AddPost/AddPost';
 import EditProfile from './Components/Profile/EditProfile';
 import ChangePassword from './Components/Profile/ChangePassword';

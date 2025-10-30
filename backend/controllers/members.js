@@ -148,10 +148,18 @@ const login = async (req, res, next) => {
       member: foundMember._id,
     });
 
+    // NEW: Add null check for missing Password document
+    if (!foundPassword) {
+      console.error(
+        `No password found for member: ${foundMember._id} (username: ${data.username})`
+      ); // Log for debugging
+      throw new HttpError('User data incomplete - contact support', 500); // Or 401 if preferred
+    }
+
     // Hash mit Klartext-Passwort vergleichen
     // wenn keine Überstimmung -> Abbruch mit Fehlermeldung
     if (!checkHash(data.password, foundPassword.password)) {
-      throw new HttpError('Invalid Credentials ', 401);
+      throw new HttpError('Invalid Credentials', 401);
     }
 
     // Token generieren mit ID des Members als Inhalt
@@ -160,10 +168,11 @@ const login = async (req, res, next) => {
     // JWT-Token an Client senden
     res.send(token);
   } catch (error) {
-    // if (error instanceof HttpError) {
-    //   return next(error);
-    // }
-    return next(new HttpError(error, error.errorCode || 500));
+    // Restore specific HttpError handling if needed
+    if (error instanceof HttpError) {
+      return next(error);
+    }
+    return next(new HttpError(error.message || 'Internal server error', error.errorCode || 500));
   }
 };
 

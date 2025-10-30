@@ -50,8 +50,6 @@ export default function SharePost({ isOpen, onClose }: { isOpen: boolean; onClos
       return;
     }
     sharePost(selectedFriends, sharePostId);
-    console.log('Sharing with:', selectedFriends);
-    toast.success(`Shared with ${selectedFriends.length} friend(s)!`);
     setShowSharePost(false);
     setSelectedFriends([]);
     setSharePostId(null);

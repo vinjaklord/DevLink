@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type {
   IMember,
   LoginCredentials,
@@ -18,7 +19,7 @@ const BASE_URL = 'http://localhost:8000';
 // Interfaces /////////////////////////////////////////
 export interface MemberStore {
   member: IMember;
-  user: IMember;
+  user: IMember | null;
   friendsSearchResults: IMember[];
   wideSearchResults: IMember[];
   loading: boolean;
@@ -30,6 +31,7 @@ export interface MemberStore {
   dialog: any | null;
   socket: any | null;
   resetMember: () => void;
+  clearProfileData: () => void;
   searchMembersFriends: (q: string) => Promise<IMember[]>;
   searchMembersWide: (q: string, limit?: number) => Promise<IMember[]>;
   getMemberById: (id: string) => Promise<IMember>;
@@ -335,6 +337,16 @@ export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = 
       set({ isUpdatingProfile: false });
     }
   },
+
+  clearProfileData: () => {
+    set({
+      user: null,
+      memberPosts: [],
+      relationshipStatus: 'none',
+      isSender: false,
+    });
+  },
+
   memberChangePassword: async (data) => {
     try {
       set({ isUpdatingProfile: true });
@@ -434,7 +446,7 @@ export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = 
       console.error(`Socket connection error for user ${loggedInMember._id}: ${error.message}`);
     });
 
-    newSocket.on('disconnect', (reason: String) => {
+    newSocket.on('disconnect', (reason: string) => {
       console.log('Disconected:', reason);
     });
 

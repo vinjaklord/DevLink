@@ -1,21 +1,21 @@
-import { 
-  Card, 
-  CardContent, 
-  CardHeader, 
-  CardTitle, 
-  Input, 
-  Button, 
-  Form, 
-  FormField, 
-  FormItem, 
-  FormControl, 
-  FormLabel, 
-  FormMessage
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Input,
+  Button,
+  Form,
+  FormField,
+  FormItem,
+  FormControl,
+  FormLabel,
+  FormMessage,
 } from '@/Components/ui';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import useStore from '../../hooks/useStore';
+import useStore from '../../../hooks/useStore';
 import { Link } from 'react-router-dom';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -68,9 +68,7 @@ export function LoginPage() {
   return (
     <div className="flex justify-center items-center h-[80vh] relative overflow-hidden pt-5">
       {/* Background dark horizontal box */}
-      <div
-        className="background-box bg-secondary w-[85%] h-[280px] rounded-md flex items-center justify-between px-12 overflow-hidden"
-      >
+      <div className="background-box bg-secondary w-[85%] h-[280px] rounded-md flex items-center justify-between px-12 overflow-hidden">
         <div className="max-w-md">
           <h2 className="text-2xl font-semibold mb-3">Don’t have an account?</h2>
           <p className="text-sm mb-8 leading-relaxed">
@@ -84,10 +82,12 @@ export function LoginPage() {
       </div>
 
       {/* Floating login card */}
-      <Card className={clsx(
-        'absolute top-1/2 -translate-y-1/2 w-[450px] max-[1300px]:w-[550px] max-[700px]:w-full shadow-xl rounded-md transition-all duration-700 ease-in-out',
-        'right-[10%] max-[1300px]:right-0 max-[1300px]:left-1/2 max-[1300px]:-translate-x-1/2'
-      )}>
+      <Card
+        className={clsx(
+          'absolute top-1/2 -translate-y-1/2 w-[450px] max-[1300px]:w-[550px] max-[700px]:w-full shadow-xl rounded-md transition-all duration-700 ease-in-out',
+          'right-[10%] max-[1300px]:right-0 max-[1300px]:left-1/2 max-[1300px]:-translate-x-1/2'
+        )}
+      >
         <CardHeader className="pb-2">
           <CardTitle className="text-lg tracking-wide">LOGIN</CardTitle>
         </CardHeader>
@@ -103,17 +103,21 @@ export function LoginPage() {
                   <FormItem>
                     <div className="flex items-center justify-between">
                       <FormLabel>Username</FormLabel>
-                      <FormMessage className="text-xs" >
+                      <FormMessage className="text-xs">
                         <span>
-                          {form.formState.errors.username?.message || form.formState.errors.root?.message}
+                          {form.formState.errors.username?.message ||
+                            form.formState.errors.root?.message}
                         </span>
                       </FormMessage>
                     </div>
                     <FormControl>
                       <Input
                         placeholder="Enter your username"
-                        className={`${form.formState.errors.username || form.formState.errors.root ? 'border border-red-500 shake' : ''
-                          }`}
+                        className={`${
+                          form.formState.errors.username || form.formState.errors.root
+                            ? 'border border-red-500 shake'
+                            : ''
+                        }`}
                         {...field}
                       />
                     </FormControl>
@@ -129,9 +133,10 @@ export function LoginPage() {
                   <FormItem className="relative mt-6">
                     <div className="flex items-center justify-between">
                       <FormLabel>Password</FormLabel>
-                      <FormMessage className="text-xs" >
+                      <FormMessage className="text-xs">
                         <span>
-                          {form.formState.errors.username?.message || form.formState.errors.root?.message}
+                          {form.formState.errors.username?.message ||
+                            form.formState.errors.root?.message}
                         </span>
                       </FormMessage>
                     </div>
@@ -140,8 +145,11 @@ export function LoginPage() {
                         <Input
                           type={showPassword ? 'text' : 'password'}
                           placeholder="Enter your password"
-                          className={`${form.formState.errors.password || form.formState.errors.root ? 'border border-red-500 shake' : ''
-                            }`}
+                          className={`${
+                            form.formState.errors.password || form.formState.errors.root
+                              ? 'border border-red-500 shake'
+                              : ''
+                          }`}
                           {...field}
                         />
                         <Button
@@ -151,7 +159,11 @@ export function LoginPage() {
                           onClick={togglePasswordVisibility}
                           className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 text-gray-500 hover:bg-transparent"
                         >
-                          {showPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
+                          {showPassword ? (
+                            <EyeSlashIcon className="h-5 w-5" />
+                          ) : (
+                            <EyeIcon className="h-5 w-5" />
+                          )}
                         </Button>
                       </div>
                     </FormControl>
@@ -177,7 +189,6 @@ export function LoginPage() {
               >
                 <Link to="/signup">Sign Up</Link>
               </Button>
-
             </form>
           </Form>
         </CardContent>

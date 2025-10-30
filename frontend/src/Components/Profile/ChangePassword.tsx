@@ -56,7 +56,6 @@ const ChangePassword = () => {
             />
           </div>
         </div>
-
         <div className="space-y-6">
           <div className="space-y-1.5">
             <div className="text-sm text-zinc-400 flex items-center gap-2">
@@ -69,7 +68,7 @@ const ChangePassword = () => {
               name="oldPassword"
               value={formState.oldPassword}
               onChange={handleFormChange}
-              className="px-4 py-2.5 bg-base-200 rounded-lg border w-full"
+              className="px-4 py-2.5 bg-base-200 rounded-lg border w-full placeholder-zinc-700"
               placeholder="Old Password"
             />
           </div>
@@ -84,7 +83,7 @@ const ChangePassword = () => {
               name="newPassword"
               value={formState.newPassword}
               onChange={handleFormChange}
-              className="px-4 py-2.5 bg-base-200 rounded-lg border w-full"
+              className="px-4 py-2.5 bg-base-200 rounded-lg border w-full placeholder-zinc-700"
               placeholder="New Password"
             />
           </div>
@@ -98,7 +97,7 @@ const ChangePassword = () => {
               name="confirmPassword"
               value={formState.confirmPassword}
               onChange={handleFormChange}
-              className="px-4 py-2.5 bg-base-200 rounded-lg border w-full"
+              className="px-4 py-2.5 bg-base-200 rounded-lg border w-full placeholder-zinc-700"
               placeholder="Confirm Password"
             />
           </div>
