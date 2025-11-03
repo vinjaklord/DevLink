@@ -1,4 +1,5 @@
 import useStore from '@/hooks/useStore';
+import type { IMember } from '@/models/member.model';
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -11,7 +12,7 @@ export default function FriendsBar() {
     fetchFriends();
   }, [fetchFriends]);
 
-  const handleFriendClick = (friend) => {
+  const handleFriendClick = (friend: IMember) => {
     setSelectedUser(friend);
   };
 

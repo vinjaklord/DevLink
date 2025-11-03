@@ -1,12 +1,22 @@
+//React
 import { useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom'; // Remove BrowserRouter import
-import useStore from './hooks/useStore';
-import Header from './Components/Header/Header';
-import { Signup } from './Components/SignUp/Signup';
-import { LoginPage } from './Components/pages/Login/LoginPage';
-import './App.css';
+import { Routes, Route, Navigate } from 'react-router-dom';
+
+//3rd lib
 import { Toaster } from 'sonner';
-import Feed from './Components/pages/MainFeed/Feed';
+
+//Hooks
+import useStore from './hooks/useStore';
+
+//Auth
+import { ResetPasswordPage } from './pages/auth/ResetPasswordPage';
+import { SetNewPasswordPage } from './pages/auth/SetNewPasswordPage';
+import { SignupPage } from './pages/auth/SignupPage';
+import { LoginPage } from './pages/auth/LoginPage';
+
+import Header from './Components/Header/Header';
+import './App.css';
+import FeedPage from './pages/feed/FeedPage';
 import AddPost from './Components/AddPost/AddPost';
 import EditProfile from './Components/Profile/EditProfile';
 import ChangePassword from './Components/Profile/ChangePassword';
@@ -14,8 +24,6 @@ import { Post } from './Components/Feed/MainFeed/Post';
 import Profile from './Components/Profile/Profile';
 import MessagePage from './Components/MessagePage/MessagePage';
 import MemberProfile from './Components/Profile/MemberProfile';
-import { ResetPassword } from './Components/ForgotPassword/ResetPassword';
-import { SetNewPassword } from './Components/ForgotPassword/SetNewPassword';
 import SharePost from './Components/Feed/MainFeed/SharePost';
 import FooterNav from './Components/Footer/Footer';
 import { SearchResults } from './Components/SearchResults/SearchResults';
@@ -52,7 +60,7 @@ function App() {
     <>
       <Routes>
         {/* Add your routes here when ready */}
-        <Route path="/" element={<Feed />} />
+        <Route path="/" element={<FeedPage />} />
         <Route path="/edit-profile" element={<EditProfile />} />
         <Route path="/change-password" element={<ChangePassword />} />
         <Route path="/posts/:id" element={<Post />} />
@@ -72,21 +80,13 @@ function App() {
     </>
   );
 
-  // Define routes for users who are not logged in
   const routerNotLoggedIn = (
     <Routes>
-      <Route path="/signup" element={<Signup />} />
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/set-new-password" element={<SetNewPassword />} />
+      <Route path="/signup" element={<SignupPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
+      <Route path="/set-new-password" element={<SetNewPasswordPage />} />
       <Route path="*" element={<Navigate to="/login" replace />} />
-      {/* Add other routes as needed */}
-      {/* <Route path="/" element={<Feed />} /> */}
-      {/* <Route path="/news" element={<NewsPage />} /> */}
-      {/* <Route path="/calendar" element={<TablePage />} /> */}
-      {/* <Route path="/calculator" element={<CalculatorPage />} /> */}
-      {/* <Route path="/calculator/position-size" element={<PositionSizePage />} /> */}
-      {/* <Route path="/calculator/currency-converter" element={<CurrencyConverterPage />} /> */}
     </Routes>
   );
 

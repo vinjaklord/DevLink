@@ -1,3 +1,19 @@
+//React
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+
+//Hooks
+import { useStore } from '@/hooks';
+import { useEnter } from '@/hooks';
+
+//3rd lib
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { EyeIcon, EyeSlashIcon } from '@phosphor-icons/react';
+import { toast } from 'sonner';
+import { clsx } from 'clsx';
 import {
   Card,
   CardContent,
@@ -12,24 +28,13 @@ import {
   FormLabel,
   FormMessage,
 } from '@/Components/ui';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import useStore from '../../../hooks/useStore';
-import { Link } from 'react-router-dom';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { EyeIcon, EyeSlashIcon } from '@phosphor-icons/react';
-import { toast } from 'sonner';
-import useEnter from '@/hooks/useEnter';
-import { clsx } from 'clsx';
 
 const FormSchema = z.object({
   username: z.string().min(1, 'Username is required'),
   password: z.string().min(1, 'Password is required'),
 });
 
-export function LoginPage() {
+export function LoginForm() {
   const { memberLogin } = useStore((state) => state);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
@@ -47,11 +52,9 @@ export function LoginPage() {
   const { setError } = form;
 
   const handleLogin = form.handleSubmit(async (values) => {
-    // Attempt login
     const result = await memberLogin(values);
 
     if (result) {
-      // Navigate to dashboard on successful login
       toast.success('Logged in succesfully! Enjoy!');
       navigate('/');
     } else {
@@ -181,7 +184,7 @@ export function LoginPage() {
                 Log In
               </Button>
 
-              {/* Sign Up button shown only under 1300px */}
+              {/* Sign Up button that is shown only under 1300px */}
               <Button
                 asChild
                 variant="outline"

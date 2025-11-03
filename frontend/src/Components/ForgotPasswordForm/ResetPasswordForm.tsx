@@ -1,3 +1,14 @@
+//React
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+
+//Hooks
+import { useStore } from '@/hooks';
+
+//3rd lib
+import { toast } from 'sonner';
+import z from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { 
   Form, 
   FormField, 
@@ -11,19 +22,13 @@ import {
   CardContent, 
   CardHeader, 
   CardTitle
- } from '@/Components/ui';
-import { useState } from 'react';
-import useStore from '../../hooks/useStore';
-import { toast } from 'sonner';
-import z from 'zod';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+} from '@/Components/ui';
 
 const ResetSchema = z.object({
   email: z.string().min(1, 'Email is required').email('Invalid email format'),
 });
 
-export function ResetPassword() {
+export function ResetPasswordForm() {
   const { memberResetPassword } = useStore((state) => state);
   const [emailSent, setEmailSent] = useState(false);
 

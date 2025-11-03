@@ -1,11 +1,18 @@
+//React
 import { useEffect, useRef, useState } from 'react';
-import { Input } from '@/Components/ui';
-import { IoSearch } from 'react-icons/io5';
-import useStore from '../../hooks/useStore.ts';
-import type { IMember } from '@/models/member.model.ts';
-import { useOutsideClick } from '@/hooks/useOutsideClick.ts';
 import { Link, useNavigate } from 'react-router-dom';
-import { useWindowWidth } from '@/hooks/useWindowWidth.ts';
+import { IoSearch } from 'react-icons/io5';
+
+//Hooks
+import { useStore } from '@/hooks';
+import { useOutsideClick } from '@/hooks';
+import { useWindowWidth } from '@/hooks';
+
+//Models
+import type { IMember } from '@/models/member.model.ts';
+
+//3rd lib
+import { Input } from '@/Components/ui';
 
 interface SearchBarProps {
   buttonMode?: boolean;

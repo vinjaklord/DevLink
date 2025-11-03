@@ -1,3 +1,18 @@
+//React
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useNavigate, Link } from 'react-router-dom';
+import { EyeIcon, EyeSlashIcon } from '@phosphor-icons/react';
+
+//Hooks
+import { useStore } from '@/hooks';
+import { useEnter } from '@/hooks';
+
+//3rd lib
+import { toast } from 'sonner';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import clsx from 'clsx';
 import {
   Form,
   FormField, 
@@ -11,19 +26,6 @@ import {
   CardContent
 } from '@/Components/ui';
 
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import useStore from '../../hooks/useStore';
-import { EyeIcon, EyeSlashIcon } from '@phosphor-icons/react';
-import { toast } from 'sonner';
-import useEnter from '@/hooks/useEnter';
-
-
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import clsx from 'clsx';
-
 const SignupSchema = z
   .object({
     firstName: z.string().min(1, 'First name is required'),
@@ -35,14 +37,16 @@ const SignupSchema = z
       .email('Invalid email format'),
     password: z.string().min(1, 'Password is required'),
     confirmPassword: z.string().min(1, 'Please confirm your password'),
-    // photo can stay commented out / optional
+    photo: z.any().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Passwords do not match',
     path: ['confirmPassword'],
-  });
+});
 
-export function Signup() {
+export type UserData = z.infer<typeof SignupSchema>;
+
+export function SignUpForm() {
   const { memberSignup } = useStore((state) => state);
   const navigate = useNavigate();
 

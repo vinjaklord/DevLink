@@ -1,14 +1,19 @@
-import useStore from '@/hooks/useStore';
+//React
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Heart, MessageSquare, SendIcon, MoreVertical, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+
+//Hooks
+import useStore from '@/hooks/useStore';
+
+//3rd lib
+import { Heart, MessageSquare, SendIcon, MoreVertical, Loader2 } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuContent,
-} from '@/Components/ui/dropdown-menu';
+} from '@/Components/ui';
 
 const Post = () => {
   const { id } = useParams();

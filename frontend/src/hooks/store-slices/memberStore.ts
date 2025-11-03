@@ -39,7 +39,7 @@ export interface MemberStore {
   memberSignup: (data: SignupCredentials) => Promise<boolean>;
   memberLogout: () => void;
   memberLogin: (data: LoginCredentials) => Promise<boolean>;
-  memberResetPassword: (data: string) => Promise<boolean>;
+  memberResetPassword: (data: {email: string}) => Promise<boolean>;
   memberSetNewPassword: (data: ForgotPasswordData) => Promise<boolean>;
   memberCheck: () => void;
   memberRefreshMe: () => void;
@@ -377,7 +377,7 @@ export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = 
     }
   },
 
-  memberResetPassword: async (data: string) => {
+  memberResetPassword: async (data: {email: string}) => {
     try {
       await fetchAPI({
         method: 'post',

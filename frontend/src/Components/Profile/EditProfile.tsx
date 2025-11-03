@@ -1,9 +1,14 @@
-import useStore from '@/hooks/useStore';
+//React
 import { useEffect } from 'react';
+
+//Hooks
+import useStore from '@/hooks/useStore';
 import useForm from '@/hooks/useForm';
+
+//3rd lib
 import { Camera, Mail, User, AtSign } from 'lucide-react';
 import { toast } from 'sonner';
-import type { UserData } from '../SignUp/Signup';
+import type { UserData } from '../AuthForm/SignUpForm';
 
 const EditProfile = () => {
   const { loggedInMember, isUpdatingProfile, editProfile } = useStore();

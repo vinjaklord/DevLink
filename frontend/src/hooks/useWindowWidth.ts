@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export function useWindowWidth(threshold: number) {
+export default function useWindowWidth(threshold: number) {
   const [isWide, setIsWide] = useState(() => window.innerWidth >= threshold);
 
   useEffect(() => {

@@ -1,3 +1,12 @@
+//React
+import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+
+//Hooks
+import useForm from '../../hooks/useForm';
+import { useStore } from '@/hooks';
+
+//3rd lib
 import {
   Card,
   CardContent,
@@ -7,16 +16,12 @@ import {
   Input,
   Button,
 } from '@/Components/ui';
-import { useState } from 'react';
-import useForm from '../../hooks/useForm';
-import useStore from '../../hooks/useStore';
-import { useSearchParams } from 'react-router-dom';
 
 type UserData = {
   password: string;
 };
 
-export function SetNewPassword() {
+export function SetNewPasswordForm() {
   const { memberSetNewPassword } = useStore((state) => state);
   const [emailSent, setEmailSent] = useState(false);
   const { formState, handleFormChange } = useForm<UserData>({ password: '' });
@@ -25,14 +30,10 @@ export function SetNewPassword() {
   const token = searchParams.get('t');
 
   const handleSetNewPassword = async () => {
-    // A crucial debugging step:
-    console.log('Token extracted from URL:', token);
-
-    // This is the call on line 37 that ultimately leads to memberSetNewPassword
     if (token) {
       await memberSetNewPassword({
         password: formState.password,
-        t: token, // Pass the actual token string
+        t: token,
       });
     }
   };
@@ -73,11 +74,11 @@ export function SetNewPassword() {
 
                 <Button
                   onClick={async () => {
-                    setEmailSent(true); // always show success UI
+                    setEmailSent(true);
                     try {
-                      await handleSetNewPassword(); // still perform request
+                      await handleSetNewPassword(); 
                     } catch (err) {
-                      console.error(err); // never expose error to user
+                      console.error(err); 
                     }
                   }}
                   className="uppercase tracking-wide w-full"
