@@ -1,12 +1,12 @@
 import { Separator } from '@/Components/ui';
 import { ModeToggle } from '@/ModeToggle/ModeToggle';
-import SearchBar from './SearchBar';
-import AppNameAndLogo from './AppNameAndLogo';
-import AvatarIcon from './AvatarIcon';
+import SearchBar from './HeaderComponets/SearchBar';
+import AppNameAndLogo from './HeaderComponets/AppNameAndLogo';
+import AvatarIcon from './HeaderComponets/AvatarIcon';
 import useStore from '@/hooks/useStore';
 import { NavLink, useLocation } from 'react-router-dom';
 import { HouseIcon, CameraPlusIcon, ChatsCircleIcon } from '@phosphor-icons/react';
-import Notifications from './Notifications';
+import Notifications from './HeaderComponets/Notifications';
 
 export default function Navbar() {
   const { setShowAddPost, loggedInMember } = useStore((state) => state);
