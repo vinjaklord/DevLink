@@ -1,11 +1,17 @@
+//React
 import { useEffect, useMemo, useState } from 'react';
-import useStore from '@/hooks/useStore';
-import SidebarSkeleton from './SidebarLoading';
 import { Users, Search } from 'lucide-react';
+
+//Hooks
+import useStore from '@/hooks/useStore';
+
+//Utils
 import { formatSidebarMessage } from '@/utils/messageFormat';
 import { formatRelativeTime } from '@/utils/lastSentFormat';
 
-const Sidebar = () => {
+import ChatSidebarSkeleton from './ChatSidebarLoading';
+
+const ChatSidebar = () => {
   const {
     friends,
     fetchFriends,
@@ -49,7 +55,7 @@ const Sidebar = () => {
     });
   }, [filteredFriends, lastMessages]);
 
-  if (isUsersLoading) return <SidebarSkeleton />;
+  if (isUsersLoading) return <ChatSidebarSkeleton />;
 
   return (
     <aside className="h-full w-20 lg:w-72 border-r border-base-300 flex flex-col transition-all duration-200">
@@ -123,4 +129,4 @@ const Sidebar = () => {
     </aside>
   );
 };
-export default Sidebar;
+export default ChatSidebar;

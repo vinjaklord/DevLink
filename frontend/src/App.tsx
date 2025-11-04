@@ -22,7 +22,7 @@ import ChatPage from './pages/chat/ChatPage';
 import Header from './Components/Header/Header';
 import './App.css';
 import FeedPage from './pages/feed/FeedPage';
-import AddPost from './Components/AddPost/AddPost';
+import AddPostForm from './Components/Posts/AddPostForm';
 import EditProfile from './Components/Profile/EditProfile';
 import ChangePassword from './Components/Profile/ChangePassword';
 import { Post } from './Components/Posts/Post';
@@ -74,7 +74,7 @@ function App() {
         <Route path="/results" element={<SearchResults />} />
         {/* <Route path="/post" element={<Post />} /> */}
       </Routes>
-      <AddPost isOpen={showAddPost} onClose={() => setShowAddPost(false)} />
+      <AddPostForm isOpen={showAddPost} onClose={() => setShowAddPost(false)} />
       <SharePost
         isOpen={showSharePost}
         onClose={() => {

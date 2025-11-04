@@ -1,9 +1,12 @@
-import useStore from '@/hooks/useStore';
-import type { IMember } from '@/models/member.model';
+//React
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-export default function FriendsBar() {
+//Hooks n Models
+import useStore from '@/hooks/useStore';
+import type { IMember } from '@/models/member.model';
+
+export default function FriendsSidebar() {
   const { friends, friendsLoading, friendsError, fetchFriends, setSelectedUser } = useStore(
     (state) => state
   );

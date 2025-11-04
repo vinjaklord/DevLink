@@ -1,4 +1,4 @@
-import FriendsBar from '@/Components/Feed/FriendsBar/FriendsBar';
+import FriendsSidebar from '@/Components/Feed/FriendsSidebar/FriendsBar';
 import type { FC } from 'react';
 import { PostFeed } from '@/Components/Posts/PostsFeed';
 import { useWindowWidth } from '@/hooks';
@@ -24,7 +24,7 @@ export default function FeedPage() {
       </div>
       {isWideEnough && (
         <div className="flex-[0_0_16rem] bg-[--sidebar]">
-          <FriendsBar />
+          <FriendsSidebar />
         </div>
       )}
     </div>

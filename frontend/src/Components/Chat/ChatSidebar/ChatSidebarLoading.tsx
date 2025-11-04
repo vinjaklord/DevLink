@@ -1,6 +1,6 @@
 import { Users } from 'lucide-react';
 
-const SidebarSkeleton = () => {
+const ChatSidebarSkeleton = () => {
   const skeletonContacts = Array(8).fill(null);
 
   return (
@@ -36,4 +36,4 @@ const SidebarSkeleton = () => {
   );
 };
 
-export default SidebarSkeleton;
+export default ChatSidebarSkeleton;

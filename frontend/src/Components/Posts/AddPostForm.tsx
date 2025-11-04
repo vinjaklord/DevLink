@@ -20,7 +20,7 @@ type PostData = {
   photo: unknown;
 };
 
-export default function AddPost({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+export default function AddPostForm({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const { uploadPost, setShowAddPost, memberRefreshMe } = useStore((state) => state);
   const { formState, handleFormChange } = useForm<PostData>({
     caption: '',

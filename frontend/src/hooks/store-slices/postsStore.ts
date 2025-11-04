@@ -253,14 +253,14 @@ const createPostsSlice: StateCreator<StoreState, [], [], PostsStore> = (set, get
       set((state) => ({
         friendsPosts: state.friendsPosts.map((post) =>
           post._id === postId
-            ? { ...post, comments: [...post.comments, response.data.comment] }
+            ? { ...post, comments: [...(state.currentPost?.comments ?? []), response.data.comment] }
             : post
         ),
         currentPost:
           state.currentPost?._id === postId
             ? {
                 ...state.currentPost,
-                comments: [...state.currentPost.comments, response.data.comment],
+                comments: [...(state.currentPost?.comments ?? []), response.data.comment],
               }
             : state.currentPost,
       }));
