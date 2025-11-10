@@ -55,15 +55,30 @@ const getRecommendations = async (req, res, next) => {
       (currentUser.location.coordinates.coordinates[0] === 0 &&
         currentUser.location.coordinates.coordinates[1] === 0)
     ) {
-      // Fallback: return random users (no location available)
+      // Fallback: return random users with valid location
       const randomUsers = await Member.find({
         _id: { $nin: excludedIds },
+        'location.coordinates.coordinates.0': { $exists: true, $ne: 0 },
+        'location.coordinates.coordinates.1': { $exists: true, $ne: 0 },
       })
         .select('username firstName lastName photo location')
         .limit(20)
         .lean();
 
-      return res.json(randomUsers);
+      // Format response
+      const formatted = randomUsers.map((user) => ({
+        _id: user._id,
+        username: user.username,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        photo: user.photo,
+        location: {
+          city: user.location?.city,
+          country: user.location?.country,
+        },
+      }));
+
+      return res.json(formatted);
     }
 
     const [userLng, userLat] = currentUser.location.coordinates.coordinates;
@@ -81,9 +96,15 @@ const getRecommendations = async (req, res, next) => {
           spherical: true,
           query: {
             _id: { $nin: excludedIds },
-            'location.coordinates.coordinates.0': { $ne: 0 }, // Exclude users without valid location
-            'location.coordinates.coordinates.1': { $ne: 0 },
+            'location.coordinates.coordinates': { $exists: true, $ne: null },
           },
+        },
+      },
+      {
+        $match: {
+          // Additional filter to ensure valid coordinates
+          'location.coordinates.coordinates.0': { $ne: 0 },
+          'location.coordinates.coordinates.1': { $ne: 0 },
         },
       },
       {
