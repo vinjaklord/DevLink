@@ -30,10 +30,8 @@ import {
 import ImageUploader from '../../constant/ImageUploader';
 
 const AddPostSchema = z.object({
-  caption: z.string().optional(),
-  photo: z.any().refine((file) => file !== null && file !== undefined, {
-    message: 'Please select a photo',
-  }),
+  caption: z.string().min(1, "Description is required"),
+  photo: z.any().optional()
 });
 
 type AddPostData = z.infer<typeof AddPostSchema>;
