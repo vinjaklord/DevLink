@@ -35,11 +35,12 @@ export interface MemberStore {
   searchMembersFriends: (q: string) => Promise<IMember[]>;
   searchMembersWide: (q: string, limit?: number) => Promise<IMember[]>;
   getMemberById: (id: string) => Promise<IMember>;
+  deleteMember: (id: string) => Promise<any>;
   getMemberByUsername: (username: string) => Promise<IMember>;
   memberSignup: (data: SignupCredentials) => Promise<boolean>;
   memberLogout: () => void;
   memberLogin: (data: LoginCredentials) => Promise<boolean>;
-  memberResetPassword: (data: {email: string}) => Promise<boolean>;
+  memberResetPassword: (data: { email: string }) => Promise<boolean>;
   memberSetNewPassword: (data: ForgotPasswordData) => Promise<boolean>;
   memberCheck: () => void;
   memberRefreshMe: () => void;
@@ -377,7 +378,7 @@ export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = 
     }
   },
 
-  memberResetPassword: async (data: {email: string}) => {
+  memberResetPassword: async (data: { email: string }) => {
     try {
       await fetchAPI({
         method: 'post',
@@ -414,6 +415,29 @@ export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = 
       return false;
     }
   },
+
+  deleteMember: async (id: string) => {
+    const token = localStorage.getItem('lh_token');
+    if (!token) throw new Error('No token found');
+
+    try {
+      await fetchAPI({
+        method: 'post',
+        url: `/members/${id}`,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      toast.success('Member deleted');
+      return true;
+    } catch (error: any) {
+      console.error('error in updating profile', error);
+      toast.error(error.response?.data?.message || error.message || 'Update failed');
+      return false;
+    }
+  },
+
   connectSocket: () => {
     const { loggedInMember, socket } = get();
     if (!loggedInMember) {

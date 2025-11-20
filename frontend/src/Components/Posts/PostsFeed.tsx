@@ -1,8 +1,8 @@
 import useStore from '@/hooks/useStore';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-
 import { Heart, MessageSquare, SendIcon } from 'lucide-react';
+import FriendRecommendations from '@/utils/friendRecommendations';
 
 const PostFeed = () => {
   const {
@@ -15,23 +15,22 @@ const PostFeed = () => {
     loggedInMember,
     setShowSharePost,
     setSharePostId,
+    addFriend,
   } = useStore((state) => state);
 
-  const [commentInputs, setCommentInputs] = useState<{ [key: string]: string }>({});
-
-  // NEW: States for infinite scroll
+  const [commentInputs, setCommentInputs] = useState<Record<string, string>>({});
   const [displayedPosts, setDisplayedPosts] = useState<any[]>([]);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const loaderRef = useRef<HTMLDivElement>(null);
 
-  const POSTS_PER_PAGE = 10; // Load 10 posts at a time
+  const POSTS_PER_PAGE = 10;
+  const RECOMMENDATION_INSERT_INDEX = 5;
 
   useEffect(() => {
     fetchFriendsPosts();
   }, [fetchFriendsPosts]);
 
-  // NEW: Helper to dedupe posts by _id (preserves first occurrence)
   const dedupePosts = useCallback((posts: any[]) => {
     const seen = new Set();
     return posts.filter((post) => {
@@ -41,24 +40,18 @@ const PostFeed = () => {
     });
   }, []);
 
-  // NEW: Function to load more posts
   const loadMorePosts = useCallback(() => {
     if (!friendsPosts || friendsPosts.length === 0) return;
 
-    // Reverse the array once to get newest first
     let reversedPosts = [...friendsPosts].reverse();
-
-    // Dedupe here to prevent accumulation of duplicates in displayedPosts
     reversedPosts = dedupePosts(reversedPosts);
 
-    // Calculate which posts to show
-    const startIndex = page * POSTS_PER_PAGE; // 0 * 10 = 0
-    const endIndex = startIndex + POSTS_PER_PAGE; // 0 + 10 = 10
+    const startIndex = page * POSTS_PER_PAGE;
+    const endIndex = startIndex + POSTS_PER_PAGE;
     const newPosts = reversedPosts.slice(startIndex, endIndex);
 
     if (newPosts.length > 0) {
       setDisplayedPosts((prev) => {
-        // Also dedupe against existing displayedPosts to be extra safe
         const existingIds = new Set(prev.map((p) => p._id));
         const filteredNewPosts = newPosts.filter((p) => !existingIds.has(p._id));
         return [...prev, ...filteredNewPosts];
@@ -66,31 +59,27 @@ const PostFeed = () => {
       setPage((prev) => prev + 1);
     }
 
-    // If the endIndex is bigger the lenght of the posts === No more posts
     if (endIndex >= reversedPosts.length) {
       setHasMore(false);
     }
   }, [friendsPosts, page, dedupePosts]);
 
-  // NEW: Load initial posts when friendsPosts changes
   useEffect(() => {
     if (friendsPosts && friendsPosts.length > 0 && displayedPosts.length === 0) {
       loadMorePosts();
     }
-  }, [friendsPosts]);
+  }, [friendsPosts, loadMorePosts, displayedPosts.length]);
 
-  // NEW: Intersection Observer for infinite scroll
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        // When the loader element comes into view AND we have more posts
         if (entries[0].isIntersecting && hasMore && !loading) {
           loadMorePosts();
         }
       },
       {
-        threshold: 0.1, // Trigger when 10% of the element is visible
-        rootMargin: '100px', // Start loading 100px before reaching the bottom
+        threshold: 0.1,
+        rootMargin: '100px',
       }
     );
 
@@ -98,11 +87,9 @@ const PostFeed = () => {
       observer.observe(loaderRef.current);
     }
 
-    // Cleanup: disconnect observer when component unmounts
     return () => observer.disconnect();
   }, [hasMore, loading, loadMorePosts]);
 
-  // NEW: Reset pagination when friendsPosts changes (e.g., new post added)
   useEffect(() => {
     setDisplayedPosts([]);
     setPage(0);
@@ -117,13 +104,69 @@ const PostFeed = () => {
     e.preventDefault();
     const text = commentInputs[postId]?.trim();
     if (!text) return;
+
+    // Optimistic update: Add temp comment to local displayedPosts
+    const tempComment = {
+      _id: `temp-${Date.now()}`,
+      author: loggedInMember, // Assumes shape matches { _id, username }
+      text,
+      createdAt: new Date().toISOString(),
+    };
+
+    setDisplayedPosts((prev) =>
+      prev.map((post) =>
+        post._id === postId
+          ? {
+              ...post,
+              comments: [...(post.comments || []), tempComment],
+            }
+          : post
+      )
+    );
+
     try {
       await addComment(postId, { text });
-      setCommentInputs((prev) => ({ ...prev, [postId]: '' }));
+      // Store updates; local stays in sync via optimistic add (real data syncs on next fetch)
     } catch (err) {
       console.error('Error adding comment:', err);
+      // Revert on error
+      setDisplayedPosts((prev) =>
+        prev.map((post) =>
+          post._id === postId
+            ? {
+                ...post,
+                comments: post.comments?.filter((c: any) => c._id !== tempComment._id) || [],
+              }
+            : post
+        )
+      );
     }
+
+    setCommentInputs((prev) => ({ ...prev, [postId]: '' }));
   };
+
+  // Add this useCallback near your other handlers (e.g., after handleCommentSubmit)
+  const handleToggleLike = useCallback(
+    (postId: string) => {
+      // Optimistic update: Toggle like in local displayedPosts
+      setDisplayedPosts((prev) =>
+        prev.map((post) =>
+          post._id === postId
+            ? {
+                ...post,
+                likes: post.likes?.includes(loggedInMember?._id)
+                  ? post.likes.filter((id: string) => id !== loggedInMember?._id)
+                  : [...(post.likes || []), loggedInMember?._id],
+              }
+            : post
+        )
+      );
+
+      // Call store action
+      toggleLike(postId);
+    },
+    [loggedInMember?._id, toggleLike]
+  );
 
   if (loading && displayedPosts.length === 0) {
     return <p className="text-center text-foreground">Loading...</p>;
@@ -147,128 +190,125 @@ const PostFeed = () => {
 
   return (
     <div className="max-w-[37.5rem] mx-auto space-y-6 px-4">
-      {/* CHANGED: Map through displayedPosts instead of friendsPosts */}
-      {displayedPosts.map((post) => (
-        <div
-          key={post._id}
-          className="bg-card dark:bg-card shadow-lg rounded-lg border border-border overflow-hidden"
-        >
-          {/* Header */}
-          <div className="flex items-center p-3 border-b border-border">
-            <img
-              src={post.author?.photo?.url || '/default-avatar.png'}
-              alt="Author"
-              className="w-8 h-8 rounded-full mr-2 object-cover"
-            />
-            <button>
+      {displayedPosts.map((post, index) => (
+        <>
+          <div
+            key={post._id}
+            className="bg-card dark:bg-card shadow-lg rounded-lg border border-border overflow-hidden"
+          >
+            <div className="flex items-center p-3 border-b border-border">
+              <img
+                src={post.author?.photo?.url || '/default-avatar.png'}
+                alt="Author"
+                className="w-8 h-8 rounded-full mr-2 object-cover"
+              />
               <Link
                 to={`/members/${post.author?.username}`}
                 className="font-semibold text-foreground text-sm"
               >
                 {post.author?.username || 'Unknown'}
               </Link>
-            </button>
-          </div>
-          {/* Image */}
-          <div className="relative w-full aspect-square">
-            <img src={post.imageUrl} alt="Post" className="w-full h-full object-cover" />
-          </div>
-          {/* Like and Comment */}
-          <div className="p-3 border-b border-border">
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => toggleLike(post._id)}
-                className="flex items-center text-foreground hover:text-primary transition-colors"
-              >
-                {post.likes?.includes(loggedInMember?._id) ? (
-                  <Heart className="w-6 h-6 text-destructive fill-destructive" />
-                ) : (
-                  <Heart className="w-6 h-6" />
-                )}
-                <span className="ml-1 text-sm">{post.likes?.length || 0}</span>
-              </button>
-              <Link
-                to={`/posts/${post._id}`}
-                className="flex items-center text-foreground hover:text-primary transition-colors"
-              >
-                <MessageSquare className="w-6 h-6" />
-                <span className="ml-1 text-sm">{post.comments?.length || 0}</span>
-              </Link>
-              <button
-                className="flex items-center text-foreground hover:text-primary transition-colors"
-                onClick={() => {
-                  setSharePostId(post._id);
-                  setShowSharePost(true);
-                }}
-              >
-                <SendIcon className="w-6 h-6" />
-              </button>
             </div>
-          </div>
-          {/* Caption */}
-          <div className="px-3 py-2">
-            <p className="text-foreground text-sm text-left flex items-start pb-2.5">
-              <button>
+            <div className="relative w-full aspect-square">
+              <img src={post.imageUrl} alt="Post" className="w-full h-full object-cover" />
+            </div>
+            <div className="p-3 border-b border-border">
+              <div className="flex items-center space-x-4">
+                <button
+                  onClick={() => handleToggleLike(post._id)}
+                  className="flex items-center text-foreground hover:text-primary transition-colors"
+                >
+                  {post.likes?.includes(loggedInMember?._id) ? (
+                    <Heart className="w-6 h-6 text-destructive fill-destructive" />
+                  ) : (
+                    <Heart className="w-6 h-6" />
+                  )}
+                  <span className="ml-1 text-sm">{post.likes?.length || 0}</span>
+                </button>
+                <Link
+                  to={`/posts/${post._id}`}
+                  className="flex items-center text-foreground hover:text-primary transition-colors"
+                >
+                  <MessageSquare className="w-6 h-6" />
+                  <span className="ml-1 text-sm">{post.comments?.length || 0}</span>
+                </Link>
+                <button
+                  className="flex items-center text-foreground hover:text-primary transition-colors"
+                  onClick={() => {
+                    setSharePostId(post._id);
+                    setShowSharePost(true);
+                  }}
+                >
+                  <SendIcon className="w-6 h-6" />
+                </button>
+              </div>
+            </div>
+            <div className="px-3 py-2">
+              <p className="text-foreground text-sm text-left flex items-start pb-2.5">
                 <Link to={`/members/${post.author?.username}`} className="font-bold mr-2">
                   {post.author?.username || 'Unknown'}
                 </Link>
-              </button>
-              <span className="flex-1">{post.caption}</span>
-            </p>
-          </div>
-          {/* Comments */}
-          <div className="px-3 pb-2 max-h-60 overflow-y-auto">
-            {post?.comments?.length > 0 ? (
-              [...post.comments]
-                .slice(-3)
-                .reverse()
-                .map((comment, index) => (
-                  <div
-                    key={index}
-                    className="text-sm text-muted-foreground mb-2 flex items-start text-left "
-                  >
-                    <button>
+                <span className="flex-1">{post.caption}</span>
+              </p>
+            </div>
+            <div className="px-3 pb-2 max-h-60 overflow-y-auto">
+              {post?.comments?.length > 0 ? (
+                [...post.comments]
+                  .slice(-3)
+                  .reverse()
+                  .map((comment: any, commentIndex: number) => (
+                    <div
+                      key={commentIndex}
+                      className="text-sm text-muted-foreground mb-2 flex items-start text-left"
+                    >
                       <Link to={`/members/${comment.author?.username}`} className="font-bold mr-2">
                         {comment.author?.username || 'Unknown'}
                       </Link>
-                    </button>
-                    <span className="flex-1">{comment.text}</span>
-                  </div>
-                ))
-            ) : (
-              <p className="text-sm text-muted-foreground">No comments yet.</p>
-            )}
-          </div>
-          {/* See More Comments Button */}
-          {post.comments && post.comments.length > 3 && (
-            <div className="px-3">
-              <Link
-                to={`/posts/${post._id}`}
-                className="text-primary font-extralight text-sm hover:underline flex items-start text-left mb-3 "
-              >
-                See all {post?.comments?.length} comments...
-              </Link>
+                      <span className="flex-1">{comment.text}</span>
+                    </div>
+                  ))
+              ) : (
+                <p className="text-sm text-muted-foreground">No comments yet.</p>
+              )}
             </div>
-          )}
-          {/* Comment Input */}
-          <div className="p-3 border-t border-border">
-            <form onSubmit={(e) => handleCommentSubmit(post._id, e)} className="flex items-center">
-              <input
-                type="text"
-                value={commentInputs[post._id] || ''}
-                onChange={(e) => handleCommentChange(post._id, e.target.value)}
-                placeholder="Add a comment..."
-                className="flex-1 bg-transparent border-none focus:ring-0 text-foreground text-sm placeholder-muted-foreground"
-              />
-              <button type="submit" className="text-primary font-semibold text-sm hover:underline">
-                Post
-              </button>
-            </form>
+            {post.comments && post.comments.length > 3 && (
+              <div className="px-3">
+                <Link
+                  to={`/posts/${post._id}`}
+                  className="text-primary font-extralight text-sm hover:underline flex items-start text-left mb-3"
+                >
+                  See all {post?.comments?.length} comments...
+                </Link>
+              </div>
+            )}
+            <div className="p-3 border-t border-border">
+              <form
+                onSubmit={(e) => handleCommentSubmit(post._id, e)}
+                className="flex items-center"
+              >
+                <input
+                  type="text"
+                  value={commentInputs[post._id] || ''}
+                  onChange={(e) => handleCommentChange(post._id, e.target.value)}
+                  placeholder="Add a comment..."
+                  className="flex-1 bg-transparent border-none focus:ring-0 text-foreground text-sm placeholder-muted-foreground"
+                />
+                <button
+                  type="submit"
+                  className="text-primary font-semibold text-sm hover:underline"
+                >
+                  Post
+                </button>
+              </form>
+            </div>
           </div>
-        </div>
+
+          {index === RECOMMENDATION_INSERT_INDEX - 1 && (
+            <FriendRecommendations key="recommendations" onAddFriend={addFriend} />
+          )}
+        </>
       ))}
 
-      {/* NEW: Loading indicator at the bottom */}
       {hasMore && (
         <div ref={loaderRef} className="py-8 text-center text-muted-foreground">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -276,7 +316,6 @@ const PostFeed = () => {
         </div>
       )}
 
-      {/* NEW: End of feed message */}
       {!hasMore && displayedPosts.length > 0 && (
         <div className="py-8 text-center text-muted-foreground">
           <p>You've reached the end! 🎉</p>
