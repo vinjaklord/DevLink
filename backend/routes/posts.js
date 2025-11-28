@@ -17,6 +17,7 @@ const router = Router();
 
 // Public routes
 router.get('/', getAllPosts);
+router.get('/myPosts', checkToken, getMyPosts);
 router.get('/:id', getPostById);
 router.get('/memberPosts/:username', getMemberPosts);
 
@@ -37,7 +38,6 @@ router.post(
   addComment
 );
 
-router.get('/myPosts', checkToken, getMyPosts);
 router.post('/share', checkToken, sharePost);
 router.put('/:id/likes', checkToken, toggleLike);
 router.delete('/delete/:id', checkToken, deletePost);
