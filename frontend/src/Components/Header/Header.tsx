@@ -4,15 +4,27 @@ import SearchBar from './HeaderComponets/SearchBar';
 import AppNameAndLogo from './HeaderComponets/AppNameAndLogo';
 import AvatarIcon from './HeaderComponets/AvatarIcon';
 import useStore from '@/hooks/useStore';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { HouseIcon, CameraPlusIcon, ChatsCircleIcon } from '@phosphor-icons/react';
 import Notifications from './HeaderComponets/Notifications';
 
 export default function Navbar() {
-  const { setShowAddPost, loggedInMember } = useStore((state) => state);
+  const { setShowAddPost, loggedInMember, fetchFriendsPosts } = useStore((state) => state);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const isResultsPage = location.pathname.startsWith('/results');
+
+  const handleHomeClick = () => {
+    if (location.pathname === '/') {
+      // Already on homepage → scroll + refresh
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      fetchFriendsPosts(); // reload posts
+    } else {
+      // Navigate normally
+      navigate('/');
+    }
+  };
 
   if (!loggedInMember) {
     return (
@@ -32,9 +44,9 @@ export default function Navbar() {
 
       {/* Center Section: NavLinks */}
       <div className="absolute left-1/2 -translate-x-1/2 flex gap-20 max-[1100px]:hidden">
-        <NavLink to="/" className="hover:text-primary">
+        <button onClick={handleHomeClick} className="hover:text-primary">
           <HouseIcon size={32} weight="thin" />
-        </NavLink>
+        </button>
 
         <button onClick={() => setShowAddPost(true)} className="hover:text-primary">
           <CameraPlusIcon size={32} weight="thin" />

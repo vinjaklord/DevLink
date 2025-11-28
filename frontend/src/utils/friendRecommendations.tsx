@@ -86,7 +86,7 @@ const FriendRecommendations = ({ onAddFriend }: FriendRecommendationsProps) => {
 
   if (loading) {
     return (
-      <div className="bg-background shadow-2xl rounded-2xl overflow-hidden border border-border/50">
+      <div className="bg-background rounded-2xl overflow-hidden border border-border/50">
         <div className="animate-pulse flex space-x-4 p-6">
           <div className="flex-1 space-y-4">
             <div className="h-4 bg-muted rounded w-3/4"></div>
@@ -104,8 +104,17 @@ const FriendRecommendations = ({ onAddFriend }: FriendRecommendationsProps) => {
   const canGoPrev = currentIndex > 0;
   const canGoNext = currentIndex + VISIBLE_CARDS < recommendations.length;
 
+  const totalWidth = recommendations.length * (CARD_WIDTH + GAP) - GAP;
+  const visibleWidth = VISIBLE_CARDS * (CARD_WIDTH + GAP) - GAP;
+  let offset = currentIndex * (CARD_WIDTH + GAP);
+
+  if (offset + visibleWidth > totalWidth) {
+    offset = totalWidth - visibleWidth;
+    if (offset < 0) offset = 0;
+  }
+
   return (
-    <div className="bg-background shadow-2xl rounded-2xl overflow-hidden border border-border/50">
+    <div className="bg-background rounded-2xl overflow-hidden border border-border/50">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border/20">
         <h3 className="font-semibold text-foreground">Suggested for you</h3>
@@ -126,7 +135,7 @@ const FriendRecommendations = ({ onAddFriend }: FriendRecommendationsProps) => {
       {/* Carousel */}
       <div className="relative px-5 py-6">
         <div className="relative w-full">
-          {/* Previous Button - Absolute overlay */}
+          {/* Previous Button */}
           <button
             onClick={handlePrev}
             disabled={!canGoPrev}
@@ -140,13 +149,13 @@ const FriendRecommendations = ({ onAddFriend }: FriendRecommendationsProps) => {
             <ChevronLeft className="w-4 h-4" />
           </button>
 
-          {/* Cards Container - Full width */}
+          {/* Cards Container */}
           <div className="overflow-hidden w-full">
             <div
               className="flex gap-4 transition-transform duration-300 ease-in-out"
               style={{
                 width: `${recommendations.length * (CARD_WIDTH + GAP) - GAP}px`,
-                transform: `translateX(-${currentIndex * (CARD_WIDTH + GAP)}px)`,
+                transform: `translateX(-${offset}px)`,
               }}
             >
               {recommendations.map((user) => (
@@ -195,7 +204,7 @@ const FriendRecommendations = ({ onAddFriend }: FriendRecommendationsProps) => {
             </div>
           </div>
 
-          {/* Next Button - Absolute overlay */}
+          {/* Next Button */}
           <button
             onClick={handleNext}
             disabled={!canGoNext}

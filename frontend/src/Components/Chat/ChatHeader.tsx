@@ -12,11 +12,16 @@ const ChatHeader = () => {
         <div className="flex items-center gap-3">
           {/* Avatar */}
           <div className="w-10 h-10 rounded-full overflow-hidden border border-border">
-            <img
-              src={selectedUser?.photo?.url || '/default-avatar.png'}
-              alt={selectedUser?.firstName || 'User'}
-              className="w-full h-full object-cover"
-            />
+            <Link
+              to={`/members/${selectedUser?.username}`}
+              className="font-semibold text-foreground text-sm"
+            >
+              <img
+                src={selectedUser?.photo?.url || '/default-avatar.png'}
+                alt={selectedUser?.firstName || 'User'}
+                className="w-full h-full object-cover"
+              />
+            </Link>
           </div>
 
           {/* User Info */}

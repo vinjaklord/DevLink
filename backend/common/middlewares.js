@@ -40,9 +40,11 @@ async function scheduleNews() {
         q: 'javascript',
         language: 'en',
         sortBy: 'publishedAt',
+        sources:
+          'bbc-news,bbc-sport,cnn,reuters,engadget,techcrunch,the-verge,wired,the-wall-street-journal,the-washington-post,fortune,business-insider,ars-technica,associated-press,bloomberg,nbc-news,independent,abc-news,fox-news,al-jazeera-english',
       });
 
-      const limitedArticles = response.articles.slice(0, 10);
+      const limitedArticles = response.articles.slice(0, 100);
 
       await News.deleteMany({});
       await News.insertMany(limitedArticles, { ordered: false });

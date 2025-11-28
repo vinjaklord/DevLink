@@ -58,7 +58,11 @@ const SidebarFriendRecommendations = ({ onAddFriend }: SidebarFriendRecommendati
   const handleFollow = async (userId: string) => {
     try {
       await onAddFriend(userId);
+
       setFollowingIds((prev) => new Set(prev).add(userId));
+
+      // 🔥 Remove user from sidebar list (like carousel logic)
+      setRecommendations((prev) => prev.filter((u) => u._id !== userId));
     } catch (error) {
       console.error('Error sending friend request:', error);
     }
@@ -66,7 +70,7 @@ const SidebarFriendRecommendations = ({ onAddFriend }: SidebarFriendRecommendati
 
   if (loading) {
     return (
-      <div className="bg-card rounded-xl border border-border/50 p-4">
+      <div className="bg-card rounded-xl p-4">
         <div className="animate-pulse space-y-3">
           <div className="h-4 bg-muted rounded w-3/4"></div>
           {[1, 2, 3].map((i) => (
@@ -83,10 +87,15 @@ const SidebarFriendRecommendations = ({ onAddFriend }: SidebarFriendRecommendati
     );
   }
 
+  // 🔥 Hide component if all recommendations are gone
+  if (!loading && recommendations.length === 0) {
+    return null;
+  }
+
   const displayedUsers = showAll ? recommendations : recommendations.slice(0, INITIAL_DISPLAY);
 
   return (
-    <div className="bg-card rounded-xl border border-border/50 overflow-hidden">
+    <div className="bg-card rounded-xl overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border/20">
         <h3 className="font-semibold text-foreground text-sm">Suggested friends</h3>
@@ -134,9 +143,8 @@ const SidebarFriendRecommendations = ({ onAddFriend }: SidebarFriendRecommendati
                   ? 'bg-muted text-muted-foreground cursor-not-allowed'
                   : 'bg-primary text-primary-foreground hover:bg-primary/90'
               }`}
-              aria-label={followingIds.has(user._id) ? 'Request pending' : 'Add friend'}
             >
-              <UserPlus className="w-4 h-4" />
+              {followingIds.has(user._id) ? 'Pending' : <UserPlus className="w-4 h-4" />}
             </button>
           </div>
         ))}

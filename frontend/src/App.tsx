@@ -72,7 +72,7 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/messages" element={<ChatPage />} />
         <Route path="/results" element={<SearchResults />} />
-        {/* <Route path="/post" element={<Post />} /> */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <AddPostForm isOpen={showAddPost} onClose={() => setShowAddPost(false)} />
       <SharePost
@@ -102,9 +102,7 @@ function App() {
   return (
     <div className="flex flex-col">
       <Header />
-      <main className="container mx-auto px-6 pt-10 flex-1 overflow-y-auto max-[1100px]:pb-[60px]">
-        {routes}
-      </main>
+      <main className="flex-1 overflow-y-auto max-[1100px]:pb-[60px] pt-10">{routes}</main>
       <FooterNav />
       <Toaster richColors position="bottom-left" />
     </div>

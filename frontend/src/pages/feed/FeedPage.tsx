@@ -8,32 +8,38 @@ export default function FeedPage() {
   const isWideEnough = useWindowWidth(1100);
 
   const handleAddFriend = async (friendId: string) => {
-    // Your friend request logic here
     const token = localStorage.getItem('lh_token');
     await fetchAPI({
-      url: `friends/request/${friendId}`,
+      url: `friends/add-friend/${friendId}`,
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
     });
   };
 
   return (
-    <div className="flex flex-col md:flex-row gap-1 pt-7 min-h-screen max-w-[75rem] mx-auto bg-[--background] text-[--foreground]">
+    <div className="flex gap-4 pt-7 min-h-screen">
+      {' '}
+      {/* Reduced gap from gap-8 → gap-4 */}
+      {/* Left Sidebar - Pulls closer to center */}
       {isWideEnough && (
-        <div className="flex-[0_0_16rem] bg-[--sidebar]">
-          <RecommendationBar onAddFriend={handleAddFriend} />
+        <div className="w-64 md:w-72 lg:w-80 flex-shrink-0">
+          <div className="sticky">
+            <RecommendationBar onAddFriend={handleAddFriend} />
+          </div>
         </div>
       )}
-      <div
-        className={`w-[48rem] overflow-y-auto mx-auto ${
-          !isWideEnough ? 'w-full max-w-[48rem]' : ''
-        }`}
-      >
-        <PostFeed />
+      {/* Center Feed - Full original width, no max-width limit */}
+      <div className="flex-1 min-w-0 max-w-none">
+        <div className="mx-auto w-full max-w-[48rem] px-4">
+          <PostFeed />
+        </div>
       </div>
+      {/* Right Sidebar - Pulls closer */}
       {isWideEnough && (
-        <div className="flex-[0_0_16rem] bg-[--sidebar]">
-          <FriendsSidebar />
+        <div className="w-64 md:w-72 lg:w-80 flex-shrink-0">
+          <div className="sticky">
+            <FriendsSidebar />
+          </div>
         </div>
       )}
     </div>
