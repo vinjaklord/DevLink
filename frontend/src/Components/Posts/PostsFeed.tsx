@@ -168,7 +168,7 @@ const PostFeed = () => {
 
   if (friendsPosts.length === 0) {
     return (
-      <div className="max-w-[37.5rem] mx-auto p-6 text-center bg-card shadow-lg rounded-xl border border-border">
+      <div className="max-w-[37.5rem] mx-auto p-6 text-center bg-card rounded-xl border border-border">
         <h2 className="text-xl font-semibold text-foreground mb-3">Your feed is empty! 😔</h2>
         <p className="text-muted-foreground mb-4">
           It looks like you haven't made any friends yet, or they haven't posted anything.

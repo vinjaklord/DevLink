@@ -99,7 +99,7 @@ const PostCardItem = ({
               return (
                 <div
                   key={index}
-                  className="relative bg-slate-950 border-2 border-blue-500/30 rounded-lg p-4 shadow-lg"
+                  className="relative bg-slate-950 border-2 border-blue-500/30 rounded-lg p-4 "
                 >
                   {index === 0 && (
                     <div className="absolute top-2 right-2 flex items-center gap-2 z-0">
@@ -142,7 +142,7 @@ const PostCardItem = ({
 
     if (isCode) {
       return (
-        <div className="relative bg-slate-950 border-2 border-blue-500/30 rounded-lg p-4 shadow-lg">
+        <div className="relative bg-slate-950 border-2 border-blue-500/30 rounded-lg p-4 ">
           <div className="absolute top-2 right-2 flex items-center gap-2 z-10">
             <div className="flex items-center gap-1.5 bg-blue-500/10 border border-blue-500/30 px-2 py-1 rounded-md">
               <Code2 className="w-3 h-3 text-blue-400" />
@@ -180,8 +180,8 @@ const PostCardItem = ({
 
   return (
     <div
-      className={`bg-card dark:bg-card shadow-lg rounded-lg border border-border overflow-hidden ${
-        clickable ? 'cursor-pointer hover:shadow-xl transition-shadow' : ''
+      className={`bg-card dark:bg-card  rounded-lg border border-border overflow-hidden ${
+        clickable ? 'cursor-pointer hover:shadow-sm transition-shadow' : ''
       }`}
       onClick={handleCardClick}
     >

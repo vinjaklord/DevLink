@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
 import { EyeIcon, EyeSlashIcon } from '@phosphor-icons/react';
-import Logo from '@/assets/react.svg';
+import Logo from '@/assets/react.svg'
 
 //Hooks
 import { useStore } from '@/hooks';
