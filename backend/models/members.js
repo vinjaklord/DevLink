@@ -17,7 +17,7 @@ photoSchema.pre('save', function (next) {
   next();
 });
 
-// New location schema
+
 const locationSchema = new Schema({
   city: { type: String },
   country: { type: String },
@@ -43,12 +43,12 @@ const membersSchema = new Schema(
     lastName: { type: String, required: true },
     isAdmin: { type: Boolean, default: false },
     photo: { type: photoSchema, required: false },
-    location: { type: locationSchema, required: false }, // NEW: Location data
+    location: { type: locationSchema, required: false }, 
   },
   { timestamps: true }
 );
 
-// Create index on location.coordinates for geospatial queries
+
 membersSchema.index({ 'location.coordinates': '2dsphere' });
 
 const passwordsSchema = new Schema(
@@ -89,26 +89,25 @@ membersSchema.post('findOneAndDelete', async (deletedMember) => {
     const { Comment } = await import('./comments.js');
 
     try {
-      // Delete Friend document
+    
       await Friend.deleteOne({ member: deletedMember._id });
 
-      // Remove from other users' friend lists
+     
       await Friend.updateMany(
         { friends: deletedMember._id },
         { $pull: { friends: deletedMember._id } }
       );
 
-      // Remove from pending requests
+    
       await Friend.updateMany(
         { pendingFriendRequests: deletedMember._id },
         { $pull: { pendingFriendRequests: deletedMember._id } }
       );
 
-      // Delete posts and comments
+   
       await Post.deleteMany({ author: deletedMember._id });
       await Comment.deleteMany({ author: deletedMember._id });
 
-      // Delete passwords and tokens
       await Password.deleteMany({ member: deletedMember._id });
       await Resettoken.deleteMany({ member: deletedMember._id });
     } catch (error) {

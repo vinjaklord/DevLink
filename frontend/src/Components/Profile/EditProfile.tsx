@@ -30,9 +30,6 @@ import {
   DialogTitle,
 } from '@/Components/ui';
 
-// ------------------------------
-// OWN Edit Profile Schema (Password fields removed)
-// ------------------------------
 const EditProfileSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
@@ -52,9 +49,6 @@ const EditProfile = () => {
     ? previewImage
     : `${loggedInMember?.photo?.url}?tr=w-128,h-128,cm-round,cq-95,sh-10,q-95,f-auto}`;
 
-  // ------------------------------
-  // react-hook-form
-  // ------------------------------
   const form = useForm<EditProfileData>({
     resolver: zodResolver(EditProfileSchema),
     defaultValues: {
@@ -68,7 +62,6 @@ const EditProfile = () => {
 
   const { setValue } = form;
 
-  // Sync when member data updates
   useEffect(() => {
     if (!loggedInMember) return;
     setValue('firstName', loggedInMember.firstName || '');
@@ -77,7 +70,6 @@ const EditProfile = () => {
     setValue('email', loggedInMember.email || '');
   }, [loggedInMember, setValue]);
 
-  // Handle photo with file size validation
   const handlePhotoChange = (e: any) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -122,7 +114,6 @@ const EditProfile = () => {
     if (values.username) formData.append('username', values.username);
     if (values.email) formData.append('email', values.email);
 
-    // Append photo only if a new one was selected
     if (values.photo && values.photo instanceof File) {
       formData.append('photo', values.photo);
     }
@@ -131,7 +122,7 @@ const EditProfile = () => {
 
     if (response) {
       toast.success('Profile edited successfully!');
-      // Reset preview after successful upload
+
       setPreviewImage(null);
     } else {
       toast.error('Error while editing!');
@@ -353,9 +344,3 @@ const EditProfile = () => {
 };
 
 export default EditProfile;
-
-// sarahk
-// emmanovak
-// filipfilip
-// andi_m
-// olisteiner

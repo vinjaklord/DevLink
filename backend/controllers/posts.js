@@ -100,7 +100,7 @@ const addComment = async (req, res, next) => {
     }
 
     const data = matchedData(req);
-    console.log(data);
+ 
 
     const { text } = data;
     const postId = req.params.id;
@@ -197,7 +197,7 @@ const getFriendsPosts = async (req, res, next) => {
 
     res.json(postsList);
   } catch (error) {
-    // This will catch any other errors, including if friendDocument is null
+
     return next(new HttpError(error, error.errorCode || 500));
   }
 };
@@ -255,13 +255,12 @@ export const sharePost = async (req, res) => {
 
 export const deletePost = async (req, res, next) => {
   try {
-    // Member suchen und gleichzeitig löschen, wenn nicht vorhanden -> Fehlermeldung ausgeben
+  
     const deletedPost = await Post.findOneAndDelete({ _id: req.params.id });
     if (!deletedPost) {
       throw new HttpError('Member was not found', 404);
     }
 
-    // Erfolgsmeldung rausschicken
     res.send('Post was deleted successfully');
   } catch (error) {
     return next(new HttpError(error, error.errorCode || 500));

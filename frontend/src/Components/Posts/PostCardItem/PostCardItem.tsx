@@ -49,12 +49,11 @@ const PostCardItem = ({
   const userId = loggedInMember?._id;
   const isTextOnly = !post.imageUrl;
 
-  // Decode the caption from HTML entities
   const decodedCaption = useMemo(() => {
     return post.caption ? decodeHTMLEntities(post.caption) : '';
   }, [post.caption]);
 
-  // Detect if caption contains code - NOW WITH SEGMENTS (using decoded caption)
+
   const { isCode, segments } = useCodeDetection(decodedCaption, {
     minMatches: 2,
     minLength: 10,

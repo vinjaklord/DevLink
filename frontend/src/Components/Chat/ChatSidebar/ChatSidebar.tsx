@@ -23,7 +23,7 @@ const ChatSidebar = () => {
     unsubscribeFromMessages,
   } = useStore();
 
-  const [searchQuery, setSearchQuery] = useState(''); // NEW: Search state
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchFriends().then(() => {
@@ -35,7 +35,6 @@ const ChatSidebar = () => {
     };
   }, [fetchFriends, subscribeToMessages, unsubscribeFromMessages]);
 
-  // UPDATED: Filter friends first, then sort filtered results
   const filteredFriends = useMemo(() => {
     const query = searchQuery.toLowerCase();
     return friends.filter((friend) =>
@@ -66,7 +65,7 @@ const ChatSidebar = () => {
         </div>
       </div>
 
-      {/* NEW: Search input section */}
+      {/* Search input section */}
       <div className="hidden lg:block p-3 border-b border-base-300">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-zinc-400" />

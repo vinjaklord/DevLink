@@ -15,10 +15,10 @@ export interface FriendsStore {
   friendsError: string | null;
   relationshipStatus: string;
   isSender: boolean;
-  fetchFriends: () => Promise<void>; // change later
-  fetchPending: () => Promise<void>; // change later
-  deleteFriend: (friend: string) => Promise<void>; // change later
-  addFriend: (friendId: string) => Promise<void>; // change later
+  fetchFriends: () => Promise<void>;
+  fetchPending: () => Promise<void>;
+  deleteFriend: (friend: string) => Promise<void>;
+  addFriend: (friendId: string) => Promise<void>;
   acceptFriendRequest: (senderId: string) => Promise<void>;
   rejectFriendRequest: (senderId: string) => Promise<void>;
   fetchRelationshipStatus: (userId: string) => Promise<void>;
@@ -114,7 +114,7 @@ export const createFriendsSlice: StateCreator<StoreState, [], [], FriendsStore> 
         headers: { Authorization: `Bearer ${token}` },
       });
       toast.success('Friend removed');
-      console.log('Friend removed');
+
       get().fetchFriends();
       get().fetchPending();
     } catch (error: any | unknown) {

@@ -19,24 +19,21 @@
     <script>
       'use strict';
 
-      // Zuweisungen ins DOM speichern
+     
       const form = document.querySelector('form');
       const message = document.querySelector('#message');
       const input = document.querySelector('input[name=login]');
 
-      // Eventlistener für Form onSubmit
       form.addEventListener('submit', (event) => {
-        // Standardverhalten abbrechen
+     
         event.preventDefault();
 
-        // ev. Prüfungen
+
         const login = input.value;
         if (login.length > 200 || login.length < 4) {
           return alert('Benutzername / Emailadresse muss 4 bis 200 Stellen lang sein');
         }
 
-        // Daten ans Backend senden
-        // Axios request config object bauen
         const config = {
           method: 'post',
           url: '/api/members/reset-password',
@@ -45,11 +42,11 @@
 
         axios(config)
           .then((response) => {
-            // Response auswerten
+       
             message.innerHTML = response.data;
           })
           .catch((error) => {
-            // Fehler-Response auswerten
+          
             message.innerHTML = error.response.data.message;
           });
       });

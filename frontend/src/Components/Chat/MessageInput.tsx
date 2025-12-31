@@ -47,7 +47,7 @@ const MessageInput = () => {
     }
 
     try {
-      sendMessage(formData); // send FormData to store
+      sendMessage(formData);
       setText('');
       setImagePreview(null);
 

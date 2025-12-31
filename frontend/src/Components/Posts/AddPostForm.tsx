@@ -31,16 +31,8 @@ const AddPostSchema = z.object({
 
 type AddPostData = z.infer<typeof AddPostSchema>;
 
-export default function AddPostForm({
-  isOpen,
-  onClose,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-}) {
-  const { uploadPost, setShowAddPost, memberRefreshMe } = useStore(
-    (state) => state
-  );
+export default function AddPostForm({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const { uploadPost, setShowAddPost, memberRefreshMe } = useStore((state) => state);
   const navigate = useNavigate();
   const [isPosting, setIsPosting] = useState(false);
   const [captionText, setCaptionText] = useState('');
@@ -82,14 +74,12 @@ export default function AddPostForm({
     }
   });
 
-  // Handle typing
   const handleCaptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     setCaptionText(value);
     form.setValue('caption', value, { shouldValidate: true });
   };
 
-  // Handle paste
   const handleCaptionPaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
     e.preventDefault();
     const pastedText = e.clipboardData.getData('text');
@@ -97,13 +87,11 @@ export default function AddPostForm({
     const textarea = e.currentTarget;
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
-    const newValue =
-      captionText.slice(0, start) + pastedText + captionText.slice(end);
+    const newValue = captionText.slice(0, start) + pastedText + captionText.slice(end);
 
     setCaptionText(newValue);
     form.setValue('caption', newValue, { shouldValidate: true });
 
-    // Move cursor after inserted text
     setTimeout(() => {
       textarea.selectionStart = textarea.selectionEnd = start + pastedText.length;
     }, 0);
@@ -136,7 +124,6 @@ export default function AddPostForm({
           <form onSubmit={handlePosting} className="flex-1 flex flex-col overflow-hidden">
             <div className="flex-1 flex overflow-hidden">
               <div className="flex flex-col overflow-y-auto px-6 py-4 space-y-4 w-full">
-                
                 {/* Caption */}
                 <FormField
                   control={form.control}
@@ -174,7 +161,11 @@ export default function AddPostForm({
                           {photoValue ? (
                             <div className="relative w-full h-32 rounded-lg overflow-hidden border border-border/50 bg-background/50">
                               <img
-                                src={typeof photoValue === 'string' ? photoValue : URL.createObjectURL(photoValue)}
+                                src={
+                                  typeof photoValue === 'string'
+                                    ? photoValue
+                                    : URL.createObjectURL(photoValue)
+                                }
                                 alt="Upload preview"
                                 className="w-full h-full object-cover"
                               />
@@ -189,8 +180,12 @@ export default function AddPostForm({
                           ) : (
                             <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border/50 rounded-lg cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all">
                               <Image className="w-8 h-8 text-muted-foreground mb-2" />
-                              <span className="text-xs text-muted-foreground">Click to upload image</span>
-                              <span className="text-xs text-muted-foreground/60 mt-1">(optional)</span>
+                              <span className="text-xs text-muted-foreground">
+                                Click to upload image
+                              </span>
+                              <span className="text-xs text-muted-foreground/60 mt-1">
+                                (optional)
+                              </span>
                               <input
                                 type="file"
                                 name="photo"

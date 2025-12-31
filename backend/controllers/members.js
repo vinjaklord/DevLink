@@ -25,7 +25,6 @@ const templatesDir = path.join(__dirname, '..', 'utils', 'email_templates');
 
 dotenv.config();
 
-// TODO: user, pass in Umgebungsvariablen speichern
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 465,
@@ -35,11 +34,11 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Resttoken-Gültigkeit: 5 Minuten
+//  5 Min
 const RESETTOKEN_EXPIRATION_TIME = 1000 * 60 * 5;
 
 const getLocationFromIP = (req) => {
-  // Try to get real IP (considering proxies/load balancers)
+  // try to get IP
   const ip =
     req.headers['x-forwarded-for']?.split(',')[0].trim() ||
     req.headers['x-real-ip'] ||
@@ -47,7 +46,6 @@ const getLocationFromIP = (req) => {
     req.socket.remoteAddress ||
     req.ip;
 
-  // Remove IPv6 prefix if present
   const cleanIP = ip.replace('::ffff:', '');
 
   // DEVELOPMENT: Hardcode Belgrade for localhost
@@ -63,7 +61,6 @@ const getLocationFromIP = (req) => {
     };
   }
 
-  // Get geolocation data
   const geo = geoip.lookup(cleanIP);
 
   if (geo) {
@@ -78,7 +75,7 @@ const getLocationFromIP = (req) => {
     };
   }
 
-  // Fallback if IP lookup fails
+  // fallback if IP lookup fails
   return {
     city: 'Unknown',
     country: 'Unknown',
@@ -90,7 +87,6 @@ const getLocationFromIP = (req) => {
   };
 };
 
-// Updated signup function
 const signup = async (req, res, next) => {
   let photo;
   try {
@@ -102,18 +98,15 @@ const signup = async (req, res, next) => {
 
     const data = matchedData(req);
 
-    // Password generiert
     const password = getHash(data.password);
 
-    // NEW: Get location from IP
     const location = getLocationFromIP(req);
 
     let newMember;
 
-    // neuen Member erschaffen with location
     const createdMember = new Member({
       ...data,
-      location, // NEW: Add location
+      location,
       photo: req.file
         ? {
             fileId: (await uploadImage(req.file.buffer, req.file.originalname)).fileId,
@@ -181,7 +174,6 @@ const signup = async (req, res, next) => {
 
 const login = async (req, res, next) => {
   try {
-    // Daten validieren
     const result = validationResult(req);
 
     if (result.errors.length > 0) {
@@ -189,7 +181,7 @@ const login = async (req, res, next) => {
     }
 
     const data = matchedData(req);
-    // Member suchen, wenn nicht vorhanden -> Abbruch mit Fehlermeldung
+
     const foundMember = await Member.findOne({
       $or: [{ username: data.username }, { email: data.username }],
     });
@@ -198,32 +190,22 @@ const login = async (req, res, next) => {
       throw new HttpError('Cannot find member', 401);
     }
 
-    // Passwort holen
     const foundPassword = await Password.findOne({
       member: foundMember._id,
     });
 
-    // NEW: Add null check for missing Password document
     if (!foundPassword) {
-      console.error(
-        `No password found for member: ${foundMember._id} (username: ${data.username})`
-      ); // Log for debugging
-      throw new HttpError('User data incomplete - contact support', 500); // Or 401 if preferred
+      throw new HttpError('User data incomplete - contact support', 500);
     }
 
-    // Hash mit Klartext-Passwort vergleichen
-    // wenn keine Überstimmung -> Abbruch mit Fehlermeldung
     if (!checkHash(data.password, foundPassword.password)) {
       throw new HttpError('Invalid Credentials', 401);
     }
 
-    // Token generieren mit ID des Members als Inhalt
     const token = getToken(foundMember._id);
 
-    // JWT-Token an Client senden
     res.send(token);
   } catch (error) {
-    // Restore specific HttpError handling if needed
     if (error instanceof HttpError) {
       return next(error);
     }
@@ -233,7 +215,6 @@ const login = async (req, res, next) => {
 
 const changePassword = async (req, res, next) => {
   try {
-    // Daten validieren
     const result = validationResult(req);
 
     if (result.errors.length > 0) {
@@ -242,30 +223,23 @@ const changePassword = async (req, res, next) => {
 
     const data = matchedData(req);
 
-    // Member suchen, wenn nicht vorhanden -> Abbruch mit Fehlermeldung
     const foundMember = await Member.findById(req.verifiedMember._id);
 
     if (!foundMember) {
       throw new HttpError('Cannot change password', 401);
     }
 
-    // Passwort holen
     const foundPassword = await Password.findOne({
       member: foundMember._id,
     });
 
-    // Hash mit Klartext-Passwort vergleichen
-    // wenn keine Überstimmung -> Abbruch mit Fehlermeldung
     if (!checkHash(data.oldPassword, foundPassword.password)) {
       throw new HttpError('Cannot change password', 401);
     }
 
-    // neues Passwort generieren und speichern
-    // Password generiert
     foundPassword.password = getHash(data.newPassword);
     await foundPassword.save();
 
-    // JWT-Token an Client senden
     res.send('Password changed successfully');
   } catch (error) {
     return next(new HttpError(error, error.errorCode || 500));
@@ -274,23 +248,18 @@ const changePassword = async (req, res, next) => {
 
 const deleteMember = async (req, res, next) => {
   try {
-    // Sicherheitsprüfung: ist die ID des angemeldeten Members gleich der übermittelten ID?
-    // wenn nein, Abbruch
     if (!req.verifiedMember.isAdmin) {
       if (req.verifiedMember._id.toString() !== req.params.id) {
         throw new HttpError('Cant delete member', 403);
       }
     }
 
-    // Member suchen und gleichzeitig löschen, wenn nicht vorhanden -> Fehlermeldung ausgeben
     const deletedMember = await Member.findOneAndDelete({ _id: req.params.id });
-    // console.log('was ist deletedMember?', deletedMember);
 
     if (!deletedMember) {
       throw new HttpError('Member was not found', 404);
     }
 
-    // Erfolgsmeldung rausschicken
     res.send('Member was deleted successfully');
   } catch (error) {
     return next(new HttpError(error, error.errorCode || 500));
@@ -298,11 +267,9 @@ const deleteMember = async (req, res, next) => {
 };
 
 const getAllMembers = async (req, res, next) => {
-  console.log(req.verifiedMember);
   try {
-    // mit leerem Objekt bekommen wir alle Members
     const membersList = await Member.find({});
-    // Liste aller Members in JSON-Format an Client senden
+
     res.json(membersList);
   } catch (error) {
     return next(new HttpError(error, error.errorCode || 500));
@@ -311,14 +278,12 @@ const getAllMembers = async (req, res, next) => {
 
 const getOneMember = async (req, res, next) => {
   try {
-    // einen Member suchen über die ID
     const member = await Member.findById(req.params.id);
 
     if (!member) {
       throw new HttpError('Cannot find member', 404);
     }
 
-    // Members als Objekt in JSON-Format an Client senden
     res.json(member);
   } catch (error) {
     return next(new HttpError(error, error.errorCode || 500));
@@ -334,7 +299,6 @@ const getMemberByUsername = async (req, res, next) => {
       throw new HttpError('Cannot find member', 404);
     }
 
-    // Members als Objekt in JSON-Format an Client senden
     res.json(member);
   } catch (error) {
     return next(new HttpError(error, error.errorCode || 500));
@@ -347,7 +311,6 @@ const filterMember = async (req, res, next) => {
   try {
     if (!q) return res.json([]);
 
-    // parse limit safely, default to 10, max 50
     const maxLimit = Math.min(parseInt(limit) || 10, 50);
 
     let matchQuery = {
@@ -455,26 +418,20 @@ const updateMember = async (req, res, next) => {
 
 const resetPassword = async (req, res, next) => {
   try {
-    // gibts es den Member? Wenn nein -> Abbruch mit Fehler
     const { email } = req.body;
-    console.log('Incoming body:', req.body);
 
     const foundMember = await Member.findOne({ email });
     if (!foundMember) {
       throw new HttpError('Cannot find member', 404);
     }
 
-    // alle bestehenden Reset-Tokens dieses Members löschen
     await Resettoken.deleteMany({ member: foundMember._id });
 
-    // Token erzeugen mit UUID
     const token = uuidv4();
 
-    // Reset Token mit Zeitangabe speichern
     const newResettoken = new Resettoken({ token, member: foundMember._id });
     await newResettoken.save();
 
-    // Email produzieren (Text mit Link) und raussenden an Email-Adresse
     const link = `${process.env.FRONTEND_URL}/set-new-password?t=${token}`;
 
     const ResetPasswordHtmlTemplate = path.join(templatesDir, 'reset-password.html');
@@ -499,7 +456,6 @@ const resetPassword = async (req, res, next) => {
       html: ResetPasswordHtml, // html body
     });
 
-    // Erfolgsmeldung rausschicken
     res.send('Mail was sent successfully');
   } catch (error) {
     const status = error.errorCode || error.statusCode || 500;
@@ -509,25 +465,20 @@ const resetPassword = async (req, res, next) => {
 
 const setNewPassword = async (req, res, next) => {
   try {
-    // 1. Express Validator check (only for the password now)
     const result = validationResult(req);
 
     if (result.errors.length > 0) {
       const errors = result.array();
       throw handleValidationErrors(errors);
-    } // 2. Get password from body (via matchedData)
+    }
 
     const { password } = matchedData(req);
 
-    // 3. Get token directly from the URL query
     const token = req.query.t;
 
-    // 4. Manually check if the token exists and has the correct length
     if (!token || typeof token !== 'string' || token.length !== 36) {
-      // This handles both 'undefined' (which has length 9) and a missing token.
       throw new HttpError('Invalid or missing reset token', 400);
-    } // Token in Resettoken suchen, wenn nicht vorhanden oder abgelaufen -> Abbruch
-
+    }
     const foundResettoken = await Resettoken.findOne({ token });
 
     if (!foundResettoken) {
@@ -542,23 +493,18 @@ const setNewPassword = async (req, res, next) => {
       throw new HttpError('Expiration time has expired', 409);
     }
 
-    // Member überprüfen auf Vorhandensein
     const foundMember = await Member.findById(foundResettoken.member);
 
     if (!foundMember) {
       throw new HttpError('Cannot find member', 404);
     }
 
-    // Passwort-hash erstellen
     const newPassword = getHash(password);
 
-    // Altes Passwort suchen, mit neuem überschreiben, speichern
     await Password.findOneAndUpdate({ member: foundResettoken.member }, { password: newPassword });
 
-    // alle bestehenden Reset-Tokens dieses Members löschen
     await Resettoken.deleteMany({ member: foundResettoken.member });
 
-    // Erfolgsmeldung rausschicken
     res.send('New Password was set successfully');
   } catch (error) {
     return next(new HttpError(error, error.errorCode || 500, error.messageArray));

@@ -84,7 +84,7 @@ export function SetNewPasswordForm() {
       }
     } catch (error) {
       const { alert } = useStore.getState();
-      console.log('alert is ', alert);
+      
       setError('root', {
         type: 'manual',
         message: alert?.description || 'Failed to change password',

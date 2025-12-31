@@ -5,7 +5,7 @@ import { Notification } from '../models/notifications.js';
 export const createNotification = async ({ fromUser, targetUser, message, relatedPost, type}) => {
   const notif = await Notification.create({ fromUser, targetUser, message, relatedPost, type });
 
-  // Emit to target user if connected
+  // emit to target user if connected
   const socketId = getRecieverSocketId(targetUser.toString());
   if (socketId) {
     io.to(socketId).emit('notification', notif);
@@ -54,7 +54,7 @@ export const markRead = async (req, res) => {
 export const getNotifications = async (req, res, next) => {
   try {
     const userId = req.verifiedMember._id;
-    console.log('user id is', userId);
+
 
     const notifications = await Notification.find({ targetUser: userId })
       .populate('fromUser', 'username photo')

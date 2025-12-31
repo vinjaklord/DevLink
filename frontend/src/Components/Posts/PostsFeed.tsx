@@ -97,7 +97,7 @@ const PostFeed = () => {
 
   const handleToggleLike = useCallback(
     (postId: string) => {
-      // Optimistic update
+      // optimistic update
       setDisplayedPosts((prev) =>
         prev.map((post) =>
           post._id === postId
@@ -124,7 +124,7 @@ const PostFeed = () => {
       createdAt: new Date().toISOString(),
     };
 
-    // Optimistic update
+    // optimistic update
     setDisplayedPosts((prev) =>
       prev.map((post) =>
         post._id === postId
@@ -140,7 +140,7 @@ const PostFeed = () => {
       await addComment(postId, { text });
     } catch (err) {
       console.error('Error adding comment:', err);
-      // Revert on error
+
       setDisplayedPosts((prev) =>
         prev.map((post) =>
           post._id === postId

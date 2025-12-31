@@ -8,7 +8,6 @@ export default function useOutsideClick(
     function handler(event: MouseEvent) {
       if (ref.current && !ref.current.contains(event.target as Node)) {
         callback();
-        // console.log(ref.current);
       }
     }
 

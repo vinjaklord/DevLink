@@ -30,7 +30,7 @@ export const sendMessage = async (req, res) => {
     const { id: recipientId } = req.params;
     const senderId = req.verifiedMember._id;
 
-    // Validate recipient exists
+    // validate recipient exists
     const recipient = await Member.findById(recipientId);
     if (!recipient) {
       throw new HttpError('Recipient not found', 404);
@@ -55,9 +55,6 @@ export const sendMessage = async (req, res) => {
     const recieverSocketId = getRecieverSocketId(recipientId);
     if (recieverSocketId) {
       io.to(recieverSocketId).emit('newMessage', newMessage);
-      console.log(`Emitted newMessage to ${recieverSocketId} for user ${recipientId}`);
-    } else {
-      console.log(`Recipient ${recipientId} is offline; message saved to database`);
     }
 
     res.json(newMessage);

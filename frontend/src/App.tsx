@@ -42,28 +42,18 @@ function App() {
     setShowSharePost,
   } = useStore((state) => state);
 
-  // Check if the user is logged in on every page load
   useEffect(() => {
-    // if (loggedInMember) {
-    // 1. Run the check immediately on mount
     memberCheck();
-
-    // 2. Set up a timer to run memberCheck periodically
     const intervalId = setInterval(() => {
-      // This function executes your token check and logs out if expired
       memberCheck();
     }, 60000);
 
-    // 3. Clean up the interval when the component unmounts
     return () => clearInterval(intervalId);
-    // }
   }, [memberCheck]);
 
-  // Define routes for logged-in users
   const routerLoggedIn = (
     <>
       <Routes>
-        {/* Add your routes here when ready */}
         <Route path="/" element={<FeedPage />} />
         <Route path="/edit-profile" element={<EditProfile />} />
         <Route path="/change-password" element={<ChangePassword />} />
@@ -94,10 +84,7 @@ function App() {
     </Routes>
   );
 
-  // Select the correct set of routes based on loggedInMember status
   const routes = loggedInMember ? routerLoggedIn : routerNotLoggedIn;
-
-  // TEMPORARY ROUTES
 
   return (
     <div className="flex flex-col">

@@ -17,11 +17,11 @@ export default function Navbar() {
 
   const handleHomeClick = () => {
     if (location.pathname === '/') {
-      // Already on homepage → scroll + refresh
+      // already on homepage → scroll + refresh
       window.scrollTo({ top: 0, behavior: 'smooth' });
       fetchFriendsPosts(); // reload posts
     } else {
-      // Navigate normally
+      // navigate normally
       navigate('/');
     }
   };

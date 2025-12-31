@@ -182,30 +182,24 @@ export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = 
   },
   memberLogin: async (data: LoginCredentials): Promise<boolean> => {
     try {
-      // Daten an API senden
       const response: ApiResponse<string> = await fetchAPI({
         method: 'post',
         url: 'members/login',
         data,
       });
 
-      // TODO: Statuscode 200 prüfen
       if (response.status !== 200) {
         throw new Error('Login failed');
       }
 
-      // Token checken, ID rausholen
       const token: string = response.data;
       const decodedToken: DecodedToken = jwtDecode<DecodedToken>(token);
       const { id } = decodedToken;
 
-      // Token ins localStorage speichern
       localStorage.setItem('lh_token', token);
 
-      // einige Daten in den Store speichern
       set({ token, decodedToken });
 
-      // Fetch member data
       const memberResponse: ApiResponse<IMember> = await fetchAPI({
         url: '/members/' + id,
         token,
@@ -213,7 +207,6 @@ export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = 
       const loggedInMember: IMember = memberResponse.data;
       set({ loggedInMember: memberResponse.data });
 
-      // loggedInMember in localStorage speichern
       localStorage.setItem('lh_member', JSON.stringify(loggedInMember));
       get().connectSocket();
       get().subscribeToMessages();
@@ -240,15 +233,13 @@ export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = 
     get().unsubscribeFromMessages();
     set({
       ...initialState,
-      selectedUser: null, // Explicitly annul selectedUser to ensure it's cleared
+      selectedUser: null,
     });
-    console.log(`member logout has been triggered`);
   },
   memberCheck: async () => {
     try {
       const token = localStorage.getItem('lh_token');
       if (!token) {
-        console.log('memberCheck: No token found in localStorage');
         get().memberLogout();
         return;
       }
@@ -258,14 +249,12 @@ export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = 
       const currentDate = Number(new Date()) / 1000;
 
       if (exp < currentDate) {
-        console.log('memberCheck: Token expired');
         get().memberLogout();
         return;
       }
 
       const memberData = localStorage.getItem('lh_member');
       if (!memberData) {
-        console.log('memberCheck: No member data found in localStorage');
         get().memberLogout();
         return;
       }
@@ -320,13 +309,13 @@ export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = 
       await fetchAPI({
         method: 'patch',
         url: `members/${memberId}`,
-        data, // FormData object
+        data,
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      await get().memberRefreshMe(); // Refresh the member data after successful update
+      await get().memberRefreshMe();
       toast.success('Profile updated successfully!');
       return true;
     } catch (error: any) {
@@ -365,7 +354,7 @@ export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = 
         },
       });
 
-      get().memberRefreshMe(); // Refresh the member data after successful update
+      get().memberRefreshMe();
       toast.success('Password updated successfully!');
       return true;
     } catch (error: any) {
@@ -428,7 +417,6 @@ export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = 
         },
       });
 
-      // Clear token and logout
       localStorage.removeItem('lh_token');
       set({ loggedInMember: null });
 
@@ -474,9 +462,7 @@ export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = 
       console.error(`Socket connection error for user ${loggedInMember._id}: ${error.message}`);
     });
 
-    newSocket.on('disconnect', (reason: string) => {
-      console.log('Disconected:', reason);
-    });
+    newSocket.on('disconnect', (reason: string) => {});
 
     set({ socket: newSocket });
   },

@@ -38,6 +38,7 @@ const FormSchema = z.object({
 export function LoginForm() {
   const { memberLogin } = useStore((state) => state);
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
@@ -53,10 +54,14 @@ export function LoginForm() {
   const { setError } = form;
 
   const handleLogin = form.handleSubmit(async (values) => {
+    setIsLoading(true);
+
     const result = await memberLogin(values);
 
+    setIsLoading(false);
+
     if (result) {
-      toast.success('Logged in succesfully! Enjoy!');
+      toast.success('Logged in successfully! Enjoy!');
       navigate('/');
     } else {
       const { alert } = useStore.getState();
@@ -66,7 +71,6 @@ export function LoginForm() {
       });
     }
   });
-
   useEnter(handleLogin);
 
   return (
@@ -195,11 +199,10 @@ export function LoginForm() {
                 </Link>
               </div>
 
-              <Button type="submit" className="uppercase tracking-wide w-full">
-                Log In
+              <Button type="submit" className="uppercase tracking-wide w-full" disabled={isLoading}>
+                {isLoading ? 'Logging in...' : 'Log In'}
               </Button>
 
-              {/* Sign Up button that is shown only under 1300px */}
               <Button
                 asChild
                 variant="outline"

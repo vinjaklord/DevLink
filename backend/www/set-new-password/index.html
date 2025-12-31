@@ -19,29 +19,26 @@
     <script>
       'use strict';
 
-      // Token aus URL Parameter auslesen
+  
       const queryString = window.location.search;
       const urlParams = new URLSearchParams(queryString);
       const resetToken = urlParams.get('t');
 
-      // Zuweisungen ins DOM speichern
+ 
       const form = document.querySelector('form');
       const message = document.querySelector('#message');
       const input = document.querySelector('input[name=password]');
 
-      // Eventlistener für Form onSubmit
       form.addEventListener('submit', (event) => {
-        // Standardverhalten abbrechen
+  
         event.preventDefault();
 
-        // ev. Prüfungen
+    
         const password = input.value;
         if (password.length > 50 || password.length < 6) {
           return alert('Passwort muss 6 bis 50 Stellen lang sein');
         }
 
-        // Daten ans Backend senden
-        // Axios request config object bauen
         const config = {
           method: 'post',
           url: '/api/members/set-new-password',
@@ -57,7 +54,7 @@
             console.log(error);
             message.innerHTML = error.response.data.message;
           });
-        // Response auswerten
+
       });
     </script>
   </body>

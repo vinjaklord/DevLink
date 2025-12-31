@@ -61,7 +61,6 @@ const SidebarFriendRecommendations = ({ onAddFriend }: SidebarFriendRecommendati
 
       setFollowingIds((prev) => new Set(prev).add(userId));
 
-      // 🔥 Remove user from sidebar list (like carousel logic)
       setRecommendations((prev) => prev.filter((u) => u._id !== userId));
     } catch (error) {
       console.error('Error sending friend request:', error);
@@ -87,7 +86,6 @@ const SidebarFriendRecommendations = ({ onAddFriend }: SidebarFriendRecommendati
     );
   }
 
-  // 🔥 Hide component if all recommendations are gone
   if (!loading && recommendations.length === 0) {
     return null;
   }

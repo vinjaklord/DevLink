@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
 import { EyeIcon, EyeSlashIcon } from '@phosphor-icons/react';
-import Logo from '@/assets/react.svg'
+import Logo from '@/assets/react.svg';
 
 //Hooks
 import { useStore } from '@/hooks';
@@ -71,44 +71,38 @@ export function SignUpForm() {
   const { setError } = form;
 
   const handleSignup = form.handleSubmit(async (values) => {
-    // Prevent double submission
+    // prevent double submission
     if (isSubmitting) return;
 
     try {
       setIsSubmitting(true);
 
-      // Show optimistic loading toast
+      // optimistic loading toast
       const loadingToast = toast.loading('Creating your account...');
 
       const response = await memberSignup(values);
 
-      // Dismiss loading toast
       toast.dismiss(loadingToast);
 
       if (response === true) {
-        // Success!
         toast.success('Successfully signed up. Welcome!', {
           duration: 3000,
         });
 
-        // Small delay to let user see success message
         setTimeout(() => {
           navigate('/welcome-test');
         }, 500);
       } else {
-        // Signup returned false but didn't throw
         throw new Error('Signup failed');
       }
     } catch (error: any) {
       console.error('Signup error:', error);
 
-      // Get error message from various possible sources
       const errorMsg =
         error?.response?.data?.message || error?.message || 'An error occurred during signup';
 
       const lowerMsg = errorMsg.toLowerCase();
 
-      // Set specific field errors based on message content
       if (lowerMsg.includes('username')) {
         setError('username', {
           type: 'manual',
@@ -122,12 +116,11 @@ export function SignUpForm() {
         });
         toast.error('Email is already registered');
       } else if (lowerMsg.includes('transaction') || lowerMsg.includes('retry')) {
-        // Database transaction error - likely transient
+        // database transaction error - likely transient
         toast.error('Server is busy. Please try again in a moment.', {
           duration: 5000,
         });
       } else {
-        // Generic error
         setError('root', {
           type: 'manual',
           message: errorMsg,

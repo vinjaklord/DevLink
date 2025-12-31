@@ -3,11 +3,6 @@ import { Friend } from '../models/friends.js';
 import HttpError from '../models/http-error.js';
 import { getDistance } from 'geolib';
 
-/**
- * Get location-based member recommendations
- * Excludes: self, existing friends, pending sent/received requests
- * Returns max 20 users sorted by distance
- */
 const getRecommendations = async (req, res, next) => {
   try {
     if (!req.verifiedMember) {
@@ -16,32 +11,32 @@ const getRecommendations = async (req, res, next) => {
 
     const currentUserId = req.verifiedMember._id;
 
-    // Get current user's data
+    // current user's data
     const currentUser = await Member.findById(currentUserId);
 
     if (!currentUser) {
       throw new HttpError('User not found', 404);
     }
 
-    // Get user's friend relationships
+    // user's friend relationships
     const friendDoc = await Friend.findOne({ member: currentUserId });
 
-    // Build exclusion list: self + friends + pending requests (both sent and received)
+    // build exclusion list: self + friends + pending requests (both sent and received)
     const excludedIds = [currentUserId];
 
     if (friendDoc) {
-      // Add existing friends
+      // add existing friends
       if (friendDoc.friends?.length > 0) {
         excludedIds.push(...friendDoc.friends);
       }
 
-      // Add users who sent me requests (pending received)
+      // add users who sent me requests (pending received)
       if (friendDoc.pendingFriendRequests?.length > 0) {
         excludedIds.push(...friendDoc.pendingFriendRequests);
       }
     }
 
-    // Find users who received my friend requests (pending sent)
+    //find users who received my friend requests (pending sent)
     const sentRequestsDocs = await Friend.find({
       pendingFriendRequests: currentUserId,
     }).select('member');
@@ -49,13 +44,13 @@ const getRecommendations = async (req, res, next) => {
     const sentRequestsIds = sentRequestsDocs.map((doc) => doc.member);
     excludedIds.push(...sentRequestsIds);
 
-    // Check if user has location data
+    // check if user has location data
     if (
       !currentUser.location?.coordinates?.coordinates ||
       (currentUser.location.coordinates.coordinates[0] === 0 &&
         currentUser.location.coordinates.coordinates[1] === 0)
     ) {
-      // Fallback: return random users with valid location
+      // fallback: return random users with valid location
       const randomUsers = await Member.find({
         _id: { $nin: excludedIds },
         'location.coordinates.coordinates.0': { $exists: true, $ne: 0 },
@@ -65,7 +60,6 @@ const getRecommendations = async (req, res, next) => {
         .limit(20)
         .lean();
 
-      // Format response
       const formatted = randomUsers.map((user) => ({
         _id: user._id,
         username: user.username,
@@ -83,7 +77,7 @@ const getRecommendations = async (req, res, next) => {
 
     const [userLng, userLat] = currentUser.location.coordinates.coordinates;
 
-    // Use MongoDB geospatial query to find nearby users
+    // mongoDB geospatial query
     let nearbyUsers = await Member.aggregate([
       {
         $geoNear: {
@@ -92,7 +86,7 @@ const getRecommendations = async (req, res, next) => {
             coordinates: [userLng, userLat],
           },
           distanceField: 'distance',
-          maxDistance: 500000, // 500km radius (adjust as needed)
+          maxDistance: 500000, // 500km radius
           spherical: true,
           query: {
             _id: { $nin: excludedIds },
@@ -102,7 +96,6 @@ const getRecommendations = async (req, res, next) => {
       },
       {
         $match: {
-          // Additional filter to ensure valid coordinates
           'location.coordinates.coordinates.0': { $ne: 0 },
           'location.coordinates.coordinates.1': { $ne: 0 },
         },
@@ -122,21 +115,21 @@ const getRecommendations = async (req, res, next) => {
       },
     ]);
 
-    // If not enough nearby users found, add some random users to fill up to 20
+    // if not enough nearby users found, add some random users to fill up to 20
     if (nearbyUsers.length < 20) {
       const nearbyIds = nearbyUsers.map((u) => u._id);
       const additionalExcluded = [...excludedIds, ...nearbyIds];
 
       const additionalUsers = await Member.find({
         _id: { $nin: additionalExcluded },
-        'location.coordinates.coordinates.0': { $ne: 0 }, // Only users with valid location
+        'location.coordinates.coordinates.0': { $ne: 0 }, // only users with valid location
         'location.coordinates.coordinates.1': { $ne: 0 },
       })
         .select('username firstName lastName photo location')
         .limit(20 - nearbyUsers.length)
         .lean();
 
-      // Add distance for additional users (they're outside the radius)
+      // add distance for additional users (they're outside the radius)
       additionalUsers.forEach((user) => {
         if (user.location?.coordinates?.coordinates) {
           const [lng, lat] = user.location.coordinates.coordinates;
@@ -150,7 +143,6 @@ const getRecommendations = async (req, res, next) => {
       nearbyUsers = [...nearbyUsers, ...additionalUsers];
     }
 
-    // Remove distance field from response (users don't need to see exact meters)
     const recommendations = nearbyUsers.map((user) => ({
       _id: user._id,
       username: user.username,
@@ -170,9 +162,6 @@ const getRecommendations = async (req, res, next) => {
   }
 };
 
-/**
- * Update user location manually (optional endpoint)
- */
 const updateLocation = async (req, res, next) => {
   try {
     if (!req.verifiedMember) {

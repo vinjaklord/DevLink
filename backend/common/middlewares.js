@@ -48,23 +48,18 @@ async function scheduleNews() {
 
       await News.deleteMany({});
       await News.insertMany(limitedArticles, { ordered: false });
-
-      console.log('News updated successfully at', new Date().toISOString());
     } catch (error) {
       console.error('Error fetching API data | ', error.message);
     }
   });
 }
 
-// Middleware für Tokenüberprüfung
 const checkToken = async (req, res, next) => {
-  // Http Methode OPTIONS durchlassen
   if (req.method === 'OPTONS') {
     return next();
   }
 
   try {
-    // Header prüfen ob ein Authorization Token kommt
     const { authorization } = req.headers;
 
     if (!authorization) {
@@ -72,11 +67,8 @@ const checkToken = async (req, res, next) => {
     }
 
     const token = authorization.split(' ')[1];
-    // console.log('token', token);
 
-    // Token überprüfen (ist er abgelaufen? Kommt eine ID mit)
     const decoded = jwt.verify(token, process.env.JWT_KEY);
-    // console.log('decoded', decoded);
 
     const { id } = decoded;
 
@@ -86,10 +78,8 @@ const checkToken = async (req, res, next) => {
       throw new HttpError('Invalid token!', 401);
     }
 
-    // Request um den Eintrag verifiedMember erweitern
     req.verifiedMember = member;
 
-    //nur weiterschalten, wenn alles ok ist
     next();
   } catch (error) {
     return next(new HttpError(error, error.errorCode || 500));

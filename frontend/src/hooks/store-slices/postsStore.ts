@@ -196,7 +196,6 @@ const createPostsSlice: StateCreator<StoreState, [], [], PostsStore> = (set, get
         };
       });
 
-      // Sync with backend
       const response = await fetchAPI({
         method: 'put',
         url: `/posts/${postId}/likes`,
@@ -205,7 +204,7 @@ const createPostsSlice: StateCreator<StoreState, [], [], PostsStore> = (set, get
         },
       });
 
-      // Update with backend likes array
+      // update with backend likes array
       set((state) => ({
         friendsPosts: state.friendsPosts.map((post) =>
           post._id === postId ? { ...post, likes: response.data.likes } : post
@@ -220,7 +219,7 @@ const createPostsSlice: StateCreator<StoreState, [], [], PostsStore> = (set, get
     } catch (error: any) {
       console.error('Like error:', error);
       toast.error(error.response?.data?.message || 'Failed to toggle like');
-      // Revert optimistic update on error
+
       set((state) => {
         const revertLikes = (post: IPost) =>
           post._id === postId

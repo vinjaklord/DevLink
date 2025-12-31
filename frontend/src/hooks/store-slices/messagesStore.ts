@@ -107,7 +107,7 @@ export const createMessageSlice: StateCreator<StoreState, [], [], MessagesStore>
       });
       // Update open chat messages
       set({ messages: [...messages, response.data] });
-      // NEW: Update lastMessages for sender (real-time sidebar update)
+      // update lastMessages for sender (real-time sidebar update)
       set((state) => ({
         lastMessages: {
           ...state.lastMessages,
@@ -131,7 +131,7 @@ export const createMessageSlice: StateCreator<StoreState, [], [], MessagesStore>
     socket.on('newMessage', (newMessage: IMessage) => {
       const { loggedInMember, messages, lastMessages, selectedUser } = get();
 
-      // Always update lastMessages (for sidebar)
+      // always update lastMessages for sidebar
       const friendId =
         newMessage.senderId === loggedInMember?._id ? newMessage.recipientId : newMessage.senderId;
 

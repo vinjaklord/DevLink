@@ -17,16 +17,6 @@ export function SearchResults() {
   const [showFriends, setShowFriends] = useState(true);
   const [showAll, setShowAll] = useState(false);
 
-  // Fetch initial data on mount or query change
-  // useEffect(() => {
-  //   if (!query) return;
-
-  //   searchMembersFriends(query);
-  //   searchMembersWide(query, 10);
-  //   setShowAll(false);
-  //   setShowFriends(true);
-  // }, [query, searchMembersFriends, searchMembersWide]);
-
   useEffect(() => {
     if (!query) return;
     const debounce = setTimeout(() => {

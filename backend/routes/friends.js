@@ -13,7 +13,7 @@ import { checkToken } from '../common/middlewares.js';
 
 const router = Router();
 
-// All friend routes require authentication
+
 router.post('/add-friend/:id', checkToken, addFriend);
 
 router.get(

@@ -94,14 +94,9 @@ const useStore = create<StoreState>()(
               .then(() => {
                 state?.subscribeToMessages();
               })
-              .catch((err) => console.error('onRehydrateStorage: Fetch error:', err));
-          } else {
-            console.log('onRehydrateStorage: No selectedUser');
-          }
-        } else {
-          console.log('onRehydrateStorage: No loggedInMember, checking session');
-          state?.memberCheck();
-        }
+              .catch();
+          } 
+        } 
       },
     }
   )

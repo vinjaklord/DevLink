@@ -23,7 +23,7 @@ const RecommendationBar: FC<RecommendationBarProps> = ({ onAddFriend }) => {
     const fetchNews = async () => {
       try {
         const response = await fetchAPI({ url: 'members/news', method: 'GET' });
-        setNews(response.data.slice(0, 6)); // Show more since no internal scroll
+        setNews(response.data.slice(0, 6)); 
       } catch (error) {
         console.error('Failed to fetch news:', error);
       } finally {
@@ -92,7 +92,7 @@ const RecommendationBar: FC<RecommendationBarProps> = ({ onAddFriend }) => {
                   rel="noopener noreferrer"
                   className="group flex items-start gap-2 py-2.5 px-4 -mx-3 rounded-xl transition-all hover:bg-accent/70"
                 >
-                  {/* Favicon / Number — perfectly aligned */}
+                  {/* Favicon / Number */}
                   <div className="flex-shrink-0 w-5 h-5 mt-0.5">
                     {getFaviconUrl(item.url) ? (
                       <img
@@ -108,7 +108,7 @@ const RecommendationBar: FC<RecommendationBarProps> = ({ onAddFriend }) => {
                     )}
                   </div>
 
-                  {/* Text Content — now perfectly aligned with padding */}
+                  {/* Text Content */}
                   <div className="flex-1 min-w-0">
                     <h4 className="text-sm font-medium text-foreground/95 line-clamp-2 leading-tight group-hover:text-primary transition-colors pr-6">
                       {item.title}
@@ -119,7 +119,7 @@ const RecommendationBar: FC<RecommendationBarProps> = ({ onAddFriend }) => {
                     </div>
                   </div>
 
-                  {/* External link icon — aligned to the right */}
+                  {/* External link icon */}
                   <ExternalLink className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 mt-0.5" />
                 </a>
               ))

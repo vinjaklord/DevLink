@@ -50,10 +50,10 @@ export default function SearchBar({
   }, [query, searchMembersFriends]);
 
   const handleSeeAll = () => {
-    // Optionally store query in session/localStorage
+
     sessionStorage.setItem('searchQuery', query);
 
-    // Redirect to full search results page
+
     navigate(`/results?query=${encodeURIComponent(query)}`);
     setShowDropdown(false);
   };
