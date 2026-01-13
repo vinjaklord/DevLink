@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import { getZodiac, getAge } from '../common/index.js';
 import { Friend } from './friends.js';
 
 const Schema = mongoose.Schema;
@@ -16,7 +15,6 @@ photoSchema.pre('save', function (next) {
   }
   next();
 });
-
 
 const locationSchema = new Schema({
   city: { type: String },
@@ -43,11 +41,10 @@ const membersSchema = new Schema(
     lastName: { type: String, required: true },
     isAdmin: { type: Boolean, default: false },
     photo: { type: photoSchema, required: false },
-    location: { type: locationSchema, required: false }, 
+    location: { type: locationSchema, required: false },
   },
   { timestamps: true }
 );
-
 
 membersSchema.index({ 'location.coordinates': '2dsphere' });
 
@@ -89,22 +86,18 @@ membersSchema.post('findOneAndDelete', async (deletedMember) => {
     const { Comment } = await import('./comments.js');
 
     try {
-    
       await Friend.deleteOne({ member: deletedMember._id });
 
-     
       await Friend.updateMany(
         { friends: deletedMember._id },
         { $pull: { friends: deletedMember._id } }
       );
 
-    
       await Friend.updateMany(
         { pendingFriendRequests: deletedMember._id },
         { $pull: { pendingFriendRequests: deletedMember._id } }
       );
 
-   
       await Post.deleteMany({ author: deletedMember._id });
       await Comment.deleteMany({ author: deletedMember._id });
 

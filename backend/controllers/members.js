@@ -15,7 +15,7 @@ import HttpError from '../models/http-error.js';
 
 import { handleValidationErrors } from '../common/index.js';
 
-import { getHash, deleteFile, checkHash, getToken, getGeoDistance } from '../common/index.js';
+import { getHash, checkHash, getToken } from '../common/index.js';
 
 ///////////////////////////////////////////////////////////////////////////////////////
 

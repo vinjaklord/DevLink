@@ -5,6 +5,14 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  // ADD THIS SECTION:
+  server: {
+    host: true, // Allows access from outside the container
+    port: 5173,
+    watch: {
+      usePolling: true, // Fixes hot-reload issues in Docker
+    },
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -16,7 +24,6 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (id.includes('node_modules')) {
-            // Split large libraries into their own chunks
             if (id.includes('react') || id.includes('react-dom')) {
               return 'react-vendor';
             }
@@ -26,7 +33,6 @@ export default defineConfig({
             if (id.includes('lucide-react')) {
               return 'icons-vendor';
             }
-            // Everything else from node_modules goes into vendor
             return 'vendor';
           }
         },

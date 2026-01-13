@@ -1,7 +1,6 @@
 import * as dotenv from 'dotenv';
 import fs from 'fs';
-import cloudinary from 'cloudinary';
-import axios from 'axios';
+
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
