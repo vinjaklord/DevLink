@@ -36,16 +36,8 @@ describe('SignUpForm', () => {
     (useStore as unknown as jest.Mock).mockReturnValue(mockStoreValue);
   });
 
-<<<<<<< HEAD
   afterEach(() => {
     jest.useRealTimers(); // Clean up after each test
-=======
-    (useStore as unknown as jest.Mock).mockReturnValue({
-      memberSignup: mockMemberSignup,
-    });
-
-    jest.spyOn(router, 'useNavigate').mockReturnValue(mockNavigate);
->>>>>>> e14aa69ba2f38bd6f1722bac832f11ec887ade37
   });
 
   describe('Rendering', () => {
