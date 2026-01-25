@@ -3,10 +3,10 @@ import axios from 'axios';
 const fetchAPI = (options = {}) => {
   const defaultConfig = {
     method: 'get',
-    timeout: 10000,
-    data: null,
+    timeout: 5000,
+    data: {},
     url: '/',
-    baseURL: 'https://devlink-backend-ra01.onrender.com/',
+    baseURL: import.meta.env.VITE_BACKEND_BASEURL,
   };
 
   const axiosConfig = {
@@ -17,4 +17,4 @@ const fetchAPI = (options = {}) => {
   return axios(axiosConfig);
 };
 
-export default fetchAPI;
+export { fetchAPI };
