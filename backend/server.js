@@ -16,7 +16,14 @@ import { app, server } from './common/socket.js';
 const PORT = process.env.PORT || 8000;
 const CONNECTION_STRING = `mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@lh-remake.johjfoh.mongodb.net/`;
 
-app.use(cors());
+const corsOptions = {
+  // Allow your local machine AND your production frontend
+  origin: ['http://localhost:5173', 'https://dev-link-ruby.vercel.app/'],
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 app.use(
   helmet.contentSecurityPolicy({
