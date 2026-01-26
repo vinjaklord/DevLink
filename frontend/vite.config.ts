@@ -5,12 +5,11 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  // ADD THIS SECTION:
   server: {
-    host: true, // Allows access from outside the container
+    host: true,
     port: 5173,
     watch: {
-      usePolling: true, // Fixes hot-reload issues in Docker
+      usePolling: true,
     },
   },
   resolve: {
@@ -18,20 +17,26 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  // Added this to ensure Sonner and other UI libs are ready
+  optimizeDeps: {
+    include: ['sonner', 'react', 'react-dom'],
+  },
   build: {
     outDir: 'dist',
+    target: 'esnext', // Ensure modern JS execution order
     rollupOptions: {
       output: {
+        // Inside vite.config.js -> build -> rollupOptions -> output
         manualChunks(id) {
           if (id.includes('node_modules')) {
-            if (id.includes('react') || id.includes('react-dom')) {
-              return 'react-vendor';
-            }
-            if (id.includes('react-router')) {
-              return 'router-vendor';
-            }
-            if (id.includes('lucide-react')) {
-              return 'icons-vendor';
+            // Grouping the "Big Four" that need to talk to each other immediately
+            if (
+              id.includes('react') ||
+              id.includes('react-dom') ||
+              id.includes('sonner') ||
+              id.includes('zustand')
+            ) {
+              return 'core-vendor';
             }
             return 'vendor';
           }
