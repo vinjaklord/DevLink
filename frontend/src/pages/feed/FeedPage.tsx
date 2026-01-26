@@ -2,7 +2,7 @@ import FriendsSidebar from '@/Components/Feed/FriendsSidebar/FriendsBar';
 import { PostFeed } from '@/Components/Posts/PostsFeed';
 import { useWindowWidth } from '@/hooks';
 import RecommendationBar from '@/Components/Feed/FriendsSidebar/RecommendationBar';
-import fetchAPI from '@/utils';
+import { fetchAPI } from '@/utils';
 
 export default function FeedPage() {
   const isWideEnough = useWindowWidth(1100);

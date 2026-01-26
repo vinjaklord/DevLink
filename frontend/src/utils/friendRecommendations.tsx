@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import fetchAPI from '.';
+import { fetchAPI } from '.';
 import { useTranslation } from 'react-i18next';
 
 interface RecommendedUser {
@@ -233,7 +233,7 @@ const FriendRecommendations = ({ onAddFriend }: FriendRecommendationsProps) => {
                       : 'w-1.5 bg-muted/50'
                   }`}
                 />
-              )
+              ),
             )}
           </div>
         )}

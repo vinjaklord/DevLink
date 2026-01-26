@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import SidebarFriendRecommendations from '@/utils/sidebarRecommendations';
 import { Newspaper, ExternalLink, Globe } from 'lucide-react';
-import fetchAPI from '@/utils';
+import { fetchAPI } from '@/utils';
 import type { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 

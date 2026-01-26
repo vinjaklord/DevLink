@@ -1,6 +1,6 @@
 import type { IMember } from '../../models/member.model.ts';
 import type { IMessage } from '../../models/messages.model.ts';
-import fetchAPI from '../../utils/index.ts';
+import { fetchAPI } from '@/utils/index.ts';
 import { toast } from 'sonner';
 import type { StateCreator } from 'zustand';
 import type { StoreState } from '../useStore.ts';
@@ -32,7 +32,7 @@ const initialState = {
 
 export const createMessageSlice: StateCreator<StoreState, [], [], MessagesStore> = (
   set,
-  get
+  get,
 ): MessagesStore => ({
   ...initialState,
 

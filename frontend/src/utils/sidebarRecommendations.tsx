@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { UserPlus } from 'lucide-react';
-import fetchAPI from '.';
+import { fetchAPI } from '.';
 import { useTranslation } from 'react-i18next';
 
 interface RecommendedUser {

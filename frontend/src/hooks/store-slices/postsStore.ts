@@ -1,5 +1,5 @@
 import type { IPost } from '@/models/posts.model';
-import fetchAPI from '@/utils';
+import { fetchAPI } from '@/utils';
 import { toast } from 'sonner';
 import type { StateCreator } from 'zustand';
 import type { StoreState } from '../useStore';
@@ -207,7 +207,7 @@ const createPostsSlice: StateCreator<StoreState, [], [], PostsStore> = (set, get
       // update with backend likes array
       set((state) => ({
         friendsPosts: state.friendsPosts.map((post) =>
-          post._id === postId ? { ...post, likes: response.data.likes } : post
+          post._id === postId ? { ...post, likes: response.data.likes } : post,
         ),
         currentPost:
           state.currentPost?._id === postId
@@ -253,7 +253,7 @@ const createPostsSlice: StateCreator<StoreState, [], [], PostsStore> = (set, get
         friendsPosts: state.friendsPosts.map((post) =>
           post._id === postId
             ? { ...post, comments: [...(state.currentPost?.comments ?? []), response.data.comment] }
-            : post
+            : post,
         ),
         currentPost:
           state.currentPost?._id === postId

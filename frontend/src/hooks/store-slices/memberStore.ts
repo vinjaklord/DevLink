@@ -8,7 +8,7 @@ import type {
   PasswordData,
 } from '../../models/member.model.ts';
 import type { Alert, DecodedToken, ApiResponse } from '@/models/helper.model.ts';
-import fetchAPI from '../../utils/index.ts';
+import { fetchAPI } from '@/utils/index.ts';
 import { jwtDecode } from 'jwt-decode';
 import { toast } from 'sonner';
 import type { StateCreator } from 'zustand';
@@ -72,7 +72,7 @@ const initialState = {
 
 export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = (
   set,
-  get
+  get,
 ): MemberStore => ({
   member: defaultMember,
   friendsSearchResults: [],
@@ -462,7 +462,7 @@ export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = 
       console.error(`Socket connection error for user ${loggedInMember._id}: ${error.message}`);
     });
 
-    newSocket.on('disconnect', (reason: string) => {});
+    newSocket.on('disconnect', () => {});
 
     set({ socket: newSocket });
   },

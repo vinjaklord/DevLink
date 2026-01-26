@@ -1,5 +1,4 @@
-
-import fetchAPI from '../../utils/index.ts';
+import { fetchAPI } from '@/utils/index.ts';
 import { toast } from 'sonner';
 import type { StateCreator } from 'zustand';
 import type { StoreState } from '../useStore.ts';
@@ -24,7 +23,7 @@ const initialState = {
 
 export const createNotificationSlice: StateCreator<StoreState, [], [], NotificationsStore> = (
   set,
-  get
+  get,
 ) => ({
   ...initialState,
 
@@ -63,9 +62,7 @@ export const createNotificationSlice: StateCreator<StoreState, [], [], Notificat
       });
 
       set((state) => ({
-        notifications: state.notifications.map((n) =>
-          n._id === id ? { ...n, isRead: true } : n
-        ),
+        notifications: state.notifications.map((n) => (n._id === id ? { ...n, isRead: true } : n)),
         unreadCount: state.notifications.filter((n) => n._id !== id && !n.isRead).length,
       }));
     } catch (error: any) {
