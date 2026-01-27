@@ -43,7 +43,7 @@ const membersSchema = new Schema(
     photo: { type: photoSchema, required: false },
     location: { type: locationSchema, required: false },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 membersSchema.index({ 'location.coordinates': '2dsphere' });
@@ -58,7 +58,7 @@ const passwordsSchema = new Schema(
     },
     password: { type: String, required: true },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const resettokensSchema = new Schema(
@@ -66,19 +66,8 @@ const resettokensSchema = new Schema(
     token: { type: String, required: true },
     member: { type: mongoose.Types.ObjectId, required: true, ref: 'Member' },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
-
-membersSchema.methods.getAge = function () {
-  return getAge(this.birthYear, this.birthMonth, this.birthDay);
-};
-
-membersSchema.pre('save', function (next) {
-  const member = this;
-  member.age = getAge(this.birthYear, this.birthMonth, this.birthDay);
-  member.zodiac = getZodiac(this.birthYear, this.birthMonth, this.birthDay);
-  next();
-});
 
 membersSchema.post('findOneAndDelete', async (deletedMember) => {
   if (deletedMember) {
@@ -90,12 +79,12 @@ membersSchema.post('findOneAndDelete', async (deletedMember) => {
 
       await Friend.updateMany(
         { friends: deletedMember._id },
-        { $pull: { friends: deletedMember._id } }
+        { $pull: { friends: deletedMember._id } },
       );
 
       await Friend.updateMany(
         { pendingFriendRequests: deletedMember._id },
-        { $pull: { pendingFriendRequests: deletedMember._id } }
+        { $pull: { pendingFriendRequests: deletedMember._id } },
       );
 
       await Post.deleteMany({ author: deletedMember._id });
