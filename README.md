@@ -14,6 +14,8 @@ To explore the platform without creating an account, please use the following de
 * **Username:** `aronpozsar`
 * **Password:** `123123`
 
+In case of loading errors refresh the page, it is a hosting issue.
+
 ---
 
 ## 🎯 Project Overview
