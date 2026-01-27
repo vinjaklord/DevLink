@@ -91,8 +91,7 @@ export function LoginForm() {
           </div>
           <h2 className="text-2xl font-semibold mb-3">{t('dontHaveAccount')}</h2>
           <p className="text-sm mb-8 leading-relaxed">
-            Banjo tote bag bicycle rights, High Life sartorial cray craft beer whatever street art
-            fap.
+            The dedicated workspace for developers to network, share snippets, and grow together.
           </p>
           <Button asChild variant="outline" className="px-6">
             <Link to="/signup">{t('signup')}</Link>
@@ -104,7 +103,7 @@ export function LoginForm() {
       <Card
         className={clsx(
           'absolute top-1/2 -translate-y-1/2 w-[450px] max-[1300px]:w-[550px] max-[700px]:w-full shadow-xl rounded-md transition-all duration-700 ease-in-out',
-          'right-[10%] max-[1300px]:right-0 max-[1300px]:left-1/2 max-[1300px]:-translate-x-1/2'
+          'right-[10%] max-[1300px]:right-0 max-[1300px]:left-1/2 max-[1300px]:-translate-x-1/2',
         )}
       >
         <CardHeader className="pb-2">
@@ -134,7 +133,7 @@ export function LoginForm() {
                         placeholder={t('enterUsername')}
                         className={clsx(
                           (form.formState.errors.username || form.formState.errors.root) &&
-                            'border border-red-500 shake'
+                            'border border-red-500 shake',
                         )}
                         {...field}
                       />
@@ -165,7 +164,7 @@ export function LoginForm() {
                           placeholder={t('enterPassword')}
                           className={clsx(
                             (form.formState.errors.password || form.formState.errors.root) &&
-                              'border border-red-500 shake'
+                              'border border-red-500 shake',
                           )}
                           {...field}
                         />

@@ -128,8 +128,7 @@ export function SignUpForm() {
           </div>
           <h2 className="text-2xl font-semibold mb-3">{t('alreadyHaveAccount')}</h2>
           <p className="text-sm mb-8 leading-relaxed">
-            Banjo tote bag bicycle rights, High Life sartorial cray craft beer whatever street art
-            fap.
+            Connect with a global community of developers to share code, insights, and innovation.
           </p>
           <Button asChild variant="outline" className="px-6">
             <Link to="/login">{t('login')}</Link>
@@ -140,7 +139,7 @@ export function SignUpForm() {
       <Card
         className={clsx(
           'absolute top-1/2 -translate-y-1/2 w-[450px] shadow-xl rounded-md transition-all duration-700 ease-in-out',
-          'left-[10%] max-[1300px]:left-1/2 max-[1300px]:-translate-x-1/2 max-[1300px]:w-[550px] max-[700px]:w-full'
+          'left-[10%] max-[1300px]:left-1/2 max-[1300px]:-translate-x-1/2 max-[1300px]:w-[550px] max-[700px]:w-full',
         )}
       >
         <CardContent>
@@ -161,7 +160,7 @@ export function SignUpForm() {
                         disabled={isSubmitting}
                         className={clsx(
                           'pr-10',
-                          form.formState.errors.firstName && 'border-red-500 shake'
+                          form.formState.errors.firstName && 'border-red-500 shake',
                         )}
                         {...field}
                       />
@@ -185,7 +184,7 @@ export function SignUpForm() {
                         disabled={isSubmitting}
                         className={clsx(
                           'pr-10',
-                          form.formState.errors.lastName && 'border-red-500 shake'
+                          form.formState.errors.lastName && 'border-red-500 shake',
                         )}
                         {...field}
                       />
@@ -209,7 +208,7 @@ export function SignUpForm() {
                         disabled={isSubmitting}
                         className={clsx(
                           'pr-10',
-                          form.formState.errors.username && 'border-red-500 shake'
+                          form.formState.errors.username && 'border-red-500 shake',
                         )}
                         {...field}
                       />
@@ -233,7 +232,7 @@ export function SignUpForm() {
                         disabled={isSubmitting}
                         className={clsx(
                           'pr-10',
-                          form.formState.errors.email && 'border-red-500 shake'
+                          form.formState.errors.email && 'border-red-500 shake',
                         )}
                         {...field}
                       />
@@ -259,7 +258,7 @@ export function SignUpForm() {
                           disabled={isSubmitting}
                           className={clsx(
                             'pr-10',
-                            form.formState.errors.password && 'border-red-500 shake'
+                            form.formState.errors.password && 'border-red-500 shake',
                           )}
                           {...field}
                         />
@@ -300,7 +299,7 @@ export function SignUpForm() {
                           disabled={isSubmitting}
                           className={clsx(
                             'pr-10',
-                            form.formState.errors.confirmPassword && 'border-red-500 shake'
+                            form.formState.errors.confirmPassword && 'border-red-500 shake',
                           )}
                           {...field}
                         />
