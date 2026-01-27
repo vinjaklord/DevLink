@@ -3,6 +3,19 @@
 > **A Specialized Social Media Platform for Developers**
 > A full-stack networking environment built to bridge the gap between social interaction and technical collaboration.
 
+## 🚀 Live Demo & Access
+
+**Experience the platform live:** [DevLink - Live App](https://dev-link-ruby.vercel.app/login)
+
+### **Recruiter / Guest Access**
+
+To explore the platform without creating an account, please use the following demonstration credentials:
+
+* **Username:** `aronpozsar`
+* **Password:** `123123`
+
+---
+
 ## 🎯 Project Overview
 
 DevLink is a dedicated space where developers can move beyond simple networking. It addresses the need for a platform that understands technical content, allowing users to share code snippets as easily as text or images, fostering a community focused on peer support and professional growth.
