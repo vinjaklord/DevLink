@@ -10,6 +10,7 @@
 ### **Recruiter / Guest Access**
 
 To explore the platform without creating an account, please use the following demonstration credentials:
+
 **In case of loading errors refresh the page, it is a hosting issue.**
 
 * **Username:** `aronpozsar`
