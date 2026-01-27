@@ -72,9 +72,9 @@ export function SignUpForm() {
   const handleSignup = form.handleSubmit(async (values) => {
     if (isSubmitting) return;
 
+    const loadingToast = toast.loading(t('creatingAccount'));
     try {
       setIsSubmitting(true);
-      const loadingToast = toast.loading(t('creatingAccount'));
 
       const response = await memberSignup(values);
       toast.dismiss(loadingToast);
@@ -91,6 +91,7 @@ export function SignUpForm() {
     } catch (error: any) {
       const errorMsg = error?.response?.data?.message || error?.message || t('signupFailed');
       const lowerMsg = errorMsg.toLowerCase();
+      toast.dismiss(loadingToast);
 
       if (lowerMsg.includes('username')) {
         setError('username', { type: 'manual', message: errorMsg });
