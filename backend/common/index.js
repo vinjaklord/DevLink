@@ -6,6 +6,8 @@ import jwt from 'jsonwebtoken';
 
 import HttpError from '../models/http-error.js';
 
+const SALT_ROUNDS = 10;
+
 dotenv.config();
 
 const getHash = (plainText) => {
@@ -30,7 +32,7 @@ const getToken = (id) => {
       id,
     },
     process.env.JWT_KEY,
-    { expiresIn: '7d' }
+    { expiresIn: '7d' },
   );
 
   return token;
