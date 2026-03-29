@@ -172,7 +172,7 @@ export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = 
           type: 'error',
           title: 'Signup Failed',
           description: error?.response?.data?.message || 'Something went wrong.',
-          duration: 5000,
+          duration: 10000,
         },
       });
       throw error;

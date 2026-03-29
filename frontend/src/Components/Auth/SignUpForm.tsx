@@ -100,7 +100,7 @@ export function SignUpForm() {
         setError('email', { type: 'manual', message: errorMsg });
         toast.error(t('This Email is taken!'));
       } else if (lowerMsg.includes('transaction') || lowerMsg.includes('retry')) {
-        toast.error(t('serverBusy'), { duration: 5000 });
+        toast.error(t('serverBusy'), { duration: 10000 });
       } else {
         setError('root', { type: 'manual', message: errorMsg });
         toast.error(errorMsg);

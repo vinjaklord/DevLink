@@ -3,7 +3,7 @@ import axios from 'axios';
 const fetchAPI = (options = {}) => {
   const defaultConfig = {
     method: 'get',
-    timeout: 5000,
+    timeout: 10000,
     data: {},
     url: '/',
     baseURL: import.meta.env.VITE_BACKEND_BASEURL,
