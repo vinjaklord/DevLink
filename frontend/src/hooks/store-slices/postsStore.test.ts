@@ -49,7 +49,6 @@ describe('Posts Slice', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    // Reliable localStorage mock
     vi.spyOn(Storage.prototype, 'getItem').mockImplementation((key) =>
       key === 'lh_token' ? 'fake-token' : null,
     );
@@ -59,7 +58,6 @@ describe('Posts Slice', () => {
     storeInstance = create<StoreState>((set, get, api) => ({
       ...(createPostsSlice(set, get, api) as any),
 
-      // Required cross-slice mocks
       loggedInMember: { _id: 'currentUser123' } as any,
       messages: [],
     }));
@@ -120,7 +118,7 @@ describe('Posts Slice', () => {
 
   describe('fetchPostById', () => {
     it('should fetch and set current post', async () => {
-      const mockPost: IPost = { _id: 'post123', content: 'Test post' } as IPost;
+      const mockPost = { _id: 'post123', content: 'Test post' } as unknown as IPost;
       mockFetchAPI.mockResolvedValueOnce(mockAxiosResponse(mockPost));
 
       await useStore.fetchPostById('post123');
@@ -132,7 +130,7 @@ describe('Posts Slice', () => {
 
   describe('fetchMyPosts', () => {
     it('should fetch and set my posts', async () => {
-      const mockPosts: IPost[] = [{ _id: 'p1' }, { _id: 'p2' }] as IPost[];
+      const mockPosts = [{ _id: 'p1' }, { _id: 'p2' }] as unknown as IPost[];
       mockFetchAPI.mockResolvedValueOnce(mockAxiosResponse(mockPosts));
 
       await useStore.fetchMyPosts();
@@ -144,7 +142,7 @@ describe('Posts Slice', () => {
 
   describe('uploadPost', () => {
     it('should upload post and add it to allPosts', async () => {
-      const newPost: IPost = { _id: 'new123', content: 'New post' } as IPost;
+      const newPost = { _id: 'new123', content: 'New post' } as unknown as IPost;
       mockFetchAPI.mockResolvedValueOnce(mockAxiosResponse(newPost));
 
       const success = await useStore.uploadPost({ content: 'New post' } as any);
@@ -156,10 +154,10 @@ describe('Posts Slice', () => {
 
   describe('toggleLike', () => {
     it('should optimistically toggle like and then update from backend', async () => {
-      const initialPost: IPost = {
+      const initialPost = {
         _id: 'post123',
         likes: ['otherUser'],
-      } as IPost;
+      } as unknown as IPost;
 
       useStore.setState({ friendsPosts: [initialPost] } as any);
 

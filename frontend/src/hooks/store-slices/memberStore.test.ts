@@ -28,10 +28,17 @@ vi.mock('socket.io-client', () => ({
   }),
 }));
 
-// Type-safe mocked functions - using vi.mocked like in your friends test
 const mockFetchAPI = vi.mocked(fetchAPI);
-const mockJwtDecode = vi.mocked(jwtDecode); // direct import
-const mockIO = vi.mocked(io); // direct import from mocked module
+const mockJwtDecode = vi.mocked(jwtDecode);
+const mockIO = vi.mocked(io);
+
+const mockAxiosResponse = (data: any) => ({
+  data,
+  status: 200,
+  statusText: 'OK',
+  headers: {},
+  config: {} as any,
+});
 
 describe('Member Slice', () => {
   let useStore: any;
@@ -39,19 +46,15 @@ describe('Member Slice', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    // Set default token so most tests don't fail on "Not logged in"
     localStorage.setItem('lh_token', 'fake-token');
 
     useStore = create<StoreState>((set, get, store) => ({
-      // Same pattern as your friendsStore test
       ...(createMemberSlice(set, get, store) as any),
 
-      // Mock cross-slice methods called inside member slice
       subscribeToMessages: vi.fn(),
       unsubscribeFromMessages: vi.fn(),
       subscribeToNotifications: vi.fn(),
 
-      // Dummy states to prevent runtime errors
       selectedUser: null,
       memberPosts: [],
       relationshipStatus: 'none',
@@ -86,8 +89,8 @@ describe('Member Slice', () => {
       mockJwtDecode.mockReturnValue(mockDecoded);
 
       mockFetchAPI
-        .mockResolvedValueOnce({ status: 200, data: mockToken }) // login endpoint
-        .mockResolvedValueOnce({ data: mockMember }); // fetch member by id
+        .mockResolvedValueOnce(mockAxiosResponse(mockToken))
+        .mockResolvedValueOnce(mockAxiosResponse(mockMember));
 
       const success = await useStore.getState().memberLogin({
         username: 'testuser',
@@ -119,6 +122,7 @@ describe('Member Slice', () => {
     expect(state.token).toBeNull();
     expect(state.loggedInMember).toBeNull();
   });
+
   describe('editProfile', () => {
     it('should update profile and refresh member data', async () => {
       const mockUpdatedMember = { _id: '123', username: 'updateduser' };
@@ -129,8 +133,8 @@ describe('Member Slice', () => {
       });
 
       mockFetchAPI
-        .mockResolvedValueOnce({}) // patch /members/:id
-        .mockResolvedValueOnce({ data: mockUpdatedMember }); // memberRefreshMe
+        .mockResolvedValueOnce(mockAxiosResponse({}))
+        .mockResolvedValueOnce(mockAxiosResponse(mockUpdatedMember));
 
       const success = await useStore.getState().editProfile({ firstName: 'NewName' });
 
