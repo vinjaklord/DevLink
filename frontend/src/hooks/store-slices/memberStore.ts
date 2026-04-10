@@ -435,11 +435,15 @@ export const createMemberSlice: StateCreator<StoreState, [], [], MemberStore> = 
     }
 
     const newSocket = io(BASE_URL, {
-      transports: ['websocket'],
+      transports: ['websocket', 'polling'],
       query: { userId: loggedInMember._id },
       reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
+      //The Vercel free tier server goes to sleep due to inactivity causing the WS connections to die.
+      //Rerender takes its time to restart so the WS usually would totaly give up after 5 retries 
+      //Hence ... INFINITY 
+      reconnectionAttempts: Infinity, 
+      reconnectionDelay: 2000,
+      reconnectionDelayMax: 30000,
     });
 
     newSocket.on('connect', () => {
