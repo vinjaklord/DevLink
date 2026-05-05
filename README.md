@@ -98,4 +98,4 @@ The project consists of:
 - MongoDB for flexible data modeling
 - WebSockets for real-time communication (chat, live updates)
 
-*This project was developed with a focus on ***Technical Collaboration** special thanks to @aronpozsar
+*This project was developed with a focus on ***Technical Collaboration** special thanks to @AndBucketDrew
